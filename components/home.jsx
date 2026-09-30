@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const PHOTOS = {
-  main: "/img1.jpg",
+  main: "/img17.jpg",
   upper: "/img8.png",
   lower: "/img3.jpg",
   farRight: "/img4.jpg",
@@ -138,7 +138,7 @@ function Hero() {
         />
       </motion.div>
 
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-green-700 via-green-700/85 to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-green-700 via-green-700/35 to-transparent" />
 
       <motion.div
         className="relative z-20 mx-auto w-full max-w-7xl px-6 md:px-12 lg:px-20"
@@ -149,7 +149,7 @@ function Hero() {
             Mt. KIlimanjaro Child Development Programme
           </p>
 
-          <h1 className="hero-serif text-[clamp(2.4rem,6.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white">
+          <h1 className="text-[clamp(2.4rem,6.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white">
             Every child deserves the chance to dream.
           </h1>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Icon = {
@@ -335,20 +335,34 @@ export default function Navbar() {
   const [mobileDropdown, setMobileDropdown] = useState(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const scrollStopTimer = useRef(null);
 
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      const goingDown = y > lastScrollY;
+//   useEffect(() => {
+//     const onScroll = () => {
+//       const y = window.scrollY;
+//       const goingDown = y > lastScrollY;
 
-      setHidden(goingDown && y > 80);
-      if (goingDown) setOpenDropdown(null);
-      setLastScrollY(y);
-    };
+//       if (goingDown && y > 80) {
+//         setHidden(true);
+//         setOpenDropdown(null);
+//       } else {
+//         setHidden(false);
+//       }
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [lastScrollY]);
+//       setLastScrollY(y);
+
+//       clearTimeout(scrollStopTimer.current);
+//       scrollStopTimer.current = setTimeout(() => {
+//         setHidden(false);
+//       }, 100);
+//     };
+
+//     window.addEventListener("scroll", onScroll, { passive: true });
+//     return () => {
+//       window.removeEventListener("scroll", onScroll);
+//       clearTimeout(scrollStopTimer.current);
+//     };
+//   }, [lastScrollY]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -367,7 +381,42 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-50 w-full font-[Montserrat] transition-transform duration-300 ease-in-out ${headerTranslate}`}
     >
-      <nav className="border-b border-green-700/10 bg-[#FBF7F0]">
+      <nav className="bg-[#FBF7F0]">
+        <div className="hidden border-b border-green-700/10 lg:block">
+          <div className="mx-auto flex max-w-[1560px] items-center justify-between gap-6 px-4 py-2.5 lg:px-14">
+            <div className="flex flex-wrap items-center gap-x-7 gap-y-1 text-[0.72rem] font-medium tracking-[0.02em] text-[#4A4A42]">
+              {CONTACT_LINES.map((line) => (
+                <ContactLine
+                  key={line.label}
+                  icon={line.Icon}
+                  label={line.label}
+                  href={line.href}
+                  wrapClass="text-[#4A4A42] hover:text-green-700"
+                  iconClass="h-3.5 w-3.5 text-green-700"
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3.5">
+              <span className="text-[0.62rem] font-bold uppercase tracking-[0.22em] text-[#4A4A42]/50">
+                Follow
+              </span>
+              {SOCIALS.map(({ label, href, Icon: SocialIcon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="grid h-7 w-7 place-items-center rounded-full text-[#4A4A42]/70 transition-all duration-200 hover:bg-green-700/8 hover:text-green-700"
+                >
+                  <SocialIcon className="h-3.5 w-3.5" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="mx-auto flex max-w-[1560px] items-center justify-between gap-2 px-4 py-2 lg:px-14">
           <Link to="/" className="flex flex-shrink-0 items-center gap-3">
             <img src="/mkcdp.png" alt="MKCDP Logo" className="h-12 w-auto lg:h-14" />
