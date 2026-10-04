@@ -76,7 +76,7 @@ const QUICK_LINKS = [
   { label: "Our Work", href: "/our-work" },
   { label: "Program Impact", href: "/program-impact" },
   { label: "News and Stories", href: "/news-and-stories" },
-  { label: "Publication", href: "/publication" },
+  { label: "Take Action", href: "/take-action" },
 ];
 
 const PROGRAMS = [

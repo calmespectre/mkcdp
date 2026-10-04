@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const PHOTOS = {
-  main: "/img17.jpg",
+  main: "/img1.jpg",
   upper: "/img8.png",
   lower: "/img3.jpg",
   farRight: "/img4.jpg",
   lowerLeft: "/img5.jpg",
 };
 
-const VIDEO_POSTER = "image.png";
+const VIDEO_POSTER = "/imageC.png";
 const VIDEO_SRC = "Inkisanjani-Digital-Resource-Centre-Documentary-2024.mp4";
 
 const formatTime = (seconds) => {
@@ -125,7 +125,7 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative flex h-[calc(100dvh-68px)] w-full items-center overflow-hidden sm:h-[calc(100dvh-108px)] lg:h-[calc(100dvh-128px)]"
+      className="relative flex h-[calc(110dvh-68px)] w-full items-center overflow-hidden sm:h-[calc(110dvh-108px)] lg:h-[calc(110dvh-128px)]"
     >
       <motion.div
         className="absolute inset-0"
@@ -136,9 +136,17 @@ function Hero() {
           alt="Children learning together"
           className="h-full w-full object-cover"
         />
+        {/* <video
+          src="/MKCDP-VIDEO.mp4"
+          poster="/image1.png"
+          autoPlay
+          muted
+          loop
+          className="h-[calc(95dvh-28px)] w-[calc(110dvw-28px)] object-cover"
+        /> */}
       </motion.div>
 
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-green-700 via-green-700/35 to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-green-700 via-green-700/50 to-transparent" />
 
       <motion.div
         className="relative z-20 mx-auto w-full max-w-7xl px-6 md:px-12 lg:px-20"
@@ -158,7 +166,7 @@ function Hero() {
             change — through education, health, protection and livelihoods.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
+          <div className="mt-9 flex flex-wrap justify-center items-center gap-4">
             <Link
               to="/take-action/sponsor-a-child"
               className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F2C94C]"

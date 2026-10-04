@@ -292,44 +292,21 @@ function OurWorkHub() {
     <div className="space-y-24 lg:space-y-32">
       <section className="relative overflow-hidden pt-16 lg:pt-24">
         <div className="mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
-          <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
-            <div>
-              <span className="mb-5 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-green-700">
-                <span className="h-px w-8 bg-green-700" />
-                Our Work
-              </span>
-              <h1 className="hero-serif text-[clamp(2.1rem,6.4vw,4.4rem)] font-bold leading-[1.06] tracking-[-0.022em] text-[#111111]">
-                Putting children first.
-              </h1>
-              <p className="mt-7 max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
-                Children are our future — and our present. We work with communities across Kenya
-                to help children and families meet their most urgent needs for health, education,
-                skills and safety. Today MKCDP focuses on sustainable, community-driven programmes
-                that target the root causes of child vulnerability: poverty, lack of access to
-                quality education, hunger and limited access to healthcare.
-              </p>
-            </div>
-
-            <div className="relative mx-auto aspect-square w-full max-w-[460px] lg:mx-0">
-              <div className="absolute left-0 top-[6%] z-20 aspect-square w-[68%] overflow-hidden rounded-full shadow-[0_34px_64px_-30px_rgba(20,20,20,0.5)]">
-                <img src="/img1.jpg" alt="Children learning" className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute right-0 top-0 z-10 aspect-square w-[36%] overflow-hidden rounded-full shadow-[0_24px_48px_-24px_rgba(20,20,20,0.45)]">
-                <img src="/img8.png" alt="Community" className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute bottom-[2%] right-[4%] z-30 aspect-square w-[28%] overflow-hidden rounded-full shadow-[0_22px_44px_-22px_rgba(20,20,20,0.45)]">
-                <img src="/img3.jpg" alt="Community life" className="h-full w-full object-cover" />
-              </div>
-              <svg viewBox="0 0 120 120" aria-hidden="true" className="absolute -top-[3%] left-[52%] z-40 w-[14%] -rotate-12">
-                <path d="M18 76c6-30 34-54 66-50 20 3 30 20 22 34-10 17-36 24-58 18" fill="none" stroke="#7FB069" strokeWidth="9" strokeLinecap="round" />
-              </svg>
-              <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute right-[10%] top-[40%] z-40 w-[9%] rotate-6">
-                <path d="M52 9c21 1 38 15 37 36-1 24-20 45-44 44C24 88 8 70 9 49 10 26 28 8 52 9Z" fill="none" stroke="#E2703A" strokeWidth="4.5" strokeLinecap="round" />
-              </svg>
-              <svg viewBox="0 0 80 80" aria-hidden="true" className="absolute bottom-[30%] left-[2%] z-40 w-[8%] -rotate-6">
-                <path d="M14 56c10-6 16-18 16-32 0-6 8-6 8 0 0 16 8 28 20 34" fill="none" stroke="#F2B33D" strokeWidth="7" strokeLinecap="round" />
-              </svg>
-            </div>
+          <div className="mx-auto max-w-[860px] text-center">
+            <span className="mb-5 inline-flex items-center justify-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-green-700">
+              <span className="h-px w-8 bg-green-700" />
+              Our Work
+            </span>
+            <h1 className="hero-serif text-[clamp(2.1rem,6.4vw,4.4rem)] font-bold leading-[1.06] tracking-[-0.022em] text-[#111111]">
+              Putting children first.
+            </h1>
+            <p className="mx-auto mt-7 max-w-[640px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
+              Children are our future — and our present. We work with communities across Kenya
+              to help children and families meet their most urgent needs for health, education,
+              skills and safety. Today MKCDP focuses on sustainable, community-driven programmes
+              that target the root causes of child vulnerability: poverty, lack of access to
+              quality education, hunger and limited access to healthcare.
+            </p>
           </div>
         </div>
       </section>
@@ -347,10 +324,8 @@ function OurWorkHub() {
               key={s.title}
               className="group flex flex-col rounded-3xl border border-green-700/12 bg-white/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-green-700/8 text-green-700 transition-colors duration-300 group-hover:bg-green-700 group-hover:text-white">
-                {wayIcon(s.icon, "h-5 w-5")}
-              </span>
-              <h3 className="hero-serif mt-6 text-[1.25rem] font-bold leading-tight text-[#111111]">
+              <span className="mb-6 block h-1 w-10 rounded-full bg-green-700/60 transition-all duration-300 group-hover:w-14 group-hover:bg-green-700" />
+              <h3 className="hero-serif text-[1.25rem] font-bold leading-tight text-[#111111]">
                 {s.title}
               </h3>
               <p className="mt-3 flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]">{s.body}</p>
@@ -373,37 +348,18 @@ function OurWorkHub() {
               to={`/our-work/${s.slug}`}
               className="group relative flex flex-col overflow-hidden rounded-[28px] border border-green-700/12 bg-white/70 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-46px_rgba(20,83,45,0.65)]"
             >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <img
-                  src={s.image}
-                  alt={s.label}
-                  className="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-
-                <span
-                  className="absolute left-5 top-5 grid h-10 w-10 place-items-center rounded-full text-[#1C6B4B]"
-                  style={{ backgroundColor: s.accent }}
-                >
-                  {wayIcon(s.slug === "where-we-work" ? "globe" : "target", "h-4 w-4")}
-                </span>
-
-                <div className="absolute bottom-5 left-5 right-5 text-white">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-white/80">
-                    {s.tag}
-                  </p>
-                  <p className="hero-serif mt-2 text-[clamp(1.5rem,2.6vw,2rem)] font-bold leading-tight">
-                    {s.label}
-                  </p>
-                </div>
-              </div>
+              <div className="h-2 w-full" style={{ backgroundColor: s.accent }} />
 
               <div className="flex flex-1 flex-col p-6 sm:p-8">
-                <p className="flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]">{s.desc}</p>
-                <div className="mt-6 inline-flex items-center justify-between gap-3 rounded-xl bg-green-700 px-5 py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 group-hover:bg-[#15543A]">
-                  <span>Open page</span>
-                  <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-green-700">
+                  {s.tag}
+                </p>
+                <p className="hero-serif mt-3 text-[clamp(1.5rem,2.6vw,2rem)] font-bold leading-tight text-[#111111]">
+                  {s.label}
+                </p>
+                <p className="mt-4 flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]">{s.desc}</p>
+                <div className="mt-6 inline-flex w-fit items-center justify-center rounded-xl bg-green-700 px-5 py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 group-hover:bg-[#15543A]">
+                  Open page
                 </div>
               </div>
             </Link>
@@ -478,10 +434,6 @@ function OurWorkHub() {
 
       <section className="relative mx-auto max-w-[1360px] px-6 sm:px-10 lg:px-14">
         <div className="relative overflow-hidden rounded-[36px] bg-green-700 px-8 py-16 sm:px-14 lg:px-20 lg:py-24">
-          <svg viewBox="0 0 120 120" aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 w-40 rotate-12 opacity-30">
-            <path d="M18 76c6-30 34-54 66-50 20 3 30 20 22 34-10 17-36 24-58 18" fill="none" stroke="#7FB069" strokeWidth="8" strokeLinecap="round" />
-          </svg>
-
           <div className="relative grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
             <div>
               <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
@@ -500,14 +452,13 @@ function OurWorkHub() {
             <div className="flex flex-col gap-3 lg:items-end">
               <Link
                 to="/about"
-                className="group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+                className="inline-flex w-fit items-center rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
               >
                 Learn more about us
-                <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/take-action/donate"
-                className="inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
+                className="inline-flex w-fit items-center rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
               >
                 Donate now
               </Link>
