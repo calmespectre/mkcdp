@@ -828,7 +828,6 @@ function GiftCart() {
       <div className="mx-auto max-w-[720px] py-16 sm:py-20">
         <div className="rounded-3xl border border-dashed border-green-700/25 bg-white/50 p-12 text-center">
           <p className="hero-serif text-[1.3rem] font-bold text-[#111111]">Your basket is empty.</p>
-          <p className="mt-2 text-[0.9rem] text-[#4A4A42]">Browse the needs and add what you'd like to cover.</p>
           <Link to="/take-action/send-a-gift" className="mt-6 inline-flex items-center rounded-xl bg-green-700 px-6 py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white transition-all duration-200 hover:bg-[#15543A]">
             Browse
           </Link>
