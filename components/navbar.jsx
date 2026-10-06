@@ -718,29 +718,164 @@ export default function Navbar() {
       className={`sticky top-0 z-50 w-full font-[Montserrat] transition-transform duration-300 ease-in-out ${headerTranslate}`}
     >
       <nav className="bg-[#FBF7F0]">
-        <div className="hidden border-b border-green-700/10 lg:block">
-          <div className="mx-auto flex max-w-[1560px] items-center justify-center gap-2 px-2 py-2 lg:px-4">
-            <div className="flex flex-wrap items-center gap-x-7 gap-y-1 text-[0.72rem] font-medium tracking-[0.02em] text-[#4A4A42]">
-              {CONTACT_LINES.map((line) => (
-                <ContactLine
-                  key={line.label}
-                  icon={line.Icon}
-                  label={line.label}
-                  href={line.href}
-                  wrapClass="text-[#4A4A42] hover:text-green-700"
-                  iconClass="h-3.5 w-3.5 text-green-700"
-                />
-              ))}
-              <p>|</p>
-              <div className="flex items-center gap-2">
+        <div className="relative mx-auto max-w-[1560px] px-4 lg:px-14">
+          <Link
+            to="/"
+            aria-label="MKCDP home"
+            className="hidden lg:absolute lg:inset-y-0 lg:left-14 lg:z-20 lg:flex lg:items-center lg:bg-[#FBF7F0] lg:pr-8"
+          >
+            <img src="/mkcdp.png" alt="MKCDP Logo" className="h-16 w-auto" />
+          </Link>
+
+          <div className="hidden lg:block">
+            <div className="border-b border-green-700/10 py-2">
+              <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-1 text-[0.72rem] font-medium tracking-[0.02em] text-[#4A4A42]">
+                {CONTACT_LINES.map((line) => (
+                  <ContactLine
+                    key={line.label}
+                    icon={line.Icon}
+                    label={line.label}
+                    href={line.href}
+                    wrapClass="text-[#4A4A42] hover:text-green-700"
+                    iconClass="h-3.5 w-3.5 text-green-700"
+                  />
+                ))}
+                <p>|</p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(true)}
+                    aria-label="Search"
+                    title="Search (press /)"
+                    className="inline-flex items-start rounded-full border border-green-700/15 px-1 py-1 text-[0.7rem] text-[#4A4A42] transition-colors duration-200 hover:border-green-700/30 hover:text-green-700"
+                  >
+                    <Icon.Search className="h-5 w-auto text-green-700" />
+                  </button>
+
+                  <Link
+                    to="/take-action/send-a-gift-cart"
+                    aria-label={
+                      basketCount
+                        ? `Basket, ${basketCount} item${basketCount === 1 ? "" : "s"}`
+                        : "Basket"
+                    }
+                    title="Basket"
+                    className="inline-flex items-center gap-1.5 text-green-700 rounded-full border border-green-700/15 px-1 py-1 transition-colors duration-200 hover:text-[#15543A]"
+                  >
+                    <span className="relative inline-flex">
+                      <Icon.Basket className="h-5 w-5" />
+                      {basketCount > 0 && (
+                        <span className="pointer-events-none absolute -right-1.5 -top-1.5 grid h-4 min-w-[1rem] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.55rem] font-bold text-white">
+                          {basketCount > 99 ? "99+" : basketCount}
+                        </span>
+                      )}
+                    </span>
+                  </Link>
+                  <Link
+                    to="/auth"
+                    aria-label="Sign in or sign up"
+                    title="Sign in / Sign up"
+                    className="text-green-700 hover:text-green-700 rounded-full border border-green-700/15 px-1 py-1"
+                  >
+                    <Icon.User className="h-5 w-auto text-green-700" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative flex items-center gap-2 py-2">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-green-700 transition-colors duration-200 hover:bg-green-700/6 lg:hidden"
+            >
+              <Icon.Menu className="h-6 w-6" />
+            </button>
+
+            <Link to="/" className="flex flex-shrink-0 items-center gap-3 lg:hidden">
+              <img src="/mkcdp.png" alt="MKCDP Logo" className="h-12 w-auto" />
+            </Link>
+
+            <ul className="hidden lg:absolute lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:flex lg:items-center lg:justify-center">
+              {NAV_LINKS.map((link) => {
+                const open = openDropdown === link.label;
+                return (
+                  <li
+                    key={link.label}
+                    className="relative"
+                    onMouseEnter={() => setOpenDropdown(link.label)}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <Link
+                      to={link.href}
+                      className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.07em] text-[#2A2A26] transition-colors duration-200 hover:text-green-700 xl:px-3.5 xl:text-[0.78rem]"
+                    >
+                      <span className="relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:rounded-full after:bg-green-700 after:transition-all after:duration-300 hover:after:w-full">
+                        {link.label}
+                      </span>
+                    </Link>
+
+                    <div
+                      className={`absolute left-0 top-full pt-3 transition-all duration-200 ${
+                        open
+                          ? "visible translate-y-0 opacity-100"
+                          : "invisible -translate-y-1 opacity-0"
+                      }`}
+                    >
+                      <ul className="min-w-[280px] overflow-hidden rounded-2xl border border-green-700/10 bg-[#FBF7F0] py-2 shadow-[0_24px_48px_-24px_rgba(20,20,20,0.28)]">
+                        {link.children.map((child) => (
+                          <li key={child.label}>
+                            <Link
+                              to={child.href}
+                              data-section={child.slug}
+                              className="group flex items-center justify-between px-5 py-2.5 text-[0.82rem] font-medium text-[#2A2A26] transition-all duration-200 hover:bg-green-700/6 hover:pl-6 hover:text-green-700"
+                            >
+                              <span>{child.label}</span>
+                              <Icon.ChevronRight className="h-3.5 w-3.5 -translate-x-1 text-green-700 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="ml-auto flex items-center gap-1.5 lg:gap-3">
+              <Link
+                to="/take-action/sponsor-a-child"
+                className="hidden items-center gap-2 rounded-xl border border-green-700/20 px-5 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/6 2xl:inline-flex"
+              >
+                Sponsor a Child
+              </Link>
+              <Link
+                to="/take-action/donate"
+                className="hidden items-center gap-2 rounded-xl bg-green-700 px-6 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-white shadow-[0_14px_30px_-16px_rgba(28,107,75,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] lg:inline-flex"
+              >
+                Donate
+              </Link>
+
+              <Link
+                to="/auth"
+                aria-label="Sign in or sign up"
+                title="Sign in / Sign up"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
+              >
+                <Icon.User className="h-5 w-5" />
+              </Link>
+
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
-                title="Search (press /)"
-                className="inline-flex items-start rounded-full border border-green-700/15 px-1 py-1 text-[0.7rem] text-[#4A4A42] transition-colors duration-200 hover:border-green-700/30 hover:text-green-700"
+                title="Search"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
               >
-                <Icon.Search className="h-5 w-auto text-green-700" />
+                <Icon.Search className="h-5 w-5" />
               </button>
 
               <Link
@@ -751,141 +886,16 @@ export default function Navbar() {
                     : "Basket"
                 }
                 title="Basket"
-                className="inline-flex items-center gap-1.5 text-green-700 rounded-full border border-green-700/15 px-1 py-1 transition-colors duration-200 hover:text-[#15543A]"
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
               >
-                <span className="relative inline-flex">
-                  <Icon.Basket className="h-5 w-5" />
-                  {basketCount > 0 && (
-                    <span className="pointer-events-none absolute -right-1.5 -top-1.5 grid h-4 min-w-[1rem] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.55rem] font-bold text-white">
-                      {basketCount > 99 ? "99+" : basketCount}
-                    </span>
-                  )}
-                </span>
+                <Icon.Basket className="h-5 w-5" />
+                {basketCount > 0 && (
+                  <span className="pointer-events-none absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.6rem] font-bold text-white ring-2 ring-[#FBF7F0]">
+                    {basketCount > 99 ? "99+" : basketCount}
+                  </span>
+                )}
               </Link>
-              <Link
-                to="/auth"
-                aria-label="Sign in or sign up"
-                title="Sign in / Sign up"
-                className="text-green-700 hover:text-green-700 rounded-full border border-green-700/15 px-1 py-1"
-              >
-                <Icon.User className="h-5 w-auto text-green-700"/>
-              </Link>
-              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="relative mx-auto flex max-w-[1560px] items-center gap-2 px-4 py-2 lg:px-14">
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-            className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-green-700 transition-colors duration-200 hover:bg-green-700/6 lg:hidden"
-          >
-            <Icon.Menu className="h-6 w-6" />
-          </button>
-
-          <Link to="/" className="flex flex-shrink-0 items-center gap-3">
-            <img src="/mkcdp.png" alt="MKCDP Logo" className="h-11 w-auto lg:h-12" />
-          </Link>
-
-          <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center lg:flex">
-            {NAV_LINKS.map((link) => {
-              const open = openDropdown === link.label;
-              return (
-                <li
-                  key={link.label}
-                  className="relative"
-                  onMouseEnter={() => setOpenDropdown(link.label)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <Link
-                    to={link.href}
-                    className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.07em] text-[#2A2A26] transition-colors duration-200 hover:text-green-700 xl:px-3.5 xl:text-[0.78rem]"
-                  >
-                    <span className="relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:rounded-full after:bg-green-700 after:transition-all after:duration-300 hover:after:w-full">
-                      {link.label}
-                    </span>
-                  </Link>
-
-                  <div
-                    className={`absolute left-0 top-full pt-3 transition-all duration-200 ${
-                      open
-                        ? "visible translate-y-0 opacity-100"
-                        : "invisible -translate-y-1 opacity-0"
-                    }`}
-                  >
-                    <ul className="min-w-[280px] overflow-hidden rounded-2xl border border-green-700/10 bg-[#FBF7F0] py-2 shadow-[0_24px_48px_-24px_rgba(20,20,20,0.28)]">
-                      {link.children.map((child) => (
-                        <li key={child.label}>
-                          <Link
-                            to={child.href}
-                            data-section={child.slug}
-                            className="group flex items-center justify-between px-5 py-2.5 text-[0.82rem] font-medium text-[#2A2A26] transition-all duration-200 hover:bg-green-700/6 hover:pl-6 hover:text-green-700"
-                          >
-                            <span>{child.label}</span>
-                            <Icon.ChevronRight className="h-3.5 w-3.5 -translate-x-1 text-green-700 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-
-          <div className="ml-auto flex items-center gap-1.5 lg:gap-3">
-            <Link
-              to="/take-action/sponsor-a-child"
-              className="hidden items-center gap-2 rounded-xl border border-green-700/20 px-5 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/6 2xl:inline-flex"
-            >
-              Sponsor a Child
-            </Link>
-            <Link
-              to="/take-action/donate"
-              className="hidden items-center gap-2 rounded-xl bg-green-700 px-6 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-white shadow-[0_14px_30px_-16px_rgba(28,107,75,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] lg:inline-flex"
-            >
-              Donate
-            </Link>
-
-            <Link
-              to="/auth"
-              aria-label="Sign in or sign up"
-              title="Sign in / Sign up"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
-            >
-              <Icon.User className="h-5 w-5" />
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              title="Search"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
-            >
-              <Icon.Search className="h-5 w-5" />
-            </button>
-
-            <Link
-              to="/take-action/send-a-gift-cart"
-              aria-label={
-                basketCount
-                  ? `Basket, ${basketCount} item${basketCount === 1 ? "" : "s"}`
-                  : "Basket"
-              }
-              title="Basket"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden"
-            >
-              <Icon.Basket className="h-5 w-5" />
-              {basketCount > 0 && (
-                <span className="pointer-events-none absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.6rem] font-bold text-white ring-2 ring-[#FBF7F0]">
-                  {basketCount > 99 ? "99+" : basketCount}
-                </span>
-              )}
-            </Link>
           </div>
         </div>
       </nav>

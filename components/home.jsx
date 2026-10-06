@@ -195,7 +195,7 @@ function VideoSection() {
           />
         </div>
 
-        <div className="mt-9 grid grid-cols-1 gap-8 border-t border-green-700/12 pt-8 sm:grid-cols-3">
+        {/* <div className="mt-9 grid grid-cols-1 gap-8 border-t border-green-700/12 pt-8 sm:grid-cols-3">
           {[
             { t: "Filmed on location", d: "Kajiado County, Kenya" },
             { t: "Community-led", d: "Produced with local storytellers" },
@@ -208,7 +208,7 @@ function VideoSection() {
               <p className="mt-1.5 text-[0.92rem] leading-relaxed text-[#4A4A42]">{item.d}</p>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </section>
   );

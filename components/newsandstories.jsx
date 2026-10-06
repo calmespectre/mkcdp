@@ -28,8 +28,6 @@ const STORIES = [
   {
     slug: "moilo-water-project",
     title: "MOILO WATER PROJECT",
-    date: "22 Mar",
-    author: "By admin",
     category: "Charity",
     tags: ["Help", "Safety"],
     excerpt:
@@ -49,8 +47,6 @@ const STORIES = [
   {
     slug: "beekeeping-project",
     title: "BEEKEEPING PROJECT",
-    date: "22 Mar",
-    author: "By admin",
     category: "Education",
     tags: ["Learning", "Safety"],
     excerpt:
@@ -67,8 +63,6 @@ const STORIES = [
   {
     slug: "sowing-seeds-of-hope",
     title: "Sowing Seeds of Hope",
-    date: "22 Mar",
-    author: "By admin",
     category: "Education",
     tags: ["Education", "Help"],
     excerpt:
@@ -85,8 +79,6 @@ const STORIES = [
   {
     slug: "a-journey-of-growth-and-firsts",
     title: "A Journey of Growth and Firsts",
-    date: "22 Mar",
-    author: "By admin",
     category: "Food",
     tags: ["Charity", "Learning"],
     excerpt:
@@ -102,42 +94,55 @@ const STORIES = [
   {
     slug: "vsla-financial-literacy-training",
     title: "VSLA and Financial Literacy Training",
-    date: "22 Mar",
-    author: "By admin",
     category: "Uncategorized",
     tags: ["Help", "Learning"],
     excerpt:
       "This month, we successfully completed a three-day Village Savings and Loan Associations (VSLA) and Financial Literacy training.",
     image: "/img4.jpg",
     content: [
-      "✨ This month, we successfully completed a three-day Village Savings and Loan Associations (VSLA) and Financial Literacy training in Naretoi, Kuku Plains and Mbirikani. The training brought together six groups: Olee Beekeeping Group, Samai Beekeeping Group, Elatia Naiborr Ajijik CBO, Iretet Self Help Group, Nasaru Women Group and Enkorropil Women Group.",
-      "🤝 The sessions were delivered by KCB Kenya Loitokitok Branch team, KCB Foundation and the Social Works Department in Kajiado South, with strong support from ChildFund Kenya. Their commitment made it possible for these groups to access practical knowledge that strengthens savings discipline, financial literacy and formal banking linkages.",
-      "📚 Participants explored VSLA operations, record keeping, budgeting, interest calculations, mobile banking and entrepreneurship. At the end of the training, each group demonstrated confidence in managing their savings structures and setting clear plans for financial growth.",
-      "👏 We sincerely appreciate ChildFund Kenya for supporting this initiative, and we thank KCB Kenya and the Social Works Department for the excellent collaboration. Most importantly, we celebrate all participants for their active engagement and dedication throughout the sessions.",
+      "This month, we successfully completed a three-day Village Savings and Loan Associations (VSLA) and Financial Literacy training in Naretoi, Kuku Plains and Mbirikani. The training brought together six groups: Olee Beekeeping Group, Samai Beekeeping Group, Elatia Naiborr Ajijik CBO, Iretet Self Help Group, Nasaru Women Group and Enkorropil Women Group.",
+      "The sessions were delivered by KCB Kenya Loitokitok Branch team, KCB Foundation and the Social Works Department in Kajiado South, with strong support from ChildFund Kenya. Their commitment made it possible for these groups to access practical knowledge that strengthens savings discipline, financial literacy and formal banking linkages.",
+      "Participants explored VSLA operations, record keeping, budgeting, interest calculations, mobile banking and entrepreneurship. At the end of the training, each group demonstrated confidence in managing their savings structures and setting clear plans for financial growth.",
+      "We sincerely appreciate ChildFund Kenya for supporting this initiative, and we thank KCB Kenya and the Social Works Department for the excellent collaboration. Most importantly, we celebrate all participants for their active engagement and dedication throughout the sessions.",
     ],
     relatedCategories: ["Uncategorized"],
   },
 ];
 
 const MEDIA_ITEMS = [
-  { id: "m1", src: "/240319_051-min.jpg", title: "Classroom moments", category: "Education" },
-  { id: "m2", src: "/240320_014-min.jpg", title: "Community gathering", category: "Community" },
-  { id: "m3", src: "/240320_028-min.jpg", title: "Field visit", category: "Field Work" },
-  { id: "m4", src: "/240320_031-min.jpg", title: "Learning together", category: "Education" },
-  { id: "m5", src: "/240319_053-min.jpg", title: "Water project", category: "Water" },
-  { id: "m6", src: "/240319_037-min.jpg", title: "Beekeeping training", category: "Livelihoods" },
-  { id: "m7", src: "/240322_013-scaled.jpg", title: "Moilo borehole", category: "Water" },
-  { id: "m8", src: "/240321_094-scaled.jpg", title: "Honey harvest", category: "Livelihoods" },
-  { id: "m9", src: "/kids-loghing-in-class.jpg", title: "In the classroom", category: "Education" },
+  { id: "m1", src: "/img1.jpg" },
+  { id: "m2", src: "/img2.jpg" },
+  { id: "m3", src: "/img3.jpg" },
+  { id: "m4", src: "/img4.jpg" },
+  { id: "m5", src: "/img5.jpg" },
+  { id: "m6", src: "/img6.jpg" },
+  { id: "m7", src: "/img7.jpg" },
+  { id: "m8", src: "/img8.png" },
+  { id: "m9", src: "/img9.jpg" },
+  { id: "m10", src: "/img10.jpg" },
+  { id: "m11", src: "/img11.jpg" },
+  { id: "m12", src: "/img12.jpg" },
+  { id: "m13", src: "/img13.jpg" },
+  { id: "m14", src: "/img14.jpg" },
+  { id: "m15", src: "/img15.jpg" },
 ];
 
 const MEDIA_FILTERS = ["All", "Education", "Water", "Livelihoods", "Community", "Field Work"];
 
 const MEDIA_VIDEOS = [
-  { id: "v1", youtubeId: "BwcCV1UA7Wg" },
+  { id: "v1", youtubeId: "VjJ7bjdomkE" },
   { id: "v2", youtubeId: "f77UOkxgp6o" },
   { id: "v3", youtubeId: "14u-g-OtPIA" },
 ];
+
+function shuffleArray(arr) {
+  const next = [...arr];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
 
 function SectionHeading({ eyebrow, title, intro, align = "left" }) {
   return (
@@ -287,14 +292,14 @@ function StoryCard({ story }) {
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-green-700 backdrop-blur">
             {story.category}
           </span>
-          <span className="absolute right-3 top-3 rounded-full bg-green-700/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur">
+          {/* <span className="absolute right-3 top-3 rounded-full bg-green-700/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur">
             {story.date}
           </span>
         </div>
         <div className="flex flex-1 flex-col p-5 sm:p-6">
           <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700">
             {story.author}
-          </p>
+          </p> */}
           <h3 className="hero-serif mt-2 text-[1.25rem] font-bold leading-tight text-[#111111] sm:text-[1.4rem]">
             {story.title}
           </h3>
@@ -425,227 +430,141 @@ function StoryDetail({ story }) {
   return (
     <>
       <div className="hidden lg:block">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-          <article className="space-y-8">
-            <div>
-              <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
-                <span className="h-px w-8 bg-green-700" />
-                {story.category}
-              </span>
-              <h1 className="hero-serif text-[clamp(1.9rem,5vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.025em] text-[#111111]">
-                {story.title}
-              </h1>
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]/80">
-                <span>{story.date}</span>
-                <span className="h-1 w-1 rounded-full bg-green-700/40" />
-                <span>{story.author}</span>
-                <span className="h-1 w-1 rounded-full bg-green-700/40" />
-                <span>5 min read</span>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-3xl border border-green-700/12 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)]">
-              <div className="relative aspect-[16/9] overflow-hidden">
-                <img
-                  src={story.image}
-                  alt={story.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              {story.content.map((para, i) => (
-                <p key={i} className="text-[1rem] leading-[1.9] text-[#3D3D37] sm:text-[1.02rem]">
-                  {para}
-                </p>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 border-t border-green-700/12 pt-6">
-              <span className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-[#4A4A42]/70">
-                Tags:
-              </span>
-              {story.tags.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-green-700/15 bg-white/70 px-3 py-1 text-[0.7rem] font-semibold text-[#4A4A42]"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-col gap-3 rounded-3xl border border-green-700/12 bg-white/70 p-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="hero-serif text-[1.05rem] font-bold text-[#111111]">
-                  Want to help write the next chapter?
-                </p>
-                <p className="mt-1 text-[0.88rem] text-[#4A4A42]">
-                  Every gift, hour and partnership keeps stories like this one coming.
-                </p>
-              </div>
-              <Link
-                to="/take-action/donate"
-                className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-green-700 px-6 py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A]"
-              >
-                Donate →
-              </Link>
-            </div>
-
-            <div className="border-t border-green-700/12 pt-8">
-              <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                <span className="h-px w-6 bg-green-700" />
-                More stories
-              </span>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                {related.map((s) => (
-                  <Link
-                    key={s.slug}
-                    to={`/news-and-stories/stories-of-impact/${s.slug}`}
-                    className="group overflow-hidden rounded-2xl border border-green-700/12 bg-white/70 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_rgba(20,83,45,0.5)]"
-                  >
-                    <div className="relative aspect-[16/10] overflow-hidden">
-                      <img
-                        src={s.image}
-                        alt={s.title}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-green-700">
-                        {s.date}
-                      </p>
-                      <p className="hero-serif mt-1.5 text-[1rem] font-bold leading-tight text-[#111111]">
-                        {s.title}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </article>
-
-          <aside className="space-y-6 lg:sticky lg:top-40 lg:self-start">
-            <div className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)]">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                Search
-              </p>
-              <div className="relative mt-3">
-                <input
-                  type="search"
-                  placeholder="Search stories…"
-                  className="w-full rounded-xl border border-green-700/15 bg-white px-4 py-3 text-sm text-[#111111] placeholder:text-[#4A4A42]/40 focus:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-700/15"
-                />
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)]">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                Recent Posts
-              </p>
-              <ul className="mt-4 space-y-3">
-                {STORIES.slice(0, 5).map((s) => (
-                  <li key={s.slug}>
-                    <Link
-                      to={`/news-and-stories/stories-of-impact/${s.slug}`}
-                      className="group flex gap-3"
-                    >
-                      <img
-                        src={s.image}
-                        alt={s.title}
-                        className="h-14 w-14 flex-shrink-0 rounded-xl object-cover"
-                        loading="lazy"
-                      />
-                      <div className="min-w-0">
-                        <p className="hero-serif text-[0.88rem] font-bold leading-tight text-[#111111] transition-colors group-hover:text-green-700">
-                          {s.title}
-                        </p>
-                        <p className="mt-1 text-[0.68rem] uppercase tracking-wider text-[#4A4A42]/70">
-                          {s.date}
-                        </p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)]">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                Categories
-              </p>
-              <ul className="mt-4 space-y-2 text-[0.88rem]">
-                {["Charity", "Education", "Food", "Help", "Treatment"].map((c) => (
-                  <li key={c}>
-                    <Link
-                      to="/news-and-stories/stories-of-impact"
-                      className="flex items-center justify-between text-[#4A4A42] transition-colors hover:text-green-700"
-                    >
-                      <span>{c}</span>
-                      <span className="text-[0.72rem] text-[#4A4A42]/60">
-                        {STORIES.filter((s) => s.category === c).length || 1}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)]">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                Tags
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {["Charity", "Colorful", "Diamond", "Education", "Food", "Help", "Learning", "Safety"].map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full border border-green-700/15 bg-white px-3 py-1 text-[0.7rem] font-semibold text-[#4A4A42]"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-
-      <div className="lg:hidden">
-        <article className="space-y-6">
-          <div>
-            <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              <span className="h-px w-6 bg-green-700" />
+        <article className="mx-auto max-w-[860px]">
+          <header className="mb-10 text-center">
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
               {story.category}
-            </span>
-            <h1 className="hero-serif text-[2rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#111111]">
+            </p>
+            <h1 className="hero-serif mt-5 text-[clamp(2.2rem,4.6vw,3.4rem)] font-bold leading-[1.1] tracking-[-0.028em] text-[#111111]">
               {story.title}
             </h1>
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]/80">
+            <div className="mt-6 flex items-center justify-center gap-3 text-[0.75rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/70">
               <span>{story.date}</span>
               <span className="h-1 w-1 rounded-full bg-green-700/40" />
               <span>{story.author}</span>
             </div>
-          </div>
+          </header>
 
-          <div className="overflow-hidden rounded-3xl border border-green-700/12">
-            <div className="relative aspect-[16/10] overflow-hidden">
-              <img src={story.image} alt={story.title} className="h-full w-full object-cover" />
+          <figure className="overflow-hidden rounded-[20px] border border-green-700/12 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)]">
+            <div className="relative aspect-[16/9] overflow-hidden">
+              <img
+                src={story.image}
+                alt={story.title}
+                className="h-full w-full object-cover"
+              />
             </div>
-          </div>
+          </figure>
 
-          <div className="space-y-5">
+          <div className="mt-12 space-y-7">
             {story.content.map((para, i) => (
-              <p key={i} className="text-[0.95rem] leading-[1.85] text-[#3D3D37]">
+              <p
+                key={i}
+                className="text-[1.05rem] leading-[1.95] text-[#2F2F2B] first:text-[1.12rem] first:leading-[1.9] first:text-[#111111]"
+              >
                 {para}
               </p>
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-t border-green-700/12 pt-5">
+          <div className="mt-12 flex flex-wrap items-center gap-2 border-t border-green-700/12 pt-8">
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#4A4A42]/70">
+              Tagged
+            </span>
+            {story.tags.map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-green-700/15 bg-white/70 px-3.5 py-1.5 text-[0.72rem] font-semibold text-[#4A4A42]"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-12 border-t border-green-700/12 pt-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="hero-serif text-[1.15rem] font-bold text-[#111111]">
+                Want to help write the next chapter?
+              </p>
+              <Link
+                to="/take-action/donate"
+                className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-green-700 px-6 py-3 text-[0.75rem] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A]"
+              >
+                Donate →
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-16 border-t border-green-700/12 pt-12">
+            <span className="mb-6 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
+              <span className="h-px w-6 bg-green-700" />
+              More stories
+            </span>
+            <div className="grid grid-cols-3 gap-6">
+              {related.map((s) => (
+                <Link
+                  key={s.slug}
+                  to={`/news-and-stories/stories-of-impact/${s.slug}`}
+                  className="group overflow-hidden rounded-2xl border border-green-700/12 bg-white/70 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_rgba(20,83,45,0.5)]"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <img
+                      src={s.image}
+                      alt={s.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-green-700">
+                      {s.date}
+                    </p>
+                    <p className="hero-serif mt-1.5 text-[0.98rem] font-bold leading-tight text-[#111111]">
+                      {s.title}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="lg:hidden">
+        <article className="space-y-7">
+          <header className="text-center">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
+              {story.category}
+            </p>
+            <h1 className="hero-serif mt-4 text-[1.9rem] font-bold leading-[1.12] tracking-[-0.02em] text-[#111111]">
+              {story.title}
+            </h1>
+            <div className="mt-4 flex items-center justify-center gap-3 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/70">
+              <span>{story.date}</span>
+              <span className="h-1 w-1 rounded-full bg-green-700/40" />
+              <span>{story.author}</span>
+            </div>
+          </header>
+
+          <figure className="overflow-hidden rounded-[20px] border border-green-700/12">
+            <div className="relative aspect-[16/10] overflow-hidden">
+              <img src={story.image} alt={story.title} className="h-full w-full object-cover" />
+            </div>
+          </figure>
+
+          <div className="space-y-5">
+            {story.content.map((para, i) => (
+              <p
+                key={i}
+                className="text-[1rem] leading-[1.9] text-[#2F2F2B] first:text-[1.05rem] first:leading-[1.85] first:text-[#111111]"
+              >
+                {para}
+              </p>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 border-t border-green-700/12 pt-6">
             <span className="text-[0.66rem] font-bold uppercase tracking-[0.16em] text-[#4A4A42]/70">
-              Tags:
+              Tagged
             </span>
             {story.tags.map((t) => (
               <span
@@ -657,7 +576,7 @@ function StoryDetail({ story }) {
             ))}
           </div>
 
-          <div className="rounded-3xl border border-green-700/12 bg-white/70 p-5">
+          <div className="border-t border-green-700/12 pt-7">
             <p className="hero-serif text-[1.05rem] font-bold text-[#111111]">
               Help write the next chapter.
             </p>
@@ -672,7 +591,7 @@ function StoryDetail({ story }) {
             </Link>
           </div>
 
-          <div className="border-t border-green-700/12 pt-6">
+          <div className="border-t border-green-700/12 pt-7">
             <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
               More stories
@@ -714,7 +633,7 @@ function VideoCard({ video }) {
       <div className="relative aspect-video overflow-hidden bg-black">
         <iframe
           src={`https://www.youtube.com/embed/${video.youtubeId}`}
-          title={video.title}
+          title={`Video ${video.id}`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           loading="lazy"
@@ -722,6 +641,54 @@ function VideoCard({ video }) {
         />
       </div>
     </article>
+  );
+}
+
+function PhotoCollage({ items, onSelect }) {
+  const [order, setOrder] = useState(() => items.map((_, i) => i));
+
+  useEffect(() => {
+    setOrder(shuffleArray(items.map((_, i) => i)));
+    const id = setInterval(() => {
+      setOrder((prev) => shuffleArray(prev));
+    }, 3200);
+    return () => clearInterval(id);
+  }, [items]);
+
+  const total = items.length;
+
+  return (
+    <div className="columns-2 gap-1.5 sm:columns-3 lg:columns-4">
+      {order.map((idx, i) => {
+        const item = items[idx % total];
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onSelect(item)}
+            style={{ breakInside: "avoid" }}
+            className="group relative mb-1.5 block w-full overflow-hidden rounded-[2px] bg-[#EFE9DF] align-top"
+          >
+            <img
+              src={item.src}
+              alt={item.title}
+              className="block h-auto w-full max-w-full object-contain transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute bottom-3 left-3 right-3 translate-y-2 text-left opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/80">
+                {item.category}
+              </p>
+              <p className="hero-serif mt-1 text-[0.95rem] font-bold leading-tight text-white">
+                {item.title}
+              </p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -748,32 +715,7 @@ function MediaCenter() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {filtered.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setLightbox(item)}
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-green-700/12 bg-white/70 shadow-[0_20px_50px_-40px_rgba(20,83,45,0.4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_60px_-40px_rgba(20,83,45,0.55)]"
-                >
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <div className="absolute bottom-3 left-3 right-3 translate-y-2 text-left opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/80">
-                      {item.category}
-                    </p>
-                    <p className="hero-serif mt-1 text-[0.95rem] font-bold leading-tight text-white">
-                      {item.title}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <PhotoCollage items={filtered} onSelect={setLightbox} />
           </div>
 
           <div>
@@ -857,46 +799,7 @@ function MediaCenter() {
             })}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {filtered.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setLightbox(item)}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-green-700/12 bg-white/70"
-              >
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-2 left-2 right-2 text-left">
-                  <p className="hero-serif text-[0.85rem] font-bold leading-tight text-white">
-                    {item.title}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <div className="rounded-3xl border border-green-700/12 border-l-2 border-l-green-700 bg-white/70 p-5">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              In The Media
-            </p>
-            <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
-              Journalists and partners are welcome to use our photography with attribution. For
-              press requests, write to{" "}
-              <a
-                href="mailto:media@mkcdp.org"
-                className="font-bold text-green-700 underline decoration-green-700/30 underline-offset-4"
-              >
-                media@mkcdp.org
-              </a>
-              .
-            </p>
-          </div>
+          <PhotoCollage items={filtered} onSelect={setLightbox} />
         </div>
       </div>
 
