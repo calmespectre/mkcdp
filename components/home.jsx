@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -10,15 +10,7 @@ const PHOTOS = {
   lowerLeft: "/img5.jpg",
 };
 
-const VIDEO_POSTER = "/imageC.png";
-const VIDEO_SRC = "Inkisanjani-Digital-Resource-Centre-Documentary-2024.mp4";
-
-const formatTime = (seconds) => {
-  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-};
+const YOUTUBE_ID = "ztwN71sY98o";
 
 function useInView(options = { threshold: 0.35 }) {
   const ref = useRef(null);
@@ -69,48 +61,6 @@ function useCountUp(target, active, duration = 2200) {
   return value;
 }
 
-const Icon = {
-  Play: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M8 5.14v13.72a1 1 0 0 0 1.53.85l10.78-6.86a1 1 0 0 0 0-1.7L9.53 4.29A1 1 0 0 0 8 5.14Z" />
-    </svg>
-  ),
-  Pause: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <rect x="6" y="4.5" width="4" height="15" rx="1.2" />
-      <rect x="14" y="4.5" width="4" height="15" rx="1.2" />
-    </svg>
-  ),
-  Volume: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M4 9.5h3l4.2-3.6a.8.8 0 0 1 1.3.62v11a.8.8 0 0 1-1.3.62L7 14.5H4a.8.8 0 0 1-.8-.8v-3.4A.8.8 0 0 1 4 9.5Z" />
-      <path d="M15.4 9.2a.85.85 0 0 1 1.2.1 4.4 4.4 0 0 1 0 5.4.85.85 0 1 1-1.3-1.08 2.7 2.7 0 0 0 0-3.24.85.85 0 0 1 .1-1.18Z" />
-    </svg>
-  ),
-  Mute: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M4 9.5h3l4.2-3.6a.8.8 0 0 1 1.3.62v11a.8.8 0 0 1-1.3.62L7 14.5H4a.8.8 0 0 1-.8-.8v-3.4A.8.8 0 0 1 4 9.5Z" />
-      <path d="M15.6 9.9l4.2 4.2m0-4.2-4.2 4.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-    </svg>
-  ),
-  Settings: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M12 15.4a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8Zm0-1.8a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2Z" />
-      <path d="M20.4 13.4a8.6 8.6 0 0 0 0-2.8l1.5-1.1-1.6-2.8-1.8.7a8.5 8.5 0 0 0-2.4-1.4L15.8 4h-3.2l-.3 2a8.5 8.5 0 0 0-2.4 1.4l-1.8-.7-1.6 2.8 1.5 1.1a8.6 8.6 0 0 0 0 2.8L6.5 14.5l1.6 2.8 1.8-.7a8.5 8.5 0 0 0 2.4 1.4l.3 2h3.2l.3-2a8.5 8.5 0 0 0 2.4-1.4l1.8.7 1.6-2.8-1.5-1.1Z" opacity="0.35" />
-    </svg>
-  ),
-  Expand: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M4 9V4.8A.8.8 0 0 1 4.8 4H9v2H6v3H4Zm11-5h4.2a.8.8 0 0 1 .8.8V9h-2V6h-3V4ZM4 15h2v3h3v2H4.8a.8.8 0 0 1-.8-.8V15Zm14 0h2v4.2a.8.8 0 0 1-.8.8H15v-2h3v-3Z" />
-    </svg>
-  ),
-  Compress: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M9 4v3.2A.8.8 0 0 1 8.2 8H5V6h2V4h2Zm6 0h2v2h2v2h-3.2A.8.8 0 0 1 15 7.2V4ZM5 16h3.2a.8.8 0 0 1 .8.8V20H7v-2H5v-2Zm14 0v2h-2v2h-2v-3.2a.8.8 0 0 1 .8-.8H19Z" />
-    </svg>
-  ),
-};
-
 function Hero() {
   const heroRef = useRef(null);
 
@@ -127,23 +77,12 @@ function Hero() {
       ref={heroRef}
       className="relative flex h-[calc(110dvh-68px)] w-full items-center overflow-hidden sm:h-[calc(110dvh-108px)] lg:h-[calc(110dvh-128px)]"
     >
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: heroY }}
-      >
+      <motion.div className="absolute inset-0" style={{ y: heroY }}>
         <img
           src={PHOTOS.main}
           alt="Children learning together"
           className="h-full w-full object-cover"
         />
-        {/* <video
-          src="/MKCDP-VIDEO.mp4"
-          poster="/image1.png"
-          autoPlay
-          muted
-          loop
-          className="h-[calc(95dvh-28px)] w-[calc(110dvw-28px)] object-cover"
-        /> */}
       </motion.div>
 
       <div className="absolute inset-0 z-10 bg-gradient-to-r from-green-700 via-green-700/50 to-transparent" />
@@ -198,357 +137,6 @@ function Hero() {
   );
 }
 
-function VideoPlayer() {
-  const shellRef = useRef(null);
-  const videoRef = useRef(null);
-  const barRef = useRef(null);
-  const hideTimer = useRef(null);
-
-  const [playing, setPlaying] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [buffered, setBuffered] = useState(0);
-  const [showControls, setShowControls] = useState(true);
-  const [scrubbing, setScrubbing] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [quality, setQuality] = useState("Auto");
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [volumeHover, setVolumeHover] = useState(false);
-
-  const progress = duration ? (current / duration) * 100 : 0;
-
-  const bumpControls = useCallback(() => {
-    setShowControls(true);
-    clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => {
-      const el = videoRef.current;
-      if (el && !el.paused && !scrubbing) setShowControls(false);
-    }, 2600);
-  }, [scrubbing]);
-
-  useEffect(() => () => clearTimeout(hideTimer.current), []);
-
-  useEffect(() => {
-    const onFsChange = () => setIsFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (el) el.volume = volume;
-  }, [volume]);
-
-  const togglePlay = useCallback(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    if (el.paused) {
-      el.play()
-        .then(() => {
-          setPlaying(true);
-          setStarted(true);
-          bumpControls();
-        })
-        .catch(() => {});
-    } else {
-      el.pause();
-      setPlaying(false);
-      setShowControls(true);
-    }
-  }, [bumpControls]);
-
-  const seekToClientX = useCallback(
-    (clientX) => {
-      const bar = barRef.current;
-      const el = videoRef.current;
-      if (!bar || !el || !duration) return;
-      const rect = bar.getBoundingClientRect();
-      const pct = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
-      el.currentTime = pct * duration;
-      setCurrent(pct * duration);
-    },
-    [duration]
-  );
-
-  useEffect(() => {
-    if (!scrubbing) return undefined;
-
-    const onMove = (e) => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      seekToClientX(clientX);
-    };
-    const onUp = () => setScrubbing(false);
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    window.addEventListener("touchmove", onMove, { passive: true });
-    window.addEventListener("touchend", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-      window.removeEventListener("touchmove", onMove);
-      window.removeEventListener("touchend", onUp);
-    };
-  }, [scrubbing, seekToClientX]);
-
-  const toggleMute = () => {
-    const el = videoRef.current;
-    if (!el) return;
-    el.muted = !el.muted;
-    setMuted(el.muted);
-    if (!el.muted && volume === 0) setVolume(0.6);
-  };
-
-  const toggleFullscreen = async () => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await shell.requestFullscreen();
-    } catch (err) {}
-  };
-
-  const onKeyDown = (e) => {
-    const el = videoRef.current;
-    if (!el) return;
-    if (e.key === " " || e.key === "k") {
-      e.preventDefault();
-      togglePlay();
-    } else if (e.key === "ArrowRight") {
-      el.currentTime = Math.min(el.currentTime + 5, duration || 0);
-    } else if (e.key === "ArrowLeft") {
-      el.currentTime = Math.max(el.currentTime - 5, 0);
-    } else if (e.key === "m") {
-      toggleMute();
-    } else if (e.key === "f") {
-      toggleFullscreen();
-    }
-  };
-
-  return (
-    <div
-      ref={shellRef}
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-      onMouseMove={bumpControls}
-      onMouseLeave={() => playing && setShowControls(false)}
-      className="group/player relative aspect-video w-full select-none overflow-hidden rounded-[18px] bg-black outline-none ring-1 ring-black/10 focus-visible:ring-2 focus-visible:ring-green-700"
-    >
-      <video
-        ref={videoRef}
-        src={VIDEO_SRC}
-        poster={VIDEO_POSTER}
-        playsInline
-        preload="metadata"
-        className="h-full w-full object-cover"
-        onClick={togglePlay}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-        onProgress={(e) => {
-          const el = e.currentTarget;
-          if (el.buffered.length && el.duration) {
-            setBuffered((el.buffered.end(el.buffered.length - 1) / el.duration) * 100);
-          }
-        }}
-        onEnded={() => {
-          setPlaying(false);
-          setShowControls(true);
-        }}
-      />
-      {!started && (
-        <button
-          type="button"
-          onClick={togglePlay}
-          aria-label="Play video"
-          className="absolute inset-0 z-20 grid place-items-center bg-black/25 transition-opacity duration-300"
-        >
-          <span className="grid h-[74px] w-[74px] place-items-center rounded-full bg-green-700/95 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:scale-105">
-            <Icon.Play className="ml-1 h-7 w-7 text-white" />
-          </span>
-        </button>
-      )}
-      {started && !playing && (
-        <button
-          type="button"
-          onClick={togglePlay}
-          aria-label="Resume video"
-          className="absolute inset-0 z-20 grid place-items-center bg-black/20"
-        >
-          <span className="grid h-[64px] w-[64px] place-items-center rounded-full bg-black/55 backdrop-blur-sm transition-transform duration-300 hover:scale-105">
-            <Icon.Play className="ml-1 h-6 w-6 text-white" />
-          </span>
-        </button>
-      )}
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/65 to-transparent px-5 pb-10 pt-4 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <p className="text-[0.95rem] font-semibold text-white drop-shadow">
-          Inkisanjani Digital Resource Center
-        </p>
-        <p className="mt-0.5 text-[0.75rem] font-medium text-white/70">
-          MKCDP · 2 min · Documentary
-        </p>
-      </div>
-      <div
-        className={`absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-3 pb-3 pt-14 transition-all duration-300 sm:px-4 sm:pb-3.5 ${
-          showControls ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
-        }`}
-      >
-        <div
-          ref={barRef}
-          onMouseDown={(e) => {
-            setScrubbing(true);
-            seekToClientX(e.clientX);
-          }}
-          onTouchStart={(e) => {
-            setScrubbing(true);
-            seekToClientX(e.touches[0].clientX);
-          }}
-          className="group/bar relative mb-2.5 flex h-4 cursor-pointer items-center"
-          role="slider"
-          aria-label="Seek"
-          aria-valuemin={0}
-          aria-valuemax={Math.round(duration)}
-          aria-valuenow={Math.round(current)}
-          tabIndex={-1}
-        >
-          <div className="relative h-[3px] w-full rounded-full bg-white/25 transition-all duration-150 group-hover/bar:h-[5px]">
-            <div
-              className="absolute inset-y-0 left-0 rounded-full bg-white/40"
-              style={{ width: `${buffered}%` }}
-            />
-            <div
-              className="absolute inset-y-0 left-0 rounded-full bg-[#E2703A]"
-              style={{ width: `${progress}%` }}
-            />
-            <div
-              className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E2703A] opacity-0 shadow transition-opacity duration-150 group-hover/bar:opacity-100"
-              style={{ left: `${progress}%`, opacity: scrubbing ? 1 : undefined }}
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-white sm:gap-2.5">
-          <button
-            type="button"
-            onClick={togglePlay}
-            aria-label={playing ? "Pause" : "Play"}
-            className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-white/15"
-          >
-            {playing ? <Icon.Pause className="h-[18px] w-[18px]" /> : <Icon.Play className="ml-0.5 h-[18px] w-[18px]" />}
-          </button>
-
-          <div
-            className="flex items-center"
-            onMouseEnter={() => setVolumeHover(true)}
-            onMouseLeave={() => setVolumeHover(false)}
-          >
-            <button
-              type="button"
-              onClick={toggleMute}
-              aria-label={muted ? "Unmute" : "Mute"}
-              className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-white/15"
-            >
-              {muted || volume === 0 ? (
-                <Icon.Mute className="h-[18px] w-[18px]" />
-              ) : (
-                <Icon.Volume className="h-[18px] w-[18px]" />
-              )}
-            </button>
-
-            <div
-              className="overflow-hidden transition-all duration-300"
-              style={{ width: volumeHover ? 68 : 0, opacity: volumeHover ? 1 : 0 }}
-            >
-              <div
-                className="relative mx-2 flex h-4 cursor-pointer items-center"
-                onMouseDown={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-                  const el = videoRef.current;
-                  setVolume(pct);
-                  if (el) {
-                    el.volume = pct;
-                    el.muted = pct === 0;
-                    setMuted(pct === 0);
-                  }
-                }}
-              >
-                <div className="h-[3px] w-full rounded-full bg-white/30">
-                  <div
-                    className="relative h-full rounded-full bg-white"
-                    style={{ width: `${(muted ? 0 : volume) * 100}%` }}
-                  >
-                    <span className="absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 translate-x-1/2 rounded-full bg-white" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <span className="ml-1 text-[0.78rem] font-semibold tabular-nums text-white/90">
-            {formatTime(current)} <span className="text-white/45">/ {formatTime(duration)}</span>
-          </span>
-
-          <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setSettingsOpen((v) => !v)}
-                aria-label="Settings"
-                className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-white/15"
-              >
-                <Icon.Settings className="h-[19px] w-[19px]" />
-              </button>
-              {settingsOpen && (
-                <div className="absolute bottom-12 right-0 w-40 overflow-hidden rounded-xl border border-white/10 bg-black/90 py-1.5 shadow-2xl backdrop-blur">
-                  <p className="px-3.5 pb-1 pt-1.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white/45">
-                    Quality
-                  </p>
-                  {["Auto"].map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => {
-                        setQuality(q);
-                        setSettingsOpen(false);
-                      }}
-                      className="flex w-full items-center justify-between px-3.5 py-2 text-left text-[0.8rem] font-medium text-white/85 transition-colors hover:bg-white/10"
-                    >
-                      {q}
-                      {quality === q && <span className="h-1.5 w-1.5 rounded-full bg-[#E2703A]" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-              className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-white/15"
-            >
-              {isFullscreen ? (
-                <Icon.Compress className="h-[18px] w-[18px]" />
-              ) : (
-                <Icon.Expand className="h-[18px] w-[18px]" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function VideoSection() {
   return (
     <section className="relative overflow-hidden bg-[#FBF7F0] py-24 lg:py-32">
@@ -581,7 +169,7 @@ function VideoSection() {
       </svg>
 
       <div className="mx-auto max-w-[1180px] px-6 sm:px-10">
-        <div className="mb-11 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
+        {/* <div className="mb-11 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-[640px]">
             <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.2em] text-green-700">
               <span className="h-px w-8 bg-green-700" />
@@ -594,9 +182,18 @@ function VideoSection() {
           <p className="max-w-[360px] text-[1rem] leading-[1.75] text-[#4A4A42]">
             A short documentary film about the Inkisanjani Digital Resource Center, a community-led initiative in Kajiado County, Kenya, that provides youth with access to digital learning resources and educational opportunities.
           </p>
-        </div>
+        </div> */}
 
-        <VideoPlayer />
+        <div className="relative aspect-video w-full overflow-hidden rounded-[18px] bg-black shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] ring-1 ring-black/10">
+          <iframe
+            src={`https://www.youtube.com/embed/${YOUTUBE_ID}`}
+            title="Inkisanjani Digital Resource Center"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            loading="lazy"
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
 
         <div className="mt-9 grid grid-cols-1 gap-8 border-t border-green-700/12 pt-8 sm:grid-cols-3">
           {[

@@ -137,7 +137,6 @@ const NAV_LINKS = [
     href: "/news-and-stories",
     children: [
       { label: "Stories of Impact", href: "/news-and-stories/stories-of-impact" },
-      { label: "Opinion", href: "/news-and-stories/opinion" },
       { label: "Media Center", href: "/news-and-stories/media-center" },
     ],
   },
@@ -147,7 +146,6 @@ const NAV_LINKS = [
     children: [
       { label: "Sponsor a Child", href: "/take-action/sponsor-a-child" },
       { label: "Send a Gift", href: "/take-action/send-a-gift" },
-      { label: "Basket", href: "/take-action/send-a-gift-cart" },
       { label: "Donate", href: "/take-action/donate" },
       { label: "Volunteer", href: "/take-action/volunteer" },
       { label: "Partner with us", href: "/take-action/partnerships" },
@@ -720,7 +718,6 @@ export default function Navbar() {
       className={`sticky top-0 z-50 w-full font-[Montserrat] transition-transform duration-300 ease-in-out ${headerTranslate}`}
     >
       <nav className="bg-[#FBF7F0]">
-        {/* Desktop top contact strip */}
         <div className="hidden border-b border-green-700/10 lg:block">
           <div className="mx-auto flex max-w-[1560px] items-center justify-center gap-2 px-2 py-2 lg:px-4">
             <div className="flex flex-wrap items-center gap-x-7 gap-y-1 text-[0.72rem] font-medium tracking-[0.02em] text-[#4A4A42]">
@@ -735,19 +732,15 @@ export default function Navbar() {
                 />
               ))}
               <p>|</p>
-
+              <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
                 title="Search (press /)"
-                className="inline-flex items-center gap-2 rounded-full border border-green-700/15 px-3 py-1 text-[0.7rem] text-[#4A4A42] transition-colors duration-200 hover:border-green-700/30 hover:text-green-700"
+                className="inline-flex items-start rounded-full border border-green-700/15 px-1 py-1 text-[0.7rem] text-[#4A4A42] transition-colors duration-200 hover:border-green-700/30 hover:text-green-700"
               >
-                <Icon.Search className="h-3.5 w-3.5 text-green-700" />
-                <span>Search</span>
-                <kbd className="hidden items-center gap-0.5 rounded border border-green-700/15 bg-white px-1.5 py-0.5 text-[0.6rem] font-semibold text-[#4A4A42]/70 lg:inline-flex">
-                  /
-                </kbd>
+                <Icon.Search className="h-5 w-auto text-green-700" />
               </button>
 
               <Link
@@ -758,7 +751,7 @@ export default function Navbar() {
                     : "Basket"
                 }
                 title="Basket"
-                className="inline-flex items-center gap-1.5 text-green-700 transition-colors duration-200 hover:text-[#15543A]"
+                className="inline-flex items-center gap-1.5 text-green-700 rounded-full border border-green-700/15 px-1 py-1 transition-colors duration-200 hover:text-[#15543A]"
               >
                 <span className="relative inline-flex">
                   <Icon.Basket className="h-5 w-5" />
@@ -768,23 +761,21 @@ export default function Navbar() {
                     </span>
                   )}
                 </span>
-                <span className="text-[0.7rem] font-semibold">Basket</span>
               </Link>
               <Link
                 to="/auth"
                 aria-label="Sign in or sign up"
                 title="Sign in / Sign up"
-                className="text-[#4A4A42] hover:text-green-700"
+                className="text-green-700 hover:text-green-700 rounded-full border border-green-700/15 px-1 py-1"
               >
-                Sign in / Sign up
+                <Icon.User className="h-5 w-auto text-green-700"/>
               </Link>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Main row */}
-        <div className="mx-auto flex max-w-[1560px] items-center gap-2 px-4 py-2 lg:px-14">
-          {/* Mobile: hamburger far left */}
+        <div className="relative mx-auto flex max-w-[1560px] items-center gap-2 px-4 py-2 lg:px-14">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
@@ -795,13 +786,11 @@ export default function Navbar() {
             <Icon.Menu className="h-6 w-6" />
           </button>
 
-          {/* Logo */}
           <Link to="/" className="flex flex-shrink-0 items-center gap-3">
-            <img src="/mkcdp.png" alt="MKCDP Logo" className="h-11 w-auto lg:h-14" />
+            <img src="/mkcdp.png" alt="MKCDP Logo" className="h-11 w-auto lg:h-12" />
           </Link>
 
-          {/* Desktop: nav next to logo */}
-          <ul className="ml-6 hidden items-center lg:flex">
+          <ul className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center lg:flex">
             {NAV_LINKS.map((link) => {
               const open = openDropdown === link.label;
               return (
@@ -813,16 +802,11 @@ export default function Navbar() {
                 >
                   <Link
                     to={link.href}
-                    className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[0.78rem] font-semibold uppercase tracking-[0.07em] text-[#2A2A26] transition-colors duration-200 hover:text-green-700"
+                    className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.07em] text-[#2A2A26] transition-colors duration-200 hover:text-green-700 xl:px-3.5 xl:text-[0.78rem]"
                   >
                     <span className="relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:rounded-full after:bg-green-700 after:transition-all after:duration-300 hover:after:w-full">
                       {link.label}
                     </span>
-                    <Icon.ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                        open ? "rotate-180 text-green-700" : "text-[#2A2A26]/50"
-                      }`}
-                    />
                   </Link>
 
                   <div
@@ -852,12 +836,10 @@ export default function Navbar() {
             })}
           </ul>
 
-          {/* Right side */}
           <div className="ml-auto flex items-center gap-1.5 lg:gap-3">
-            {/* Desktop CTAs */}
             <Link
               to="/take-action/sponsor-a-child"
-              className="hidden items-center gap-2 rounded-xl border border-green-700/20 px-5 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/6 lg:inline-flex"
+              className="hidden items-center gap-2 rounded-xl border border-green-700/20 px-5 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/6 2xl:inline-flex"
             >
               Sponsor a Child
             </Link>
@@ -868,7 +850,6 @@ export default function Navbar() {
               Donate
             </Link>
 
-            {/* Mobile icon buttons: user, search, basket */}
             <Link
               to="/auth"
               aria-label="Sign in or sign up"

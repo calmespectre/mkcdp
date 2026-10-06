@@ -5,6 +5,8 @@ import Home from "../components/home";
 import AboutPage from "../pages/about-us";
 import Auth from "../components/auth";
 import OurWork from "../components/our-work";
+import ProgramImpact from "../components/program";
+import NewsAndStories from "../components/newsandstories";
 import TakeAction from "../components/take-action";
 import { GiftCartProvider } from "../components/giftCart";
 
@@ -31,8 +33,13 @@ function App() {
             <Route path="/about/:section" element={<AboutPage />} />
             <Route path="/take-action" element={<TakeAction />} />
             <Route path="/take-action/:section" element={<TakeAction />} />
+            <Route path="/news-and-stories" element={<NewsAndStories />} />
+            <Route path="/news-and-stories/:section" element={<NewsAndStories />} />
+            <Route path="/news-and-stories/:section/:slug" element={<NewsAndStories />} />
             <Route path="/our-work" element={<OurWork />} />
             <Route path="/our-work/:section" element={<OurWork />} />
+            <Route path="/program-impact" element={<ProgramImpact />} />
+            <Route path="/program-impact/:section" element={<ProgramImpact />} />
           </Route>
 
           <Route path="/auth" element={<Auth />} />
