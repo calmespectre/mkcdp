@@ -1,5 +1,8 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+
+const API_BASE = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
 
 const flagOf = (code) =>
   code.replace(/[A-Z]/g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
@@ -214,20 +217,68 @@ const USERNAME_RULE = /^[A-Za-z][A-Za-z0-9_-]{2,19}$/;
 const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RULE = /^\+?[\d\s()-]{7,20}$/;
 
+const CODE_LENGTH = 6;
+const RESEND_SECONDS = 30;
+const NOTICE_MS = 3000;
+
+async function apiPost(path, body) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    data = null;
+  }
+  return { ok: res.ok, status: res.status, data };
+}
+
+function unwrap(data) {
+  if (data && typeof data === "object" && "success" in data && "data" in data) {
+    return data.data;
+  }
+  return data;
+}
+
+function flattenErrors(data) {
+  if (!data || typeof data !== "object") {
+    return { _form: "Something went wrong. Please try again." };
+  }
+
+  const source =
+    data.errors && typeof data.errors === "object" ? data.errors : data;
+
+  const out = {};
+  for (const [key, value] of Object.entries(source)) {
+    if (Array.isArray(value)) {
+      out[key] = String(value[0]);
+    } else if (typeof value === "string") {
+      out[key] = value;
+    } else if (value && typeof value === "object") {
+      const flat = Object.values(value).flat().map(String);
+      out[key] = flat.join(" ");
+    }
+  }
+
+  if (Object.keys(out).length === 0) {
+    const detail =
+      (data.errors && data.errors.detail) || data.detail || data.message;
+    if (detail) {
+      out._form = String(Array.isArray(detail) ? detail[0] : detail);
+    }
+  }
+
+  if (Object.keys(out).length === 0) {
+    out._form = "Something went wrong. Please try again.";
+  }
+
+  return out;
+}
+
 const Icon = {
-  Google: (p) => (
-    <svg viewBox="0 0 24 24" {...p}>
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-    </svg>
-  ),
-  Apple: (p) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-    </svg>
-  ),
   Eye: (p) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}>
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
@@ -283,20 +334,17 @@ const Icon = {
       <path d="M5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.1 1.5 1.5 0 0 1 5 3.5Z" />
     </svg>
   ),
-  Shield: (p) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 3l7 3v6c0 4.6-3 8.1-7 9-4-.9-7-4.4-7-9V6z" />
-      <path d="m9 12 2 2 4-4" />
+  Refresh: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M3 12a9 9 0 0 1 15.3-6.3L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15.3 6.3L3 16" />
+      <path d="M3 21v-5h5" />
     </svg>
   ),
-  Heart: (p) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10Z" />
-    </svg>
-  ),
-  Bell: (p) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M18 16V11a6 6 0 1 0-12 0v5l-1.5 3h15zM10 21.5a2 2 0 0 0 4 0" />
+  Close: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" {...p}>
+      <path d="M6 6l12 12M18 6L6 18" />
     </svg>
   ),
 };
@@ -374,8 +422,326 @@ function PasswordField({ id, label, value, onChange, error, show, onToggle, hint
   );
 }
 
+function NoticeToast({ open, mode, title, body, onClose }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setVisible(false);
+      return;
+    }
+    setVisible(true);
+    const t = window.setTimeout(() => {
+      setVisible(false);
+      window.setTimeout(() => onClose?.(), 260);
+    }, NOTICE_MS);
+    return () => window.clearTimeout(t);
+  }, [open, onClose]);
+
+  if (!open && !visible) return null;
+
+  const resolvedTitle =
+    title || (mode === "signup" ? "Account created." : mode === "signin" ? "Signed in." : "Success.");
+  const resolvedBody =
+    body ||
+    (mode === "signup"
+      ? "Check your inbox to confirm your email and set up your giving preferences."
+      : "Redirecting you to your dashboard.");
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-5 z-[9999] flex justify-center px-4 sm:top-7">
+      <div
+        role="status"
+        aria-live="polite"
+        className={`pointer-events-auto flex w-full max-w-[520px] items-start gap-4 rounded-2xl border border-green-700/25 bg-[#FBF7F0] p-4 shadow-[0_28px_60px_-24px_rgba(20,83,45,0.45)] transition-all duration-300 ${
+          visible ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+        }`}
+      >
+        <span className="mt-0.5 grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[#FBF7F0]">
+          <Icon.Check className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[1rem] font-bold leading-tight text-[#111111]">{resolvedTitle}</p>
+          <p className="mt-1 text-[0.82rem] leading-[1.65] text-[#4A4A42]">{resolvedBody}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setVisible(false);
+            window.setTimeout(() => onClose?.(), 260);
+          }}
+          aria-label="Dismiss"
+          className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-full text-[#4A4A42]/60 transition-colors duration-200 hover:bg-green-700/8 hover:text-green-700"
+        >
+          <Icon.Close className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CodeVerification({ destination, purpose, onBack, onVerified }) {
+  const [digits, setDigits] = useState(() => Array(CODE_LENGTH).fill(""));
+  const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [seconds, setSeconds] = useState(RESEND_SECONDS);
+  const [resending, setResending] = useState(false);
+  const [resendOk, setResendOk] = useState(false);
+  const inputsRef = useRef([]);
+
+  useEffect(() => {
+    inputsRef.current[0]?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (seconds <= 0) return;
+    const id = setInterval(() => setSeconds((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [seconds]);
+
+  const code = digits.join("");
+
+  const focusIndex = (i) => {
+    if (i < 0 || i >= CODE_LENGTH) return;
+    inputsRef.current[i]?.focus();
+    inputsRef.current[i]?.select?.();
+  };
+
+  const setDigitAt = (i, val) => {
+    setDigits((prev) => {
+      const next = [...prev];
+      next[i] = val;
+      return next;
+    });
+  };
+
+  const handleChange = (i, e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    if (!raw) {
+      setDigitAt(i, "");
+      return;
+    }
+    if (raw.length > 1) {
+      const chars = raw.slice(0, CODE_LENGTH - i).split("");
+      setDigits((prev) => {
+        const next = [...prev];
+        chars.forEach((c, k) => {
+          next[i + k] = c;
+        });
+        return next;
+      });
+      const nextIdx = Math.min(i + chars.length, CODE_LENGTH - 1);
+      focusIndex(nextIdx);
+      return;
+    }
+    setDigitAt(i, raw);
+    if (i < CODE_LENGTH - 1) focusIndex(i + 1);
+  };
+
+  const handleKeyDown = (i, e) => {
+    if (e.key === "Backspace") {
+      if (digits[i]) {
+        setDigitAt(i, "");
+      } else if (i > 0) {
+        setDigitAt(i - 1, "");
+        focusIndex(i - 1);
+      }
+      e.preventDefault();
+    } else if (e.key === "ArrowLeft") {
+      focusIndex(i - 1);
+      e.preventDefault();
+    } else if (e.key === "ArrowRight") {
+      focusIndex(i + 1);
+      e.preventDefault();
+    } else if (e.key === "Enter" && code.length === CODE_LENGTH) {
+      handleVerify();
+    }
+  };
+
+  const handlePaste = (e) => {
+    const text = (e.clipboardData?.getData("text") || "").replace(/\D/g, "");
+    if (!text) return;
+    e.preventDefault();
+    const chars = text.slice(0, CODE_LENGTH).split("");
+    setDigits(() => {
+      const next = Array(CODE_LENGTH).fill("");
+      chars.forEach((c, k) => {
+        next[k] = c;
+      });
+      return next;
+    });
+    focusIndex(Math.min(chars.length, CODE_LENGTH - 1));
+  };
+
+  const handleVerify = async () => {
+    if (verifying) return;
+    if (code.length !== CODE_LENGTH) {
+      setError(`Please enter the ${CODE_LENGTH}-digit code.`);
+      return;
+    }
+    setError("");
+    setVerifying(true);
+
+    const { ok, data } = await apiPost("/verify/", { email: destination, code });
+
+    if (!ok) {
+      const flat = flattenErrors(data);
+      setError(flat.detail || flat.code || flat.email || "Verification failed. Please try again.");
+      setVerifying(false);
+      return;
+    }
+
+    setVerifying(false);
+    onVerified(unwrap(data));
+  };
+
+  const handleResend = async () => {
+    if (seconds > 0 || resending) return;
+    setResending(true);
+    setError("");
+    setResendOk(false);
+    const { ok } = await apiPost("/resend/", { email: destination, purpose });
+    setResending(false);
+    if (!ok) {
+      setError("Could not resend the code. Please try again.");
+      return;
+    }
+    setResendOk(true);
+    setDigits(Array(CODE_LENGTH).fill(""));
+    setSeconds(RESEND_SECONDS);
+    focusIndex(0);
+    window.setTimeout(() => setResendOk(false), 2500);
+  };
+
+  const handleClear = () => {
+    setDigits(Array(CODE_LENGTH).fill(""));
+    setError("");
+    focusIndex(0);
+  };
+
+  return (
+    <div>
+      <div className="mb-8 flex items-start gap-4">
+        <div>
+          <h1 className="mt-2 text-[1.7rem] font-bold leading-tight text-[#111111]">
+            Enter your 6-digit code.
+          </h1>
+          <p className="mt-3 text-[0.9rem] leading-[1.75] text-[#4A4A42]">
+            We sent a one-time code to{" "}
+            <span className="font-semibold text-[#111111]">{destination}</span>. The code
+            expires in 10 minutes.
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-green-700/12 bg-white/70 p-5 sm:p-6">
+        <div
+          className="flex justify-between gap-2 sm:gap-3"
+          onPaste={handlePaste}
+          role="group"
+          aria-label={`${CODE_LENGTH}-digit verification code`}
+        >
+          {digits.map((d, i) => (
+            <input
+              key={i}
+              ref={(el) => (inputsRef.current[i] = el)}
+              type="text"
+              inputMode="numeric"
+              autoComplete={i === 0 ? "one-time-code" : "off"}
+              maxLength={1}
+              value={d}
+              onChange={(e) => handleChange(i, e)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              onFocus={(e) => e.target.select()}
+              aria-label={`Digit ${i + 1}`}
+              className={`h-14 w-full min-w-0 rounded-xl border bg-white text-center text-[1.35rem] font-bold tracking-[0.02em] text-[#111111] outline-none transition-all duration-200 focus:ring-2 sm:h-16 sm:text-[1.6rem] ${
+                error
+                  ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/20"
+                  : d
+                  ? "border-green-700/45 focus:border-green-700 focus:ring-green-700/15"
+                  : "border-green-700/15 focus:border-green-700 focus:ring-green-700/15"
+              }`}
+            />
+          ))}
+        </div>
+
+        {error && <p className="mt-3 text-[0.78rem] font-medium text-[#E2703A]">{error}</p>}
+        {resendOk && !error && (
+          <p className="mt-3 text-[0.78rem] font-medium text-green-700">New code sent.</p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleVerify}
+          disabled={verifying}
+          className="group mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-green-700 px-8 py-[1.05rem] text-[0.82rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_18px_36px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {verifying ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              Verifying…
+            </>
+          ) : (
+            <>
+              Verify and continue
+              <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </>
+          )}
+        </button>
+
+        <div className="mt-4 flex flex-col items-center justify-between gap-3 text-[0.8rem] text-[#4A4A42] sm:flex-row">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={seconds > 0 || resending}
+            className={`inline-flex items-center gap-2 font-semibold transition-colors duration-200 ${
+              seconds > 0 || resending
+                ? "cursor-not-allowed text-[#4A4A42]/50"
+                : "text-green-700 hover:text-green-950"
+            }`}
+          >
+            <Icon.Refresh className="h-3.5 w-3.5" />
+            {resending ? "Sending…" : seconds > 0 ? `Resend code in ${seconds}s` : "Resend code"}
+          </button>
+
+          {code.length > 0 && !verifying && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="font-semibold text-[#4A4A42] transition-colors duration-200 hover:text-green-700"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col items-start gap-3 text-[0.85rem] text-[#4A4A42] sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 font-semibold text-[#4A4A42] transition-colors duration-200 hover:text-green-700"
+        >
+          <Icon.ArrowLeft className="h-3.5 w-3.5" />
+          Use a different account
+        </button>
+        <p className="text-[0.78rem] text-[#4A4A42]/70">
+          Didn&rsquo;t get the code? Check spam, or resend.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function Auth() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/";
+  const { signInWithTokens } = useAuth();
+
+  const [step, setStep] = useState("form");
   const [mode, setMode] = useState("signin");
+  const [purpose, setPurpose] = useState("signin");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [country, setCountry] = useState("");
@@ -388,7 +754,8 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const selectedCountry = useMemo(
     () => COUNTRIES.find((c) => c.code === country) || null,
@@ -413,18 +780,12 @@ export default function Auth() {
 
   const switchMode = (next) => {
     setMode(next);
+    setPurpose(next);
     setErrors({});
-    setSubmitted(false);
+    setNotice(null);
   };
 
-  const handleSocial = (provider) => {
-    setErrors({});
-    setSubmitted(true);
-    window.setTimeout(() => setSubmitted(false), 3200);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const validate = () => {
     const next = {};
 
     if (mode === "signup") {
@@ -446,12 +807,105 @@ export default function Auth() {
       next.password = "Please enter your password.";
     }
 
-    setErrors(next);
+    return next;
+  };
 
-    if (Object.keys(next).length === 0) {
-      setSubmitted(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const next = validate();
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
+
+    setSubmitting(true);
+    setNotice(null);
+
+    try {
+      if (mode === "signup") {
+        const { ok, data } = await apiPost("/signup/", {
+          full_name: fullName.trim(),
+          username: username.trim(),
+          country,
+          phone: phone.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+          confirm,
+          newsletter,
+          agree,
+        });
+        if (!ok) {
+          setErrors(flattenErrors(data));
+          return;
+        }
+        setPurpose("signup");
+        setStep("verify");
+        return;
+      }
+
+      const { ok, data } = await apiPost("/signin/", {
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (!ok) {
+        setErrors(flattenErrors(data));
+        return;
+      }
+
+      const payload = unwrap(data) || {};
+
+      if (payload.requires_verification === false && payload.tokens) {
+        signInWithTokens({
+          access: payload.tokens.access,
+          refresh: payload.tokens.refresh,
+          user: payload.user,
+        });
+        setNotice({
+          mode: "signin",
+          title: "Signed in.",
+          body: `Taking you back to ${from}.`,
+        });
+        window.setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 400);
+        return;
+      }
+
+      setPurpose("signin");
+      setStep("verify");
+    } catch (err) {
+      setErrors({ _form: "Network error. Please check your connection and try again." });
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const backToForm = () => {
+    setStep("form");
+    setErrors({});
+  };
+
+  const handleVerified = (payload) => {
+    const data = payload || {};
+
+    if (data.tokens) {
+      signInWithTokens({
+        access: data.tokens.access,
+        refresh: data.tokens.refresh,
+        user: data.user,
+      });
+    }
+
+    setNotice({
+      mode: purpose === "signup" ? "signup" : "signin",
+      title: purpose === "signup" ? "Account verified." : "Signed in.",
+      body: `Taking you back to ${from}.`,
+    });
+
+    window.setTimeout(() => {
+      navigate(from, { replace: true });
+    }, 400);
+  };
+
+  const verificationDestination = email.trim().toLowerCase() || "your email address";
 
   return (
     <div className="hero-sans relative min-h-screen overflow-x-hidden bg-[#FBF7F0] text-[#141414] antialiased">
@@ -483,7 +937,7 @@ export default function Auth() {
       <div className="relative flex min-h-screen flex-col items-center px-6 py-8 sm:px-10 lg:py-10">
         <div className="flex w-full max-w-[560px] items-center justify-between">
           <Link
-            to="/"
+            to="/#"
             className="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42] transition-colors duration-200 hover:text-green-700"
           >
             <Icon.ArrowLeft className="h-3.5 w-3.5" />
@@ -492,338 +946,330 @@ export default function Auth() {
         </div>
 
         <div className="w-full max-w-[560px] flex-1 py-12">
-          {mode === "signup" && (
-            <p className="leading-tight text-[#111111] mb-12">
-              By creating an account with MKCDP, you'll receive updates on ongoing and upcoming projects, events, and other relevant news. You can change your preferences at any time.
-            </p>
-          )}
-
-          {submitted && (
-            <div className="mt-8 flex items-start gap-4 rounded-2xl border border-green-700/20 bg-green-700/6 p-5">
-              <span className="mt-0.5 grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[#FBF7F0]">
-                <Icon.Check className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="hero-serif text-[1.05rem] font-bold leading-tight text-[#111111]">
-                  {mode === "signup" ? "Account created." : "Signed in."}
+          {step === "verify" ? (
+            <CodeVerification
+              destination={verificationDestination}
+              purpose={purpose}
+              onBack={backToForm}
+              onVerified={handleVerified}
+            />
+          ) : (
+            <>
+              {mode === "signup" && (
+                <p className="leading-tight text-[#111111] mb-12">
+                  By creating an account with MKCDP, you'll receive updates on ongoing and upcoming projects, events, and other relevant news. You can change your preferences at any time.
                 </p>
-                <p className="mt-1 text-[0.85rem] leading-[1.7] text-[#4A4A42]">
-                  {mode === "signup"
-                    ? "Check your inbox to confirm your email and set up your giving preferences."
-                    : "Redirecting you to your dashboard."}
-                </p>
-              </div>
-            </div>
-          )}
+              )}
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-            {mode === "signup" && (
-              <>
-                <Field
-                  id="fullName"
-                  label="Full name"
-                  icon={Icon.User}
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
-                  autoComplete="name"
-                  error={errors.fullName}
-                />
-
-                <Field
-                  id="username"
-                  label="Username"
-                  icon={Icon.At}
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
-                  placeholder="Enter a username"
-                  autoComplete="username"
-                  hint="Pick your own — 3–20 characters. Letters, numbers, _ and - only."
-                  error={errors.username}
-                />
-
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="country" className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
-                      Country
-                    </label>
-                    <div className="relative mt-2">
-                      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-green-700/45">
-                        <Icon.Globe className="h-4 w-4" />
-                      </span>
-                      <select
-                        id="country"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        className={`w-full appearance-none rounded-xl border bg-white py-3.5 pl-11 pr-10 text-[0.92rem] text-[#111111] outline-none transition-all duration-200 focus:ring-2 ${
-                          errors.country
-                            ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/20"
-                            : "border-green-700/15 focus:border-green-700 focus:ring-green-700/15"
-                        }`}
-                      >
-                        <option value="">Select your country</option>
-                        {COUNTRIES.map((c) => (
-                          <option key={c.code} value={c.code}>
-                            {flagOf(c.code)} {c.name} ({c.dial})
-                          </option>
-                        ))}
-                      </select>
-                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-green-700/45">
-                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </span>
-                    </div>
-                    {errors.country && (
-                      <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.country}</p>
-                    )}
-                  </div>
-
-                  <Field
-                    id="phone"
-                    label="Phone number"
-                    icon={Icon.Phone}
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder={phonePlaceholder}
-                    autoComplete="tel"
-                    hint={selectedCountry ? `Use the ${selectedCountry.dial} country code.` : undefined}
-                    error={errors.phone}
-                  />
+              {errors._form && (
+                <div className="mb-6 rounded-2xl border border-[#E2703A]/30 bg-[#E2703A]/8 p-4 text-[0.85rem] font-medium text-[#8a3a12]">
+                  {errors._form}
                 </div>
-              </>
-            )}
+              )}
 
-            <Field
-              id="email"
-              label="Email address"
-              icon={Icon.At}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              autoComplete="email"
-              error={errors.email}
-            />
-
-            <PasswordField
-              id="password"
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              show={showPassword}
-              onToggle={() => setShowPassword((v) => !v)}
-              error={errors.password}
-            />
-
-            {mode === "signup" && (
-              <>
-                <div>
-                  <div className="mb-3 flex items-center justify-between gap-4">
-                    <span className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
-                      Password strength
-                    </span>
-                    <span
-                      className={`text-[0.68rem] font-bold uppercase tracking-[0.14em] ${
-                        strength.tone === "weak"
-                          ? "text-[#E2703A]"
-                          : strength.tone === "good"
-                          ? "text-[#F2B33D]"
-                          : strength.tone === "strong"
-                          ? "text-green-700"
-                          : "text-[#4A4A42]/40"
-                      }`}
-                    >
-                      {strength.label || "—"}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-green-700/8">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        strength.tone === "weak"
-                          ? "bg-[#E2703A]"
-                          : strength.tone === "good"
-                          ? "bg-[#F2B33D]"
-                          : "bg-green-700"
-                      }`}
-                      style={{ width: `${strength.width}%` }}
+              <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                {mode === "signup" && (
+                  <>
+                    <Field
+                      id="fullName"
+                      label="Full name"
+                      icon={Icon.User}
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                      autoComplete="name"
+                      error={errors.fullName}
                     />
-                  </div>
-                  <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {PASSWORD_RULES.map((r) => {
-                      const passed = r.test(password);
-                      return (
-                        <li
-                          key={r.id}
-                          className={`flex items-center gap-2.5 text-[0.78rem] transition-colors duration-200 ${
-                            passed ? "text-green-700" : "text-[#4A4A42]/70"
-                          }`}
-                        >
-                          <span
-                            className={`grid h-4 w-4 flex-shrink-0 place-items-center rounded-full transition-colors duration-200 ${
-                              passed
-                                ? "bg-green-700 text-[#FBF7F0]"
-                                : "border border-green-700/20 text-transparent"
+
+                    <Field
+                      id="username"
+                      label="Username"
+                      icon={Icon.At}
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+                      placeholder="Enter a username"
+                      autoComplete="username"
+                      hint="Pick your own — 3–20 characters. Letters, numbers, _ and - only."
+                      error={errors.username}
+                    />
+
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="country" className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
+                          Country
+                        </label>
+                        <div className="relative mt-2">
+                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-green-700/45">
+                            <Icon.Globe className="h-4 w-4" />
+                          </span>
+                          <select
+                            id="country"
+                            value={country}
+                            onChange={(e) => setCountry(e.target.value)}
+                            className={`w-full appearance-none rounded-xl border bg-white py-3.5 pl-11 pr-10 text-[0.92rem] text-[#111111] outline-none transition-all duration-200 focus:ring-2 ${
+                              errors.country
+                                ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/20"
+                                : "border-green-700/15 focus:border-green-700 focus:ring-green-700/15"
                             }`}
                           >
-                            <Icon.Check className="h-2.5 w-2.5" />
+                            <option value="">Select your country</option>
+                            {COUNTRIES.map((c) => (
+                              <option key={c.code} value={c.code}>
+                                {flagOf(c.code)} {c.name} ({c.dial})
+                              </option>
+                            ))}
+                          </select>
+                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-green-700/45">
+                            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
                           </span>
-                          {r.label}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+                        </div>
+                        {errors.country && (
+                          <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.country}</p>
+                        )}
+                      </div>
+
+                      <Field
+                        id="phone"
+                        label="Phone number"
+                        icon={Icon.Phone}
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder={phonePlaceholder}
+                        autoComplete="tel"
+                        hint={selectedCountry ? `Use the ${selectedCountry.dial} country code.` : undefined}
+                        error={errors.phone}
+                      />
+                    </div>
+                  </>
+                )}
+
+                <Field
+                  id="email"
+                  label="Email address"
+                  icon={Icon.At}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  autoComplete="email"
+                  error={errors.email}
+                />
 
                 <PasswordField
-                  id="confirm"
-                  label="Confirm password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  show={showConfirm}
-                  onToggle={() => setShowConfirm((v) => !v)}
-                  error={errors.confirm}
+                  id="password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  show={showPassword}
+                  onToggle={() => setShowPassword((v) => !v)}
+                  error={errors.password}
                 />
-              </>
-            )}
 
-            {mode === "signup" && (
-              <>
-                <label
-                  htmlFor="newsletter"
-                  className="group flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4 transition-colors duration-200 hover:border-green-700/25 hover:bg-white/85"
-                >
-                  <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                    <input
-                      id="newsletter"
-                      type="checkbox"
-                      checked={newsletter}
-                      onChange={(e) => setNewsletter(e.target.checked)}
-                      className="peer sr-only"
-                    />
-                    <span
-                      className={`grid h-5 w-5 place-items-center rounded-md border transition-all duration-200 ${
-                        newsletter
-                          ? "border-green-700 bg-green-700 text-[#FBF7F0]"
-                          : "border-green-700/25 bg-white text-transparent"
-                      }`}
-                    >
-                      <Icon.Check className="h-3 w-3" />
-                    </span>
-                  </span>
-                  <span>
-                    <span className="block text-[0.88rem] font-semibold text-[#111111]">
-                      Send me news, impact stories and giving updates
-                    </span>
-                    <span className="mt-1 block text-[0.78rem] leading-[1.6] text-[#4A4A42]/80">
-                      Roughly one email a month. No spam, unsubscribe anytime.
-                    </span>
-                  </span>
-                </label>
+                {mode === "signup" && (
+                  <>
+                    <div>
+                      <div className="mb-3 flex items-center justify-between gap-4">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
+                          Password strength
+                        </span>
+                        <span
+                          className={`text-[0.68rem] font-bold uppercase tracking-[0.14em] ${
+                            strength.tone === "weak"
+                              ? "text-[#E2703A]"
+                              : strength.tone === "good"
+                              ? "text-[#F2B33D]"
+                              : strength.tone === "strong"
+                              ? "text-green-700"
+                              : "text-[#4A4A42]/40"
+                          }`}
+                        >
+                          {strength.label || "—"}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-green-700/8">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            strength.tone === "weak"
+                              ? "bg-[#E2703A]"
+                              : strength.tone === "good"
+                              ? "bg-[#F2B33D]"
+                              : "bg-green-700"
+                          }`}
+                          style={{ width: `${strength.width}%` }}
+                        />
+                      </div>
+                      <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {PASSWORD_RULES.map((r) => {
+                          const passed = r.test(password);
+                          return (
+                            <li
+                              key={r.id}
+                              className={`flex items-center gap-2.5 text-[0.78rem] transition-colors duration-200 ${
+                                passed ? "text-green-700" : "text-[#4A4A42]/70"
+                              }`}
+                            >
+                              <span
+                                className={`grid h-4 w-4 flex-shrink-0 place-items-center rounded-full transition-colors duration-200 ${
+                                  passed
+                                    ? "bg-green-700 text-[#FBF7F0]"
+                                    : "border border-green-700/20 text-transparent"
+                                }`}
+                              >
+                                <Icon.Check className="h-2.5 w-2.5" />
+                              </span>
+                              {r.label}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
 
-                <label htmlFor="agree" className="group flex cursor-pointer items-start gap-3.5">
-                  <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                    <input
-                      id="agree"
-                      type="checkbox"
-                      checked={agree}
-                      onChange={(e) => setAgree(e.target.checked)}
-                      className="peer sr-only"
+                    <PasswordField
+                      id="confirm"
+                      label="Confirm password"
+                      value={confirm}
+                      onChange={(e) => setConfirm(e.target.value)}
+                      show={showConfirm}
+                      onToggle={() => setShowConfirm((v) => !v)}
+                      error={errors.confirm}
                     />
-                    <span
-                      className={`grid h-5 w-5 place-items-center rounded-md border transition-all duration-200 ${
-                        agree
-                          ? "border-green-700 bg-green-700 text-[#FBF7F0]"
-                          : errors.agree
-                          ? "border-[#E2703A]/60 bg-white text-transparent"
-                          : "border-green-700/25 bg-white text-transparent"
-                      }`}
-                    >
-                      <Icon.Check className="h-3 w-3" />
-                    </span>
-                  </span>
-                  <span className="text-[0.82rem] leading-[1.7] text-[#4A4A42]">
-                    I agree to the{" "}
-                    <Link to="/terms" className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy-policy" className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">
-                      Privacy Policy
-                    </Link>
-                    .
-                  </span>
-                </label>
-                {errors.agree && (
-                  <p className="-mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.agree}</p>
+                  </>
                 )}
-              </>
-            )}
 
-            <button
-              type="submit"
-              className="group mt-2 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-green-700 px-8 py-[1.1rem] text-[0.82rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_18px_36px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 active:scale-[0.99]"
-            >
-              {mode === "signup" ? "Create my account" : "Sign in"}
-              <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
+                {mode === "signup" && (
+                  <>
+                    <label
+                      htmlFor="newsletter"
+                      className="group flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4 transition-colors duration-200 hover:border-green-700/25 hover:bg-white/85"
+                    >
+                      <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
+                        <input
+                          id="newsletter"
+                          type="checkbox"
+                          checked={newsletter}
+                          onChange={(e) => setNewsletter(e.target.checked)}
+                          className="peer sr-only"
+                        />
+                        <span
+                          className={`grid h-5 w-5 place-items-center rounded-md border transition-all duration-200 ${
+                            newsletter
+                              ? "border-green-700 bg-green-700 text-[#FBF7F0]"
+                              : "border-green-700/25 bg-white text-transparent"
+                          }`}
+                        >
+                          <Icon.Check className="h-3 w-3" />
+                        </span>
+                      </span>
+                      <span>
+                        <span className="block text-[0.88rem] font-semibold text-[#111111]">
+                          Send me news, impact stories and giving updates
+                        </span>
+                        <span className="mt-1 block text-[0.78rem] leading-[1.6] text-[#4A4A42]/80">
+                          Roughly one email a month. No spam, unsubscribe anytime.
+                        </span>
+                      </span>
+                    </label>
 
-            <p className="pt-2 text-center text-[0.85rem] text-[#4A4A42]">
-              {mode === "signup" ? (
-                <>
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => switchMode("signin")}
-                    className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700"
-                  >
-                    Sign in
-                  </button>
-                </>
-              ) : (
-                <>
-                  Don't have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => switchMode("signup")}
-                    className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700"
-                  >
-                    Create an account
-                  </button>
-                </>
-              )}
-            </p>
-          </form>
-          <div className="my-8 flex items-center gap-4">
-            <span className="h-px flex-1 bg-green-700/15" />
-            <span className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#4A4A42]/70">
-              or
-            </span>
-            <span className="h-px flex-1 bg-green-700/15" />
-          </div>
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => handleSocial("google")}
-              className="inline-flex items-center justify-center gap-3 rounded-xl border border-green-700/15 bg-white px-5 py-3.5 text-[0.82rem] font-bold text-[#111111] transition-all duration-200 hover:-translate-y-0.5 hover:border-green-700/30 hover:shadow-[0_14px_28px_-18px_rgba(20,83,45,0.5)]"
-            >
-              <Icon.Google className="h-5 w-5" />
-              Continue with Google
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSocial("apple")}
-              className="inline-flex items-center justify-center gap-3 rounded-xl border border-green-700/15 bg-[#111111] px-5 py-3.5 text-[0.82rem] font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-black hover:shadow-[0_14px_28px_-18px_rgba(0,0,0,0.5)]"
-            >
-              <Icon.Apple className="h-5 w-5" />
-              Continue with Apple
-            </button>
-          </div>
+                    <label htmlFor="agree" className="group flex cursor-pointer items-start gap-3.5">
+                      <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
+                        <input
+                          id="agree"
+                          type="checkbox"
+                          checked={agree}
+                          onChange={(e) => setAgree(e.target.checked)}
+                          className="peer sr-only"
+                        />
+                        <span
+                          className={`grid h-5 w-5 place-items-center rounded-md border transition-all duration-200 ${
+                            agree
+                              ? "border-green-700 bg-green-700 text-[#FBF7F0]"
+                              : errors.agree
+                              ? "border-[#E2703A]/60 bg-white text-transparent"
+                              : "border-green-700/25 bg-white text-transparent"
+                          }`}
+                        >
+                          <Icon.Check className="h-3 w-3" />
+                        </span>
+                      </span>
+                      <span className="text-[0.82rem] leading-[1.7] text-[#4A4A42]">
+                        I agree to the{" "}
+                        <Link to="/terms" className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link to="/privacy-policy" className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                    {errors.agree && (
+                      <p className="-mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.agree}</p>
+                    )}
+                  </>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="group mt-2 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-green-700 px-8 py-[1.1rem] text-[0.82rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_18px_36px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {submitting ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      {mode === "signup" ? "Creating account…" : "Signing in…"}
+                    </>
+                  ) : (
+                    <>
+                      {mode === "signup" ? "Create my account" : "Sign in"}
+                      <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+
+                <p className="pt-2 text-center text-[0.85rem] text-[#4A4A42]">
+                  {mode === "signup" ? (
+                    <>
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => switchMode("signin")}
+                        className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700"
+                      >
+                        Sign in
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      Don't have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => switchMode("signup")}
+                        className="font-semibold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700"
+                      >
+                        Create an account
+                      </button>
+                    </>
+                  )}
+                </p>
+              </form>
+            </>
+          )}
         </div>
       </div>
+
+      <NoticeToast
+        open={!!notice}
+        mode={notice?.mode || mode}
+        title={notice?.title}
+        body={notice?.body}
+        onClose={() => setNotice(null)}
+      />
     </div>
   );
 }

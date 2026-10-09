@@ -1,5 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  useEditor,
+  EditableText,
+  EditableImage,
+} from "./editorContext";
 
 const SECTIONS = [
   {
@@ -268,7 +273,7 @@ const wayIcon = (key, cls) => {
   return <Cmp className={cls} />;
 };
 
-function SectionHeading({ eyebrow, title, intro, align = "left" }) {
+function SectionHeading({ idPrefix, eyebrow, title, intro, align = "left" }) {
   return (
     <div className={align === "center" ? "mx-auto max-w-[720px] text-center" : "max-w-[720px]"}>
       <span
@@ -277,17 +282,30 @@ function SectionHeading({ eyebrow, title, intro, align = "left" }) {
         }`}
       >
         <span className="h-px w-8 bg-green-700" />
-        {eyebrow}
+        <EditableText id={`${idPrefix}.eyebrow`} defaultValue={eyebrow} />
       </span>
-      <h2 className="hero-serif text-[clamp(1.7rem,4vw,2.9rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#111111]">
-        {title}
-      </h2>
-      {intro && <p className="mt-5 text-[1rem] leading-[1.85] text-[#4A4A42]">{intro}</p>}
+      <EditableText
+        as="h2"
+        id={`${idPrefix}.title`}
+        defaultValue={title}
+        multiline
+        className="block hero-serif text-[clamp(1.7rem,4vw,2.9rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#111111]"
+      />
+      {intro && (
+        <EditableText
+          as="p"
+          id={`${idPrefix}.intro`}
+          defaultValue={intro}
+          multiline
+          className="mt-5 block text-[1rem] leading-[1.85] text-[#4A4A42]"
+        />
+      )}
     </div>
   );
 }
 
 function OurWorkHub() {
+  const { isEditing } = useEditor();
   return (
     <div className="space-y-24 lg:space-y-32">
       <section className="relative overflow-hidden pt-16 lg:pt-24">
@@ -295,40 +313,54 @@ function OurWorkHub() {
           <div className="mx-auto max-w-[860px] text-center">
             <span className="mb-5 inline-flex items-center justify-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-green-700">
               <span className="h-px w-8 bg-green-700" />
-              Our Work
+              <EditableText id="ourWork.hub.hero.eyebrow" defaultValue="Our Work" />
             </span>
-            <h1 className="hero-serif text-[clamp(2.1rem,6.4vw,4.4rem)] font-bold leading-[1.06] tracking-[-0.022em] text-[#111111]">
-              Putting children first.
-            </h1>
-            <p className="mx-auto mt-7 max-w-[640px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
-              Children are our future — and our present. We work with communities across Kenya
-              to help children and families meet their most urgent needs for health, education,
-              skills and safety. Today MKCDP focuses on sustainable, community-driven programmes
-              that target the root causes of child vulnerability: poverty, lack of access to
-              quality education, hunger and limited access to healthcare.
-            </p>
+            <EditableText
+              as="h1"
+              id="ourWork.hub.hero.title"
+              defaultValue="Putting children first."
+              multiline
+              className="hero-serif block text-[clamp(2.1rem,6.4vw,4.4rem)] font-bold leading-[1.06] tracking-[-0.022em] text-[#111111]"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.hub.hero.intro"
+              defaultValue="Children are our future — and our present. We work with communities across Kenya to help children and families meet their most urgent needs for health, education, skills and safety. Today MKCDP focuses on sustainable, community-driven programmes that target the root causes of child vulnerability: poverty, lack of access to quality education, hunger and limited access to healthcare."
+              multiline
+              className="mx-auto mt-7 block max-w-[640px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]"
+            />
           </div>
         </div>
       </section>
 
       <section className="relative mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
         <SectionHeading
+          idPrefix="ourWork.hub.services"
           eyebrow="Our services"
           title="Four programme areas. One child at the centre."
           intro="Choose one of the programme areas below to learn more about our work, or use the links further down to see how and where we deliver it."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s) => (
+          {SERVICES.map((s, i) => (
             <div
               key={s.title}
               className="group flex flex-col rounded-3xl border border-green-700/12 bg-white/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
             >
               <span className="mb-6 block h-1 w-10 rounded-full bg-green-700/60 transition-all duration-300 group-hover:w-14 group-hover:bg-green-700" />
-              <h3 className="hero-serif text-[1.25rem] font-bold leading-tight text-[#111111]">
-                {s.title}
-              </h3>
-              <p className="mt-3 flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]">{s.body}</p>
+              <EditableText
+                as="h3"
+                id={`ourWork.hub.services.${i}.title`}
+                defaultValue={s.title}
+                className="hero-serif block text-[1.25rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.hub.services.${i}.body`}
+                defaultValue={s.body}
+                multiline
+                className="mt-3 block flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -336,30 +368,45 @@ function OurWorkHub() {
 
       <section className="relative mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
         <SectionHeading
+          idPrefix="ourWork.hub.explore"
           eyebrow="Explore deeper"
           title="Two more pages to take you inside our work."
           intro="Learn how our programmes are designed, and where in Kajiado South they are delivered."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {SECTIONS.filter((s) => s.id !== "what-we-do").map((s) => (
+          {SECTIONS.filter((s) => s.id !== "what-we-do").map((s, i) => (
             <Link
               key={s.slug}
               to={`/our-work/${s.slug}`}
-              className="group relative flex flex-col overflow-hidden rounded-[28px] border border-green-700/12 bg-white/70 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-46px_rgba(20,83,45,0.65)]"
+              className={`group relative flex flex-col overflow-hidden rounded-[28px] border border-green-700/12 bg-white/70 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-46px_rgba(20,83,45,0.65)] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               <div className="h-2 w-full" style={{ backgroundColor: s.accent }} />
 
               <div className="flex flex-1 flex-col p-6 sm:p-8">
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-green-700">
-                  {s.tag}
-                </p>
-                <p className="hero-serif mt-3 text-[clamp(1.5rem,2.6vw,2rem)] font-bold leading-tight text-[#111111]">
-                  {s.label}
-                </p>
-                <p className="mt-4 flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]">{s.desc}</p>
+                <EditableText
+                  as="p"
+                  id={`ourWork.hub.sections.${s.slug}.tag`}
+                  defaultValue={s.tag}
+                  className="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-green-700"
+                />
+                <EditableText
+                  as="p"
+                  id={`ourWork.hub.sections.${s.slug}.label`}
+                  defaultValue={s.label}
+                  className="hero-serif mt-3 block text-[clamp(1.5rem,2.6vw,2rem)] font-bold leading-tight text-[#111111]"
+                />
+                <EditableText
+                  as="p"
+                  id={`ourWork.hub.sections.${s.slug}.desc`}
+                  defaultValue={s.desc}
+                  multiline
+                  className="mt-4 block flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]"
+                />
                 <div className="mt-6 inline-flex w-fit items-center justify-center rounded-xl bg-green-700 px-5 py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 group-hover:bg-[#15543A]">
-                  Open page
+                  <EditableText id={`ourWork.hub.sections.${s.slug}.cta`} defaultValue="Open page" />
                 </div>
               </div>
             </Link>
@@ -384,23 +431,32 @@ function OurWorkHub() {
             <div>
               <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
                 <span className="h-px w-8 bg-[#F2B33D]" />
-                Our impact in numbers
+                <EditableText id="ourWork.hub.stats.eyebrow" defaultValue="Our impact in numbers" />
               </span>
-              <h2 className="hero-serif text-[clamp(1.8rem,4.2vw,3rem)] font-bold leading-[1.08] tracking-[-0.025em] text-[#FBF7F0]">
-                Numbers that carry names, families and futures.
-              </h2>
+              <EditableText
+                as="h2"
+                id="ourWork.hub.stats.title"
+                defaultValue="Numbers that carry names, families and futures."
+                multiline
+                className="hero-serif block text-[clamp(1.8rem,4.2vw,3rem)] font-bold leading-[1.08] tracking-[-0.025em] text-[#FBF7F0]"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {STATS.map((s) => (
+              {STATS.map((s, i) => (
                 <div key={s.label} className="border-l-2 border-[#F2B33D]/60 pl-5">
                   <p className="hero-serif text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-none text-[#FBF7F0]">
-                    {s.value}
-                    {s.suffix && <span className="text-[#F2B33D]">{s.suffix}</span>}
+                    <EditableText id={`ourWork.stats.${i}.value`} defaultValue={s.value} />
+                    {s.suffix && (
+                      <EditableText as="span" id={`ourWork.stats.${i}.suffix`} defaultValue={s.suffix} className="text-[#F2B33D]" />
+                    )}
                   </p>
-                  <p className="mt-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#FBF7F0]/60">
-                    {s.label}
-                  </p>
+                  <EditableText
+                    as="p"
+                    id={`ourWork.stats.${i}.label`}
+                    defaultValue={s.label}
+                    className="mt-3 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#FBF7F0]/60"
+                  />
                 </div>
               ))}
             </div>
@@ -410,23 +466,36 @@ function OurWorkHub() {
 
       <section className="relative mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
         <SectionHeading
+          idPrefix="ourWork.hub.approach"
           eyebrow="Our approach"
           title="Six principles that guide every programme."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {APPROACH.map((a) => (
+          {APPROACH.map((a, i) => (
             <div
               key={a.n}
               className="group relative overflow-hidden rounded-3xl border border-green-700/12 bg-white/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
             >
-              <span className="hero-serif text-[2.4rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35">
-                {a.n}
-              </span>
-              <h3 className="hero-serif mt-5 text-[1.2rem] font-bold leading-tight text-[#111111]">
-                {a.title}
-              </h3>
-              <p className="mt-3 text-[0.9rem] leading-[1.75] text-[#4A4A42]">{a.body}</p>
+              <EditableText
+                as="span"
+                id={`ourWork.hub.approach.${i}.n`}
+                defaultValue={a.n}
+                className="hero-serif block text-[2.4rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35"
+              />
+              <EditableText
+                as="h3"
+                id={`ourWork.hub.approach.${i}.title`}
+                defaultValue={a.title}
+                className="hero-serif mt-5 block text-[1.2rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.hub.approach.${i}.body`}
+                defaultValue={a.body}
+                multiline
+                className="mt-3 block text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -438,29 +507,40 @@ function OurWorkHub() {
             <div>
               <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
                 <span className="h-px w-8 bg-[#F2B33D]" />
-                Join us
+                <EditableText id="ourWork.hub.cta.eyebrow" defaultValue="Join us" />
               </span>
-              <h3 className="hero-serif text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]">
-                Join us in building brighter futures for children around Mt. Kilimanjaro.
-              </h3>
-              <p className="mt-6 max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70">
-                Whether you give, volunteer or partner with us, your contribution reaches a real
-                child in a real classroom — and stays with them for years.
-              </p>
+              <EditableText
+                as="h3"
+                id="ourWork.hub.cta.title"
+                defaultValue="Join us in building brighter futures for children around Mt. Kilimanjaro."
+                multiline
+                className="hero-serif block text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]"
+              />
+              <EditableText
+                as="p"
+                id="ourWork.hub.cta.body"
+                defaultValue="Whether you give, volunteer or partner with us, your contribution reaches a real child in a real classroom — and stays with them for years."
+                multiline
+                className="mt-6 block max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70"
+              />
             </div>
 
             <div className="flex flex-col gap-3 lg:items-end">
               <Link
                 to="/about"
-                className="inline-flex w-fit items-center rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+                className={`inline-flex w-fit items-center rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white ${
+                  isEditing ? "pointer-events-none" : ""
+                }`}
               >
-                Learn more about us
+                <EditableText id="ourWork.hub.cta.learnMore" defaultValue="Learn more about us" />
               </Link>
               <Link
                 to="/take-action/donate"
-                className="inline-flex w-fit items-center rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
+                className={`inline-flex w-fit items-center rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700 ${
+                  isEditing ? "pointer-events-none" : ""
+                }`}
               >
-                Donate now
+                <EditableText id="ourWork.hub.cta.donate" defaultValue="Donate now" />
               </Link>
             </div>
           </div>
@@ -471,27 +551,31 @@ function OurWorkHub() {
 }
 
 function WhereWeWork() {
+  const { isEditing } = useEditor();
   return (
     <div className="space-y-20 lg:space-y-28">
       <section className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
         <div>
           <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
             <span className="h-px w-8 bg-green-700" />
-            Where We Work
+            <EditableText id="ourWork.where.hero.eyebrow" defaultValue="Where We Work" />
           </span>
 
-          <h1 className="hero-serif text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]">
-            Around Mt. Kilimanjaro.
-            <br />
-            <span className="italic text-green-700">Where vulnerability meets opportunity.</span>
-          </h1>
+          <EditableText
+            as="h1"
+            id="ourWork.where.hero.title"
+            defaultValue={"Around Mt. Kilimanjaro.\nWhere vulnerability meets opportunity."}
+            multiline
+            className="hero-serif block whitespace-pre-line text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]"
+          />
 
-          <p className="mt-8 max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
-            The Mt. Kilimanjaro Child Development Programme (MKCDP) works in communities located
-            around the Mt. Kilimanjaro region, focusing on areas where children face the highest
-            levels of vulnerability due to poverty, limited access to education, food insecurity
-            and inadequate healthcare.
-          </p>
+          <EditableText
+            as="p"
+            id="ourWork.where.hero.intro"
+            defaultValue="The Mt. Kilimanjaro Child Development Programme (MKCDP) works in communities located around the Mt. Kilimanjaro region, focusing on areas where children face the highest levels of vulnerability due to poverty, limited access to education, food insecurity and inadequate healthcare."
+            multiline
+            className="mt-8 block max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]"
+          />
         </div>
 
         <div className="relative">
@@ -503,16 +587,26 @@ function WhereWeWork() {
             <span className="grid h-12 w-12 place-items-center rounded-full bg-green-700/8 text-green-700">
               <Icon.MapPin className="h-5 w-5" />
             </span>
-            <p className="mt-6 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Primary operating region
-            </p>
-            <p className="hero-serif mt-3 text-[clamp(1.3rem,2.4vw,1.7rem)] font-bold leading-tight text-[#111111]">
-              Moshi Rural, Hai District, Siha District &amp; Rombo
-            </p>
-            <p className="mt-4 text-[0.95rem] leading-[1.8] text-[#4A4A42]">
-              Communities surrounding Mt. Kilimanjaro, where the need is greatest and the impact
-              of consistent support is highest.
-            </p>
+            <EditableText
+              as="p"
+              id="ourWork.where.region.eyebrow"
+              defaultValue="Primary operating region"
+              className="mt-6 block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.where.region.title"
+              defaultValue="Moshi Rural, Hai District, Siha District & Rombo"
+              multiline
+              className="hero-serif mt-3 block text-[clamp(1.3rem,2.4vw,1.7rem)] font-bold leading-tight text-[#111111]"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.where.region.body"
+              defaultValue="Communities surrounding Mt. Kilimanjaro, where the need is greatest and the impact of consistent support is highest."
+              multiline
+              className="mt-4 block text-[0.95rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute -right-4 -top-6 z-10 w-16 rotate-12">
@@ -523,24 +617,37 @@ function WhereWeWork() {
 
       <section>
         <SectionHeading
+          idPrefix="ourWork.where.why"
           eyebrow="Why these communities"
           title="Where the need is highest."
           intro="We deliberately focus on communities where children face overlapping barriers — so that every shilling goes where it changes the most."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {REACH_AREAS.map((r) => (
+          {REACH_AREAS.map((r, i) => (
             <div
               key={r.n}
               className="group relative overflow-hidden rounded-3xl border border-green-700/12 bg-white/60 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
             >
-              <span className="hero-serif text-[2.6rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35">
-                {r.n}
-              </span>
-              <h3 className="hero-serif mt-5 text-[1.25rem] font-bold leading-tight text-[#111111]">
-                {r.title}
-              </h3>
-              <p className="mt-3 text-[0.94rem] leading-[1.8] text-[#4A4A42]">{r.body}</p>
+              <EditableText
+                as="span"
+                id={`ourWork.where.reach.${i}.n`}
+                defaultValue={r.n}
+                className="hero-serif block text-[2.6rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35"
+              />
+              <EditableText
+                as="h3"
+                id={`ourWork.where.reach.${i}.title`}
+                defaultValue={r.title}
+                className="hero-serif mt-5 block text-[1.25rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.where.reach.${i}.body`}
+                defaultValue={r.body}
+                multiline
+                className="mt-3 block text-[0.94rem] leading-[1.8] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -551,19 +658,26 @@ function WhereWeWork() {
           <div>
             <span className="mb-3 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-8 bg-green-700" />
-              Our districts
+              <EditableText id="ourWork.where.districts.eyebrow" defaultValue="Our districts" />
             </span>
-            <h3 className="hero-serif text-[clamp(1.5rem,3vw,2rem)] font-bold leading-tight text-[#111111]">
-              Four districts. One shared mission.
-            </h3>
+            <EditableText
+              as="h3"
+              id="ourWork.where.districts.title"
+              defaultValue="Four districts. One shared mission."
+              className="hero-serif block text-[clamp(1.5rem,3vw,2rem)] font-bold leading-tight text-[#111111]"
+            />
           </div>
-          <p className="text-[0.85rem] text-[#4A4A42]/75">
-            Programme focus varies slightly by district, based on local priorities.
-          </p>
+          <EditableText
+            as="p"
+            id="ourWork.where.districts.note"
+            defaultValue="Programme focus varies slightly by district, based on local priorities."
+            multiline
+            className="block text-[0.85rem] text-[#4A4A42]/75"
+          />
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {DISTRICTS.map((d) => (
+          {DISTRICTS.map((d, i) => (
             <div
               key={d.name}
               className="rounded-2xl border border-green-700/12 bg-white/70 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700/30"
@@ -571,10 +685,19 @@ function WhereWeWork() {
               <span className="grid h-10 w-10 place-items-center rounded-full bg-green-700/8 text-green-700">
                 <Icon.MapPin className="h-4 w-4" />
               </span>
-              <p className="hero-serif mt-5 text-[1.15rem] font-bold leading-tight text-[#111111]">
-                {d.name}
-              </p>
-              <p className="mt-2 text-[0.85rem] leading-[1.7] text-[#4A4A42]">{d.note}</p>
+              <EditableText
+                as="p"
+                id={`ourWork.where.districts.${i}.name`}
+                defaultValue={d.name}
+                className="hero-serif mt-5 block text-[1.15rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.where.districts.${i}.note`}
+                defaultValue={d.note}
+                multiline
+                className="mt-2 block text-[0.85rem] leading-[1.7] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -589,30 +712,41 @@ function WhereWeWork() {
           <div>
             <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
               <span className="h-px w-8 bg-[#F2B33D]" />
-              Visit us
+              <EditableText id="ourWork.where.visit.eyebrow" defaultValue="Visit us" />
             </span>
-            <h3 className="hero-serif text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]">
-              Come and see the work for yourself.
-            </h3>
-            <p className="mt-6 max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70">
-              We host structured partner visits throughout the year. All visitors sign our
-              safeguarding code of conduct before any contact with children.
-            </p>
+            <EditableText
+              as="h3"
+              id="ourWork.where.visit.title"
+              defaultValue="Come and see the work for yourself."
+              multiline
+              className="hero-serif block text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.where.visit.body"
+              defaultValue="We host structured partner visits throughout the year. All visitors sign our safeguarding code of conduct before any contact with children."
+              multiline
+              className="mt-6 block max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70"
+            />
           </div>
 
           <div className="flex flex-col gap-3 lg:items-end">
             <a
               href="tel:+254782216288"
-              className="group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              className={`group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               <Icon.Phone className="h-4 w-4" />
-              +254 737 332 219
+              <EditableText id="ourWork.where.visit.phone" defaultValue="+254 737 332 219" />
             </a>
             <Link
               to="/take-action/report-safeguarding"
-              className="inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
+              className={`inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Report a concern
+              <EditableText id="ourWork.where.visit.report" defaultValue="Report a concern" />
             </Link>
           </div>
         </div>
@@ -622,42 +756,56 @@ function WhereWeWork() {
 }
 
 function HowWeWork() {
+  const { isEditing } = useEditor();
+  const practiceItems = [
+    "A community meeting before a new programme starts — not after.",
+    "A health check for a sponsored child that also looks at nutrition, not just attendance.",
+    "A safeguarding briefing for every visitor before they meet a single child.",
+    "A local nurse or teacher trained to spot warning signs early.",
+    "A quarterly review with community leaders to hear what is working and what is not.",
+  ];
   return (
     <div className="space-y-20 lg:space-y-28">
       <section className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
         <div>
           <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
             <span className="h-px w-8 bg-green-700" />
-            How We Work
+            <EditableText id="ourWork.how.hero.eyebrow" defaultValue="How We Work" />
           </span>
 
-          <h1 className="hero-serif text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]">
-            Child-centred.
-            <br />
-            Community-driven.
-            <br />
-            <span className="italic text-green-700">Partnership-based.</span>
-          </h1>
+          <EditableText
+            as="h1"
+            id="ourWork.how.hero.title"
+            defaultValue={"Child-centred.\nCommunity-driven.\nPartnership-based."}
+            multiline
+            className="hero-serif block whitespace-pre-line text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]"
+          />
 
-          <p className="mt-8 max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
-            MKCDP works through a child-centred, community-driven and partnership-based approach
-            that places children's wellbeing, safety and long-term development at the core of
-            every programme.
-          </p>
+          <EditableText
+            as="p"
+            id="ourWork.how.hero.intro"
+            defaultValue="MKCDP works through a child-centred, community-driven and partnership-based approach that places children's wellbeing, safety and long-term development at the core of every programme."
+            multiline
+            className="mt-8 block max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]"
+          />
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
               to="/take-action/donate"
-              className="group inline-flex items-center gap-3 rounded-full bg-green-700 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A]"
+              className={`group inline-flex items-center gap-3 rounded-full bg-green-700 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Donate now
+              <EditableText id="ourWork.how.hero.donate" defaultValue="Donate now" />
               <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
               to="/our-work/where-we-work"
-              className="inline-flex items-center gap-3 rounded-full border border-green-700/25 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5"
+              className={`inline-flex items-center gap-3 rounded-full border border-green-700/25 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Where we work
+              <EditableText id="ourWork.how.hero.where" defaultValue="Where we work" />
             </Link>
           </div>
         </div>
@@ -671,31 +819,40 @@ function HowWeWork() {
             <span className="grid h-12 w-12 place-items-center rounded-full bg-green-700/8 text-green-700">
               <Icon.Target className="h-5 w-5" />
             </span>
-            <p className="mt-6 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Our promise
-            </p>
-            <p className="hero-serif mt-3 text-[clamp(1.15rem,2.2vw,1.5rem)] font-medium italic leading-[1.55] text-[#111111]">
-              &ldquo;Every programme is designed with children, not just for them.&rdquo;
-            </p>
+            <EditableText
+              as="p"
+              id="ourWork.how.promise.eyebrow"
+              defaultValue="Our promise"
+              className="mt-6 block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.how.promise.body"
+              defaultValue="“Every programme is designed with children, not just for them.”"
+              multiline
+              className="hero-serif mt-3 block text-[clamp(1.15rem,2.2vw,1.5rem)] font-medium italic leading-[1.55] text-[#111111]"
+            />
             <div className="mt-8 grid grid-cols-3 gap-6 border-t border-green-700/12 pt-6">
-              <div>
-                <p className="hero-serif text-[1.5rem] font-bold leading-none text-green-700">7</p>
-                <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75">
-                  Guiding principles
-                </p>
-              </div>
-              <div>
-                <p className="hero-serif text-[1.5rem] font-bold leading-none text-green-700">4</p>
-                <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75">
-                  Districts served
-                </p>
-              </div>
-              <div>
-                <p className="hero-serif text-[1.5rem] font-bold leading-none text-green-700">100%</p>
-                <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75">
-                  Safeguarding audited
-                </p>
-              </div>
+              {[
+                { key: "principles", value: "7", label: "Guiding principles" },
+                { key: "districts", value: "4", label: "Districts served" },
+                { key: "safeguarding", value: "100%", label: "Safeguarding audited" },
+              ].map((item) => (
+                <div key={item.key}>
+                  <EditableText
+                    as="p"
+                    id={`ourWork.how.promise.${item.key}.value`}
+                    defaultValue={item.value}
+                    className="hero-serif block text-[1.5rem] font-bold leading-none text-green-700"
+                  />
+                  <EditableText
+                    as="p"
+                    id={`ourWork.how.promise.${item.key}.label`}
+                    defaultValue={item.label}
+                    className="mt-2 block text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75"
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -707,13 +864,14 @@ function HowWeWork() {
 
       <section>
         <SectionHeading
+          idPrefix="ourWork.how.principles"
           eyebrow="Our principles"
           title="Seven pillars behind every programme."
           intro="Each of these principles shows up in the design, delivery and review of every project we run."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {HOW_PILLARS.map((p) => (
+          {HOW_PILLARS.map((p, i) => (
             <div
               key={p.n}
               className="group flex flex-col rounded-3xl border border-green-700/12 bg-white/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
@@ -722,15 +880,27 @@ function HowWeWork() {
                 <span className="grid h-12 w-12 place-items-center rounded-xl bg-green-700/8 text-green-700 transition-colors duration-300 group-hover:bg-green-700 group-hover:text-white">
                   {wayIcon(p.icon, "h-5 w-5")}
                 </span>
-                <span className="hero-serif text-[1.6rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35">
-                  {p.n}
-                </span>
+                <EditableText
+                  as="span"
+                  id={`ourWork.how.pillars.${i}.n`}
+                  defaultValue={p.n}
+                  className="hero-serif block text-[1.6rem] font-bold leading-none text-green-700/15 transition-colors duration-300 group-hover:text-green-700/35"
+                />
               </div>
 
-              <h3 className="hero-serif mt-6 text-[1.2rem] font-bold leading-tight text-[#111111]">
-                {p.title}
-              </h3>
-              <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">{p.body}</p>
+              <EditableText
+                as="h3"
+                id={`ourWork.how.pillars.${i}.title`}
+                defaultValue={p.title}
+                className="hero-serif mt-6 block text-[1.2rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.how.pillars.${i}.body`}
+                defaultValue={p.body}
+                multiline
+                className="mt-3 block text-[0.9rem] leading-[1.8] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -740,6 +910,7 @@ function HowWeWork() {
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
           <div>
             <SectionHeading
+              idPrefix="ourWork.how.practice"
               eyebrow="In practice"
               title="What this looks like on the ground."
               intro="These principles are not slogans. Here is how they translate into the work we do every day."
@@ -747,18 +918,18 @@ function HowWeWork() {
           </div>
 
           <ul className="space-y-5">
-            {[
-              "A community meeting before a new programme starts — not after.",
-              "A health check for a sponsored child that also looks at nutrition, not just attendance.",
-              "A safeguarding briefing for every visitor before they meet a single child.",
-              "A local nurse or teacher trained to spot warning signs early.",
-              "A quarterly review with community leaders to hear what is working and what is not.",
-            ].map((line) => (
-              <li key={line} className="flex items-start gap-4">
+            {practiceItems.map((_, i) => (
+              <li key={i} className="flex items-start gap-4">
                 <span className="mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-full bg-green-700 text-white">
                   <Icon.Check className="h-3 w-3" />
                 </span>
-                <p className="text-[0.95rem] leading-[1.8] text-[#3D3D37]">{line}</p>
+                <EditableText
+                  as="p"
+                  id={`ourWork.how.practice.${i}`}
+                  defaultValue={practiceItems[i]}
+                  multiline
+                  className="block text-[0.95rem] leading-[1.8] text-[#3D3D37]"
+                />
               </li>
             ))}
           </ul>
@@ -774,30 +945,41 @@ function HowWeWork() {
           <div>
             <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
               <span className="h-px w-8 bg-[#F2B33D]" />
-              Work with us
+              <EditableText id="ourWork.how.cta.eyebrow" defaultValue="Work with us" />
             </span>
-            <h3 className="hero-serif text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]">
-              Help us put these principles to work.
-            </h3>
-            <p className="mt-6 max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70">
-              Volunteer with us, partner with us, or give monthly — every path puts a child
-              in school and keeps them there.
-            </p>
+            <EditableText
+              as="h3"
+              id="ourWork.how.cta.title"
+              defaultValue="Help us put these principles to work."
+              multiline
+              className="hero-serif block text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.how.cta.body"
+              defaultValue="Volunteer with us, partner with us, or give monthly — every path puts a child in school and keeps them there."
+              multiline
+              className="mt-6 block max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70"
+            />
           </div>
 
           <div className="flex flex-col gap-3 lg:items-end">
             <Link
               to="/take-action/volunteer"
-              className="group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              className={`group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Volunteer with us
+              <EditableText id="ourWork.how.cta.volunteer" defaultValue="Volunteer with us" />
               <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
               to="/take-action/partnerships"
-              className="inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
+              className={`inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Partner with us
+              <EditableText id="ourWork.how.cta.partner" defaultValue="Partner with us" />
             </Link>
           </div>
         </div>
@@ -807,22 +989,29 @@ function HowWeWork() {
 }
 
 function WhatWeDo() {
+  const { isEditing } = useEditor();
   return (
     <div className="space-y-20 lg:space-y-28">
       <section className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
         <div>
           <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
             <span className="h-px w-8 bg-green-700" />
-            What We Do
+            <EditableText id="ourWork.what.hero.eyebrow" defaultValue="What We Do" />
           </span>
-          <h1 className="hero-serif text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]">
-            Putting children first.
-          </h1>
-          <p className="mt-8 max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]">
-            Children are our future — and our present. We work with communities across Kenya to
-            help children and families meet their basic, most urgent needs for health, education,
-            skills and safety.
-          </p>
+          <EditableText
+            as="h1"
+            id="ourWork.what.hero.title"
+            defaultValue="Putting children first."
+            multiline
+            className="hero-serif block text-[clamp(2rem,5.4vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]"
+          />
+          <EditableText
+            as="p"
+            id="ourWork.what.hero.intro"
+            defaultValue="Children are our future — and our present. We work with communities across Kenya to help children and families meet their basic, most urgent needs for health, education, skills and safety."
+            multiline
+            className="mt-8 block max-w-[540px] text-[1.0625rem] leading-[1.85] text-[#3D3D37]"
+          />
         </div>
 
         <div className="relative">
@@ -834,13 +1023,19 @@ function WhatWeDo() {
             <span className="grid h-12 w-12 place-items-center rounded-full bg-green-700/8 text-green-700">
               <Icon.Heart className="h-5 w-5" />
             </span>
-            <p className="mt-6 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Our focus
-            </p>
-            <p className="hero-serif mt-3 text-[clamp(1.15rem,2.2vw,1.5rem)] font-medium italic leading-[1.55] text-[#111111]">
-              &ldquo;Sustainable, community-driven programmes that target the root causes of
-              child vulnerability.&rdquo;
-            </p>
+            <EditableText
+              as="p"
+              id="ourWork.what.focus.eyebrow"
+              defaultValue="Our focus"
+              className="mt-6 block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.what.focus.body"
+              defaultValue="“Sustainable, community-driven programmes that target the root causes of child vulnerability.”"
+              multiline
+              className="hero-serif mt-3 block text-[clamp(1.15rem,2.2vw,1.5rem)] font-medium italic leading-[1.55] text-[#111111]"
+            />
           </div>
 
           <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute -right-4 -top-6 z-10 w-16 rotate-12">
@@ -851,13 +1046,14 @@ function WhatWeDo() {
 
       <section>
         <SectionHeading
+          idPrefix="ourWork.what.services"
           eyebrow="Our services"
           title="Four programme areas."
           intro="Each area reinforces the others. A child who is healthy learns better. A child who is protected stays in school. A family with an income can keep both going."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s) => (
+          {SERVICES.map((s, i) => (
             <div
               key={s.title}
               className="group flex flex-col rounded-3xl border border-green-700/12 bg-white/60 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
@@ -865,10 +1061,19 @@ function WhatWeDo() {
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-green-700/8 text-green-700 transition-colors duration-300 group-hover:bg-green-700 group-hover:text-white">
                 {wayIcon(s.icon, "h-5 w-5")}
               </span>
-              <h3 className="hero-serif mt-6 text-[1.25rem] font-bold leading-tight text-[#111111]">
-                {s.title}
-              </h3>
-              <p className="mt-3 flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]">{s.body}</p>
+              <EditableText
+                as="h3"
+                id={`ourWork.what.services.${i}.title`}
+                defaultValue={s.title}
+                className="hero-serif mt-6 block text-[1.25rem] font-bold leading-tight text-[#111111]"
+              />
+              <EditableText
+                as="p"
+                id={`ourWork.what.services.${i}.body`}
+                defaultValue={s.body}
+                multiline
+                className="mt-3 block flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+              />
             </div>
           ))}
         </div>
@@ -876,23 +1081,29 @@ function WhatWeDo() {
 
       <section>
         <SectionHeading
+          idPrefix="ourWork.what.reach"
           eyebrow="Our impact in numbers"
           title="Our reach."
         />
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((s) => (
+          {STATS.map((s, i) => (
             <div
               key={s.label}
               className="rounded-3xl border border-green-700/12 bg-white/60 p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-green-700/30 hover:bg-white/85"
             >
               <p className="hero-serif text-[clamp(2rem,4.4vw,2.9rem)] font-bold leading-none text-green-700">
-                {s.value}
-                {s.suffix && <span className="text-[#E2703A]">{s.suffix}</span>}
+                <EditableText id={`ourWork.stats.${i}.value`} defaultValue={s.value} />
+                {s.suffix && (
+                  <EditableText as="span" id={`ourWork.stats.${i}.suffix`} defaultValue={s.suffix} className="text-[#E2703A]" />
+                )}
               </p>
-              <p className="mt-4 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-[#4A4A42]/80">
-                {s.label}
-              </p>
+              <EditableText
+                as="p"
+                id={`ourWork.stats.${i}.label`}
+                defaultValue={s.label}
+                className="mt-4 block text-[0.72rem] font-bold uppercase tracking-[0.16em] text-[#4A4A42]/80"
+              />
             </div>
           ))}
         </div>
@@ -907,30 +1118,41 @@ function WhatWeDo() {
           <div>
             <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
               <span className="h-px w-8 bg-[#F2B33D]" />
-              Join us
+              <EditableText id="ourWork.what.cta.eyebrow" defaultValue="Join us" />
             </span>
-            <h3 className="hero-serif text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]">
-              Join us in building brighter futures for children around Mt. Kilimanjaro.
-            </h3>
-            <p className="mt-6 max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70">
-              Choose a child to sponsor, give once, or volunteer your time. Every path leads to a
-              real child in a real classroom.
-            </p>
+            <EditableText
+              as="h3"
+              id="ourWork.what.cta.title"
+              defaultValue="Join us in building brighter futures for children around Mt. Kilimanjaro."
+              multiline
+              className="hero-serif block text-[clamp(1.7rem,3.6vw,2.5rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#FBF7F0]"
+            />
+            <EditableText
+              as="p"
+              id="ourWork.what.cta.body"
+              defaultValue="Choose a child to sponsor, give once, or volunteer your time. Every path leads to a real child in a real classroom."
+              multiline
+              className="mt-6 block max-w-[560px] text-[0.98rem] leading-[1.85] text-[#FBF7F0]/70"
+            />
           </div>
 
           <div className="flex flex-col gap-3 lg:items-end">
             <Link
               to="/take-action/sponsor-a-child"
-              className="group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              className={`group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Sponsor a child
+              <EditableText id="ourWork.what.cta.sponsor" defaultValue="Sponsor a child" />
               <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
               to="/take-action/donate"
-              className="inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700"
+              className={`inline-flex w-fit items-center gap-3 rounded-xl border border-[#FBF7F0]/30 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[#FBF7F0] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FBF7F0] hover:text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Donate now
+              <EditableText id="ourWork.what.cta.donate" defaultValue="Donate now" />
             </Link>
           </div>
         </div>
@@ -940,6 +1162,7 @@ function WhatWeDo() {
 }
 
 function Breadcrumb({ label }) {
+  const { isEditing } = useEditor();
   return (
     <nav aria-label="Breadcrumb" className="relative border-b border-green-700/12 bg-[#FBF7F0]">
       <div className="mx-auto max-w-[1560px] px-6 py-5 sm:px-10 lg:px-14 lg:py-6">
@@ -947,7 +1170,9 @@ function Breadcrumb({ label }) {
           <li>
             <Link
               to="/our-work"
-              className="text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline"
+              className={`text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               Our Work
             </Link>
@@ -965,20 +1190,30 @@ function Breadcrumb({ label }) {
 }
 
 function NotFound() {
+  const { isEditing } = useEditor();
   return (
     <section className="relative flex min-h-[60vh] items-center justify-center py-20">
       <div className="mx-auto max-w-[600px] px-6 text-center">
-        <p className="text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
-          Page not found
-        </p>
-        <h1 className="hero-serif mt-5 text-[clamp(1.8rem,4vw,2.8rem)] font-bold leading-tight text-[#111111]">
-          We couldn't find that page in the Our Work section.
-        </h1>
+        <EditableText
+          as="p"
+          id="ourWork.notFound.kicker"
+          defaultValue="Page not found"
+          className="block text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700"
+        />
+        <EditableText
+          as="h1"
+          id="ourWork.notFound.title"
+          defaultValue="We couldn't find that page in the Our Work section."
+          multiline
+          className="hero-serif mt-5 block text-[clamp(1.8rem,4vw,2.8rem)] font-bold leading-tight text-[#111111]"
+        />
         <Link
           to="/our-work"
-          className="mt-10 inline-flex items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950"
+          className={`mt-10 inline-flex items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 ${
+            isEditing ? "pointer-events-none" : ""
+          }`}
         >
-          Back to Our Work
+          <EditableText id="ourWork.notFound.cta" defaultValue="Back to Our Work" />
           <Icon.ArrowRight className="h-4 w-4" />
         </Link>
       </div>

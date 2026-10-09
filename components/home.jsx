@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  useEditor,
+  EditableText,
+  EditableImage,
+  EditableVideo,
+} from "./editorContext";
 
 const PHOTOS = {
   main: "/img1.jpg",
-  upper: "/img8.png",
-  lower: "/img3.jpg",
-  farRight: "/img4.jpg",
-  lowerLeft: "/img5.jpg",
 };
 
 const YOUTUBE_ID = "ztwN71sY98o";
@@ -63,6 +65,7 @@ function useCountUp(target, active, duration = 2200) {
 
 function Hero() {
   const heroRef = useRef(null);
+  const { isEditing } = useEditor();
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -78,10 +81,12 @@ function Hero() {
       className="relative flex h-[calc(110dvh-68px)] w-full items-center overflow-hidden sm:h-[calc(110dvh-108px)] lg:h-[calc(110dvh-128px)]"
     >
       <motion.div className="absolute inset-0" style={{ y: heroY }}>
-        <img
-          src={PHOTOS.main}
+        <EditableImage
+          id="home.hero.image"
+          defaultValue={PHOTOS.main}
           alt="Children learning together"
           className="h-full w-full object-cover"
+          wrapperClassName="h-full w-full"
         />
       </motion.div>
 
@@ -92,25 +97,37 @@ function Hero() {
         style={{ opacity: heroOpacity }}
       >
         <div className="max-w-2xl">
-          <p className="mb-4 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#F2C94C]">
-            Mt. KIlimanjaro Child Development Programme
-          </p>
+          <EditableText
+            as="p"
+            id="home.hero.eyebrow"
+            defaultValue="Mt. KIlimanjaro Child Development Programme"
+            className="mb-4 block text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#F2C94C]"
+          />
 
-          <h1 className="text-[clamp(2.4rem,6.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white">
-            Every child deserves the chance to dream.
-          </h1>
+          <EditableText
+            as="h1"
+            id="home.hero.heading"
+            defaultValue="Every child deserves the chance to dream."
+            multiline
+            className="block text-[clamp(2.4rem,6.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white"
+          />
 
-          <p className="mt-6 max-w-xl text-[1.0625rem] leading-[1.8] text-white/85">
-            Supporting children, families and communities across Kajiado South to create lasting
-            change — through education, health, protection and livelihoods.
-          </p>
+          <EditableText
+            as="p"
+            id="home.hero.subheading"
+            defaultValue="Supporting children, families and communities across Kajiado South to create lasting change — through education, health, protection and livelihoods."
+            multiline
+            className="mt-6 block max-w-xl text-[1.0625rem] leading-[1.8] text-white/85"
+          />
 
           <div className="mt-9 flex flex-wrap justify-center items-center gap-4">
             <Link
               to="/take-action/sponsor-a-child"
-              className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F2C94C]"
+              className={`group inline-flex items-center gap-3 rounded-full bg-white px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F2C94C] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Sponsor a child
+              <EditableText id="home.hero.ctaPrimary" defaultValue="Sponsor a child" />
               <svg
                 viewBox="0 0 24 24"
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
@@ -126,9 +143,11 @@ function Hero() {
 
             <Link
               to="/our-work"
-              className="inline-flex items-center gap-3 rounded-full border border-white/40 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:border-white hover:bg-white/10"
+              className={`inline-flex items-center gap-3 rounded-full border border-white/40 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:border-white hover:bg-white/10 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Explore our work
+              <EditableText id="home.hero.ctaSecondary" defaultValue="Explore our work" />
             </Link>
           </div>
         </div>
@@ -169,46 +188,13 @@ function VideoSection() {
       </svg>
 
       <div className="mx-auto max-w-[1180px] px-6 sm:px-10">
-        {/* <div className="mb-11 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-[640px]">
-            <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.2em] text-green-700">
-              <span className="h-px w-8 bg-green-700" />
-              Watch the story
-            </span>
-            <h2 className="hero-serif text-[clamp(1.9rem,4.6vw,3.4rem)] font-bold leading-[1.1] tracking-[-0.02em] text-[#111111]">
-              Inkisanjani Digital Resource Center
-            </h2>
-          </div>
-          <p className="max-w-[360px] text-[1rem] leading-[1.75] text-[#4A4A42]">
-            A short documentary film about the Inkisanjani Digital Resource Center, a community-led initiative in Kajiado County, Kenya, that provides youth with access to digital learning resources and educational opportunities.
-          </p>
-        </div> */}
-
         <div className="relative aspect-video w-full overflow-hidden rounded-[18px] bg-black shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] ring-1 ring-black/10">
-          <iframe
-            src={`https://www.youtube.com/embed/${YOUTUBE_ID}`}
+          <EditableVideo
+            id="home.video.youtubeId"
+            defaultValue={YOUTUBE_ID}
             title="Inkisanjani Digital Resource Center"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            loading="lazy"
-            className="absolute inset-0 h-full w-full"
           />
         </div>
-
-        {/* <div className="mt-9 grid grid-cols-1 gap-8 border-t border-green-700/12 pt-8 sm:grid-cols-3">
-          {[
-            { t: "Filmed on location", d: "Kajiado County, Kenya" },
-            { t: "Community-led", d: "Produced with local storytellers" },
-            { t: "3 minutes", d: "Subtitled available in English" },
-          ].map((item) => (
-            <div key={item.t}>
-              <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-green-700">
-                {item.t}
-              </p>
-              <p className="mt-1.5 text-[0.92rem] leading-relaxed text-[#4A4A42]">{item.d}</p>
-            </div>
-          ))}
-        </div> */}
       </div>
     </section>
   );
@@ -222,33 +208,55 @@ const STATS = [
 ];
 
 function StatItem({ stat, active, index }) {
-  const count = useCountUp(stat.value, active, 2000 + index * 180);
+  const { isEditing, getValue, setValue } = useEditor();
+  const target = Number(getValue(`home.stats.${index}.value`, stat.value)) || 0;
+  const suffix = getValue(`home.stats.${index}.suffix`, stat.suffix);
+  const count = useCountUp(target, active && !isEditing, 2000 + index * 180);
 
   return (
     <div className="relative px-1 py-8 sm:px-4 lg:px-8">
       <div className="flex items-baseline gap-0.5">
-        <span className="text-[clamp(2.4rem,5.4vw,3.9rem)] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[#FBF7F0]">
-          {count.toLocaleString("en-US")}
-        </span>
-        {stat.suffix && (
-          <span className="text-[clamp(1.4rem,3vw,2.1rem)] font-extrabold leading-none text-[#F2B33D]">
-            {stat.suffix}
+        {isEditing ? (
+          <input
+            type="number"
+            value={target}
+            onChange={(e) => setValue(`home.stats.${index}.value`, Number(e.target.value) || 0)}
+            className="w-40 rounded-md border-2 border-amber-400 bg-amber-50/20 px-2 py-1 text-[2rem] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[#FBF7F0] outline-none"
+          />
+        ) : (
+          <span className="text-[clamp(2.4rem,5.4vw,3.9rem)] font-extrabold leading-none tracking-[-0.03em] tabular-nums text-[#FBF7F0]">
+            {count.toLocaleString("en-US")}
           </span>
         )}
+        <EditableText
+          as="span"
+          id={`home.stats.${index}.suffix`}
+          defaultValue={stat.suffix}
+          className="text-[clamp(1.4rem,3vw,2.1rem)] font-extrabold leading-none text-[#F2B33D]"
+        />
       </div>
 
       <div className="mt-5 h-px w-12 bg-[#F2B33D]/70" />
 
-      <p className="mt-5 text-[0.78rem] font-bold uppercase tracking-[0.15em] text-[#FBF7F0]">
-        {stat.label}
-      </p>
-      <p className="mt-2 text-[0.85rem] leading-relaxed text-[#FBF7F0]/60">{stat.note}</p>
+      <EditableText
+        as="p"
+        id={`home.stats.${index}.label`}
+        defaultValue={stat.label}
+        className="mt-5 block text-[0.78rem] font-bold uppercase tracking-[0.15em] text-[#FBF7F0]"
+      />
+      <EditableText
+        as="p"
+        id={`home.stats.${index}.note`}
+        defaultValue={stat.note}
+        className="mt-2 block text-[0.85rem] leading-relaxed text-[#FBF7F0]/60"
+      />
     </div>
   );
 }
 
 function StatsSection() {
   const [ref, inView] = useInView({ threshold: 0.25 });
+  const { isEditing } = useEditor();
 
   return (
     <section ref={ref} className="relative overflow-hidden bg-green-700">
@@ -296,16 +304,23 @@ function StatsSection() {
           <div className="max-w-[620px]">
             <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.2em] text-[#F2B33D]">
               <span className="h-px w-8 bg-[#F2B33D]" />
-              Our impact
+              <EditableText id="home.stats.eyebrow" defaultValue="Our impact" />
             </span>
-            <h2 className="text-[clamp(1.8rem,4.2vw,3.1rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#FBF7F0]">
-              Numbers that carry names, families and futures.
-            </h2>
+            <EditableText
+              as="h2"
+              id="home.stats.heading"
+              defaultValue="Numbers that carry names, families and futures."
+              multiline
+              className="block text-[clamp(1.8rem,4.2vw,3.1rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#FBF7F0]"
+            />
           </div>
-          <p className="max-w-[340px] text-[0.98rem] leading-[1.75] text-[#FBF7F0]/65">
-            Every figure below is a person, a household or a community that chose to build something
-            lasting with us.
-          </p>
+          <EditableText
+            as="p"
+            id="home.stats.intro"
+            defaultValue="Every figure below is a person, a household or a community that chose to build something lasting with us."
+            multiline
+            className="block max-w-[340px] text-[0.98rem] leading-[1.75] text-[#FBF7F0]/65"
+          />
         </div>
 
         <div className="grid grid-cols-1 divide-y divide-[#FBF7F0]/15 border-t border-[#FBF7F0]/15 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
@@ -322,14 +337,19 @@ function StatsSection() {
         </div>
 
         <div className="mt-12 flex flex-col gap-6 border-t border-[#FBF7F0]/15 pt-9 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[0.95rem] text-[#FBF7F0]/70">
-            Figures audited annually and reported to every partner and sponsor.
-          </p>
+          <EditableText
+            as="p"
+            id="home.stats.footerNote"
+            defaultValue="Figures audited annually and reported to every partner and sponsor."
+            className="block text-[0.95rem] text-[#FBF7F0]/70"
+          />
           <a
-            href="#"
-            className="group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+            href="/program-impact"
+            className={`group inline-flex w-fit items-center gap-3 rounded-xl bg-[#FBF7F0] px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white ${
+              isEditing ? "pointer-events-none" : ""
+            }`}
           >
-            Read the full report
+            <EditableText id="home.stats.footerCta" defaultValue="Read the full report" />
             <svg
               viewBox="0 0 24 24"
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"

@@ -1,3 +1,9 @@
+import {
+  useEditor,
+  EditableText,
+  EditableImage,
+} from "./editorContext";
+
 const GREEN = "#14532D";
 const GREEN_DARK = "#0F3D22";
 const CREAM = "#FBF7F0";
@@ -88,6 +94,8 @@ const PROGRAMS = [
 ];
 
 export default function Footer() {
+  const { isEditing } = useEditor();
+
   return (
     <footer className="relative w-full overflow-hidden bg-[#FBF7F0] font-[Montserrat] text-[#141414]">
       <div
@@ -139,45 +147,78 @@ export default function Footer() {
           <div className="max-w-[560px]">
             <span className="mb-4 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-8 bg-green-700" />
-              Stay connected
+              <EditableText
+                id="footer.stayConnected.eyebrow"
+                defaultValue="Stay connected"
+              />
             </span>
-            <h3 className="hero-serif text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#111111]">
-              Every child deserves a future worth dreaming about.
-            </h3>
+            <EditableText
+              as="h3"
+              id="footer.stayConnected.heading"
+              defaultValue="Every child deserves a future worth dreaming about."
+              multiline
+              className="hero-serif text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold leading-[1.14] tracking-[-0.02em] text-[#111111]"
+            />
           </div>
           <a
             href="/take-action/sponsor-a-child"
-            className="group inline-flex w-fit items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950"
+            className={`group inline-flex w-fit items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 ${
+              isEditing ? "pointer-events-none" : ""
+            }`}
           >
-            Sponsor a Child
+            <EditableText
+              id="footer.stayConnected.cta"
+              defaultValue="Sponsor a Child"
+            />
             <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         </div>
 
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-4">
-            <a href="/" className="inline-flex items-center gap-3">
-              <img src="/mkcdp.png" alt="MKCDP Logo" className="h-24 w-auto rounded-full object-cover" />
+            <a
+              href="/"
+              className={`inline-flex items-center gap-3 ${isEditing ? "pointer-events-none" : ""}`}
+            >
+              <EditableImage
+                id="footer.brand.logo"
+                defaultValue="/mkcdp.png"
+                alt="MKCDP Logo"
+                className="h-24 w-auto rounded-full object-cover"
+                wrapperClassName="inline-block"
+                circular
+              />
             </a>
-            <p className="mt-6 max-w-[380px] text-[0.92rem] leading-[1.8] text-[#4A4A42]">
-              Mt. Kilimanjaro Child Development Programme is a registered, child-centered NGO
-              dedicated to empowering children and communities in Kajiado South, Kenya.
-            </p>
+            <EditableText
+              as="p"
+              id="footer.brand.description"
+              defaultValue="Mt. Kilimanjaro Child Development Programme is a registered, child-centered NGO dedicated to empowering children and communities in Kajiado South, Kenya."
+              multiline
+              className="mt-6 block max-w-[380px] text-[0.92rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="lg:col-span-2 lg:col-start-6">
-            <h4 className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Quick Links
-            </h4>
+            <EditableText
+              as="h4"
+              id="footer.quickLinks.heading"
+              defaultValue="Quick Links"
+              className="block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
             <ul className="mt-6 space-y-3.5">
-              {QUICK_LINKS.map((link) => (
+              {QUICK_LINKS.map((link, i) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="group inline-flex items-center gap-2 text-[0.88rem] font-medium text-[#4A4A42] transition-colors duration-200 hover:text-green-900"
+                    className={`group inline-flex items-center gap-2 text-[0.88rem] font-medium text-[#4A4A42] transition-colors duration-200 hover:text-green-900 ${
+                      isEditing ? "pointer-events-none" : ""
+                    }`}
                   >
                     <Icon.ChevronRight className="h-3.5 w-3.5 text-green-700 transition-transform duration-200 group-hover:translate-x-1" />
-                    {link.label}
+                    <EditableText
+                      id={`footer.quickLinks.${i}.label`}
+                      defaultValue={link.label}
+                    />
                   </a>
                 </li>
               ))}
@@ -185,18 +226,26 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Our Programs
-            </h4>
+            <EditableText
+              as="h4"
+              id="footer.programs.heading"
+              defaultValue="Our Programs"
+              className="block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
             <ul className="mt-6 space-y-3.5">
-              {PROGRAMS.map((program) => (
+              {PROGRAMS.map((program, i) => (
                 <li key={program.label}>
                   <a
                     href={program.href}
-                    className="group inline-flex items-center gap-2 text-[0.88rem] font-medium text-[#4A4A42] transition-colors duration-200 hover:text-green-900"
+                    className={`group inline-flex items-center gap-2 text-[0.88rem] font-medium text-[#4A4A42] transition-colors duration-200 hover:text-green-900 ${
+                      isEditing ? "pointer-events-none" : ""
+                    }`}
                   >
                     <Icon.ChevronRight className="h-3.5 w-3.5 text-green-700 transition-transform duration-200 group-hover:translate-x-1" />
-                    {program.label}
+                    <EditableText
+                      id={`footer.programs.${i}.label`}
+                      defaultValue={program.label}
+                    />
                   </a>
                 </li>
               ))}
@@ -204,45 +253,54 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-3">
-            <h4 className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Get in Touch
-            </h4>
+            <EditableText
+              as="h4"
+              id="footer.contact.heading"
+              defaultValue="Get in Touch"
+              className="block text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
             <ul className="mt-6 space-y-4 text-[0.88rem] text-[#4A4A42]">
               <li className="flex items-start gap-3">
                 <Icon.MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-700" />
-                <span>P.O Box 249-00209 Loitokitok, Kenya</span>
+                <EditableText
+                  id="footer.contact.address"
+                  defaultValue="P.O Box 249-00209 Loitokitok, Kenya"
+                />
               </li>
               <li>
-                <a
-                  href="mailto:info@mkcdp.org"
-                  className="flex items-start gap-3 transition-colors duration-200 hover:text-green-700"
-                >
+                <span className="flex items-start gap-3">
                   <Icon.Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-700" />
-                  info@mkcdp.org
-                </a>
+                  <EditableText
+                    id="footer.contact.email"
+                    defaultValue="info@mkcdp.org"
+                  />
+                </span>
               </li>
               <li>
-                <a
-                  href="tel:+254737332219"
-                  className="flex items-start gap-3 transition-colors duration-200 hover:text-green-700"
-                >
+                <span className="flex items-start gap-3">
                   <Icon.Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-700" />
-                  +254 737 332 219
-                </a>
+                  <EditableText
+                    id="footer.contact.phone"
+                    defaultValue="+254 737 332 219"
+                  />
+                </span>
               </li>
             </ul>
             <div className="mt-8 flex items-center gap-3">
-              {SOCIALS.map(({ label, href, Icon: SocialIcon }) => (
-                <a
+              {SOCIALS.map(({ label, href, Icon: SocialIcon }, i) => (
+                <span
                   key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:border-green-900 hover:bg-green-900 hover:text-white active:scale-95"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200"
+                  title={label}
                 >
                   <SocialIcon className="h-4 w-4" />
-                </a>
+                  <span className="sr-only">
+                    <EditableText
+                      id={`footer.socials.${i}.label`}
+                      defaultValue={label}
+                    />
+                  </span>
+                </span>
               ))}
             </div>
           </div>
@@ -251,19 +309,25 @@ export default function Footer() {
 
       <div className="relative border-t border-green-700/12">
         <div className="mx-auto flex max-w-[1560px] flex-col items-center justify-between gap-4 px-6 py-7 text-center sm:px-10 lg:flex-row lg:px-14 lg:text-left">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#4A4A42]/75">
-            © {new Date().getFullYear()} MKCDP. All rights reserved.
-          </p>
+          <EditableText
+            as="p"
+            id="footer.copyright"
+            defaultValue={`© ${new Date().getFullYear()} MKCDP. All rights reserved.`}
+            className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#4A4A42]/75"
+          />
           <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-[0.78rem] font-medium text-[#4A4A42]">
-            <a href="/privacy-policy" className="transition-colors duration-200 hover:text-green-700">
-              Privacy Policy
-            </a>
-            <a href="/terms" className="transition-colors duration-200 hover:text-green-700">
-              Terms of Service
-            </a>
-            <a href="/sitemap" className="transition-colors duration-200 hover:text-green-700">
-              Sitemap
-            </a>
+            <EditableText
+              id="footer.legal.privacy"
+              defaultValue="Privacy Policy"
+            />
+            <EditableText
+              id="footer.legal.terms"
+              defaultValue="Terms of Service"
+            />
+            <EditableText
+              id="footer.legal.sitemap"
+              defaultValue="Sitemap"
+            />
           </div>
         </div>
       </div>

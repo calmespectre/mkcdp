@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  useEditor,
+  EditableText,
+  EditableImage,
+} from "./editorContext";
 
 const SECTIONS = [
   {
@@ -114,7 +119,7 @@ const FEATURED_PROJECTS = [
   },
 ];
 
-function SectionHeading({ eyebrow, title, intro, align = "left" }) {
+function SectionHeading({ idPrefix, eyebrow, title, intro, align = "left" }) {
   return (
     <div className={align === "center" ? "mx-auto max-w-[720px] text-center" : "max-w-[720px]"}>
       <span
@@ -123,17 +128,30 @@ function SectionHeading({ eyebrow, title, intro, align = "left" }) {
         }`}
       >
         <span className="h-px w-8 bg-green-700" />
-        {eyebrow}
+        <EditableText id={`${idPrefix}.eyebrow`} defaultValue={eyebrow} />
       </span>
-      <h2 className="hero-serif text-[clamp(1.7rem,4vw,2.9rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#111111]">
-        {title}
-      </h2>
-      {intro && <p className="mt-5 text-[1rem] leading-[1.85] text-[#4A4A42]">{intro}</p>}
+      <EditableText
+        as="h2"
+        id={`${idPrefix}.title`}
+        defaultValue={title}
+        multiline
+        className="block hero-serif text-[clamp(1.7rem,4vw,2.9rem)] font-bold leading-[1.12] tracking-[-0.02em] text-[#111111]"
+      />
+      {intro && (
+        <EditableText
+          as="p"
+          id={`${idPrefix}.intro`}
+          defaultValue={intro}
+          multiline
+          className="mt-5 block text-[1rem] leading-[1.85] text-[#4A4A42]"
+        />
+      )}
     </div>
   );
 }
 
 function MobileBreadcrumb({ label }) {
+  const { isEditing } = useEditor();
   return (
     <nav aria-label="Breadcrumb" className="border-b border-green-700/12 bg-[#FBF7F0] lg:hidden">
       <div className="mx-auto max-w-[1560px] px-5 py-3.5 sm:px-10">
@@ -141,7 +159,9 @@ function MobileBreadcrumb({ label }) {
           <li>
             <Link
               to="/program-impact"
-              className="text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline"
+              className={`text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               Program Impact
             </Link>
@@ -155,6 +175,7 @@ function MobileBreadcrumb({ label }) {
 }
 
 function DesktopBreadcrumb({ label }) {
+  const { isEditing } = useEditor();
   return (
     <nav aria-label="Breadcrumb" className="relative hidden border-b border-green-700/12 bg-[#FBF7F0] lg:block">
       <div className="mx-auto max-w-[1560px] px-6 py-5 sm:px-10 lg:px-14 lg:py-6">
@@ -162,7 +183,9 @@ function DesktopBreadcrumb({ label }) {
           <li>
             <Link
               to="/program-impact"
-              className="text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline"
+              className={`text-green-700 transition-colors duration-200 hover:text-green-950 hover:underline ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               Program Impact
             </Link>
@@ -175,18 +198,24 @@ function DesktopBreadcrumb({ label }) {
   );
 }
 
-function BarChart({ data, accent = "#16A34A", unit = "%" }) {
+function BarChart({ idPrefix, data, accent = "#16A34A", unit = "%" }) {
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <div className="space-y-4">
-      {data.map((item) => {
+      {data.map((item, i) => {
         const pct = Math.round((item.value / max) * 100);
         return (
           <div key={item.label}>
             <div className="flex items-center justify-between text-[0.82rem]">
-              <span className="font-semibold text-[#2A2A26]">{item.label}</span>
+              <EditableText
+                as="span"
+                id={`${idPrefix}.${i}.label`}
+                defaultValue={item.label}
+                className="block font-semibold text-[#2A2A26]"
+              />
               <span className="font-bold text-green-700">
-                {item.value}{unit}
+                <EditableText id={`${idPrefix}.${i}.value`} defaultValue={String(item.value)} />
+                {unit}
               </span>
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-green-700/10">
@@ -213,7 +242,7 @@ function ReachCharts() {
   return (
     <div className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)] sm:p-8">
       <div className="flex flex-wrap gap-2 rounded-xl border border-green-700/15 bg-white p-1">
-        {tabs.map((t) => (
+        {tabs.map((t, i) => (
           <button
             key={t.id}
             type="button"
@@ -224,15 +253,15 @@ function ReachCharts() {
                 : "text-[#4A4A42] hover:text-green-700"
             }`}
           >
-            {t.label}
+            <EditableText id={`program.reach.charts.tab.${t.id}`} defaultValue={t.label} />
           </button>
         ))}
       </div>
 
       <div className="mt-7">
-        {tab === "county" && <BarChart data={REACH_BY_COUNTY} accent="#16A34A" />}
-        {tab === "life" && <BarChart data={REACH_BY_LIFE_STAGE} accent="#F2B33D" />}
-        {tab === "gender" && <BarChart data={REACH_BY_GENDER} accent="#1C6B4B" />}
+        {tab === "county" && <BarChart idPrefix="program.reach.charts.county" data={REACH_BY_COUNTY} accent="#16A34A" />}
+        {tab === "life" && <BarChart idPrefix="program.reach.charts.life" data={REACH_BY_LIFE_STAGE} accent="#F2B33D" />}
+        {tab === "gender" && <BarChart idPrefix="program.reach.charts.gender" data={REACH_BY_GENDER} accent="#1C6B4B" />}
       </div>
     </div>
   );
@@ -246,34 +275,43 @@ function ProgramImpactHero() {
           <div>
             <span className="mb-5 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-green-700">
               <span className="h-px w-8 bg-green-700" />
-              Program Impact
+              <EditableText id="program.hero.eyebrow" defaultValue="Program Impact" />
             </span>
-            <h1 className="hero-serif text-[clamp(2rem,8vw,4.4rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]">
-              Every number
-              <br />
-              is a child.
-              <br />
-              <span className="italic text-green-700">Every project is a promise.</span>
-            </h1>
+            <EditableText
+              as="h1"
+              id="program.hero.title"
+              defaultValue={"Every number\nis a child.\nEvery project is a promise."}
+              multiline
+              className="hero-serif block whitespace-pre-line text-[clamp(2rem,8vw,4.4rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]"
+            />
           </div>
           <div className="lg:pb-3">
-            <p className="max-w-[520px] text-[0.98rem] leading-[1.85] text-[#3D3D37] sm:text-[1.0625rem]">
-              Our reach, measured honestly. Our projects, told with dignity. Two views into the
-              work MKCDP does every day alongside the communities surrounding Mt. Kilimanjaro.
-            </p>
+            <EditableText
+              as="p"
+              id="program.hero.intro"
+              defaultValue="Our reach, measured honestly. Our projects, told with dignity. Two views into the work MKCDP does every day alongside the communities surrounding Mt. Kilimanjaro."
+              multiline
+              className="block max-w-[520px] text-[0.98rem] leading-[1.85] text-[#3D3D37] sm:text-[1.0625rem]"
+            />
             <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-green-700/15 pt-6 sm:gap-x-10">
               {[
-                { v: "2,833", l: "Enrolled children" },
-                { v: "100+", l: "Projects delivered" },
-                { v: "40K", l: "Lives touched" },
+                { v: "2,833", l: "Enrolled children", key: "enrolled" },
+                { v: "100+", l: "Projects delivered", key: "projects" },
+                { v: "40K", l: "Lives touched", key: "lives" },
               ].map((item) => (
-                <div key={item.l}>
-                  <p className="hero-serif text-[1.15rem] font-bold leading-none text-green-700 sm:text-[1.25rem]">
-                    {item.v}
-                  </p>
-                  <p className="mt-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75 sm:text-[0.68rem]">
-                    {item.l}
-                  </p>
+                <div key={item.key}>
+                  <EditableText
+                    as="p"
+                    id={`program.hero.stat.${item.key}.v`}
+                    defaultValue={item.v}
+                    className="hero-serif block text-[1.15rem] font-bold leading-none text-green-700 sm:text-[1.25rem]"
+                  />
+                  <EditableText
+                    as="p"
+                    id={`program.hero.stat.${item.key}.l`}
+                    defaultValue={item.l}
+                    className="mt-2 block text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/75 sm:text-[0.68rem]"
+                  />
                 </div>
               ))}
             </div>
@@ -297,6 +335,12 @@ function ProgramImpactHero() {
 }
 
 function ProgramImpactLanding() {
+  const { isEditing } = useEditor();
+  const whyCards = [
+    { key: "verified", n: "01", title: "Verified reach", body: "Every figure we publish is sourced from programme records, school registers, and periodic field monitoring." },
+    { key: "real", n: "02", title: "Real projects", body: "Every featured project has a name, a place, a budget, and a completion note — documented as it happens." },
+    { key: "open", n: "03", title: "Open reporting", body: "Annual reports, donor updates and programme evaluations are published so progress and challenges are both visible." },
+  ];
   return (
     <>
       <div className="hidden lg:block">
@@ -305,6 +349,7 @@ function ProgramImpactLanding() {
         <section className="relative py-14 sm:py-20 lg:py-28">
           <div className="mx-auto max-w-[1560px] px-5 sm:px-10 lg:px-14">
             <SectionHeading
+              idPrefix="program.landing.explore"
               eyebrow="Explore the impact"
               title="Two windows into our work."
               intro="Start with the reach — the children, families and communities we serve. Then walk through three projects that show what that reach looks like on the ground."
@@ -317,29 +362,43 @@ function ProgramImpactLanding() {
                   to={`/program-impact/${s.slug}`}
                   className={`group relative flex flex-col overflow-hidden rounded-[28px] border border-green-700/12 bg-white/70 shadow-[0_28px_70px_-46px_rgba(20,83,45,0.5)] transition-all duration-500 hover:-translate-y-1.5 hover:border-green-700/30 hover:bg-white/85 hover:shadow-[0_36px_80px_-46px_rgba(20,83,45,0.65)] active:scale-[0.99] ${
                     i === 1 ? "lg:mt-8" : ""
-                  }`}
+                  } ${isEditing ? "pointer-events-none" : ""}`}
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
-                    <img
-                      src={s.image}
+                    <EditableImage
+                      id={`program.sections.${s.slug}.image`}
+                      defaultValue={s.image}
                       alt={s.label}
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
+                      wrapperClassName="h-full w-full"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                    <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-green-700 backdrop-blur">
-                      {s.tag}
-                    </span>
+                    <EditableText
+                      as="span"
+                      id={`program.sections.${s.slug}.tag`}
+                      defaultValue={s.tag}
+                      className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-green-700 backdrop-blur"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col p-6 sm:p-8">
-                    <h3 className="hero-serif text-[clamp(1.5rem,4vw,2rem)] font-bold leading-tight text-[#111111]">
-                      {s.label}
-                    </h3>
-                    <p className="mt-4 flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]">
-                      {s.desc}
-                    </p>
+                    <EditableText
+                      as="h3"
+                      id={`program.sections.${s.slug}.label`}
+                      defaultValue={s.label}
+                      className="hero-serif block text-[clamp(1.5rem,4vw,2rem)] font-bold leading-tight text-[#111111]"
+                    />
+                    <EditableText
+                      as="p"
+                      id={`program.sections.${s.slug}.desc`}
+                      defaultValue={s.desc}
+                      multiline
+                      className="mt-4 block flex-1 text-[0.95rem] leading-[1.8] text-[#4A4A42]"
+                    />
                     <div className="mt-6 inline-flex items-center justify-between gap-3 border-t border-green-700/15 pt-5 text-[0.75rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-colors duration-300 group-hover:text-[#15543A]">
-                      <span>{i === 0 ? "Explore the numbers" : "See the projects"}</span>
+                      <EditableText
+                        id={`program.sections.${s.slug}.cta`}
+                        defaultValue={i === 0 ? "Explore the numbers" : "See the projects"}
+                      />
                       <span className="transition-transform duration-300 group-hover:translate-x-1">
                         →
                       </span>
@@ -354,39 +413,37 @@ function ProgramImpactLanding() {
         <section className="relative border-t border-green-700/12 bg-[#FBF7F0] py-16 lg:py-24">
           <div className="mx-auto max-w-[1560px] px-5 sm:px-10 lg:px-14">
             <SectionHeading
+              idPrefix="program.landing.why"
               eyebrow="Why this matters"
               title="Numbers build the case. Stories build the trust."
               intro="Reach tells you how many. Projects tell you how. Both are essential to honest reporting, and both are things we track, review and share — every year, with every donor."
             />
 
             <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  title: "Verified reach",
-                  body: "Every figure we publish is sourced from programme records, school registers, and periodic field monitoring.",
-                },
-                {
-                  title: "Real projects",
-                  body: "Every featured project has a name, a place, a budget, and a completion note — documented as it happens.",
-                },
-                {
-                  title: "Open reporting",
-                  body: "Annual reports, donor updates and programme evaluations are published so progress and challenges are both visible.",
-                },
-              ].map((card, i) => (
+              {whyCards.map((card) => (
                 <div
-                  key={card.title}
+                  key={card.key}
                   className="rounded-[24px] border border-green-700/12 bg-white/70 p-6 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)] sm:p-8"
                 >
-                  <span className="hero-serif text-[2rem] font-bold leading-none text-green-700/25 sm:text-[2.4rem]">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <p className="hero-serif mt-3 text-[1.15rem] font-bold leading-tight text-[#111111] sm:text-[1.2rem]">
-                    {card.title}
-                  </p>
-                  <p className="mt-3 text-[0.9rem] leading-[1.75] text-[#4A4A42]">
-                    {card.body}
-                  </p>
+                  <EditableText
+                    as="span"
+                    id={`program.landing.why.card.${card.key}.n`}
+                    defaultValue={card.n}
+                    className="hero-serif block text-[2rem] font-bold leading-none text-green-700/25 sm:text-[2.4rem]"
+                  />
+                  <EditableText
+                    as="p"
+                    id={`program.landing.why.card.${card.key}.title`}
+                    defaultValue={card.title}
+                    className="hero-serif mt-3 block text-[1.15rem] font-bold leading-tight text-[#111111] sm:text-[1.2rem]"
+                  />
+                  <EditableText
+                    as="p"
+                    id={`program.landing.why.card.${card.key}.body`}
+                    defaultValue={card.body}
+                    multiline
+                    className="mt-3 block text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+                  />
                 </div>
               ))}
             </div>
@@ -396,18 +453,26 @@ function ProgramImpactLanding() {
         <section className="relative py-16 lg:py-24">
           <div className="mx-auto max-w-[1560px] px-5 sm:px-10 lg:px-14">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-              {STATS.map((s) => (
+              {STATS.map((s, i) => (
                 <div
                   key={s.label}
                   className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_20px_50px_-40px_rgba(20,83,45,0.4)] sm:p-6"
                 >
                   <p className="hero-serif text-[clamp(1.6rem,4.5vw,2.4rem)] font-bold leading-none text-green-700">
-                    {s.value}
-                    <span className="text-[0.6em] align-top text-green-700/70">{s.suffix}</span>
+                    <EditableText id={`program.stats.${i}.value`} defaultValue={s.value} />
+                    <EditableText
+                      as="span"
+                      id={`program.stats.${i}.suffix`}
+                      defaultValue={s.suffix}
+                      className="text-[0.6em] align-top text-green-700/70"
+                    />
                   </p>
-                  <p className="mt-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80">
-                    {s.label}
-                  </p>
+                  <EditableText
+                    as="p"
+                    id={`program.stats.${i}.label`}
+                    defaultValue={s.label}
+                    className="mt-3 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80"
+                  />
                 </div>
               ))}
             </div>
@@ -415,15 +480,19 @@ function ProgramImpactLanding() {
             <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:mt-16 sm:flex-row">
               <Link
                 to="/program-impact/our-reach"
-                className="inline-flex items-center justify-center rounded-full bg-green-700 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A]"
+                className={`inline-flex items-center justify-center rounded-full bg-green-700 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] ${
+                  isEditing ? "pointer-events-none" : ""
+                }`}
               >
-                See our reach →
+                <EditableText id="program.landing.cta.reach" defaultValue="See our reach →" />
               </Link>
               <Link
                 to="/program-impact/featured-projects"
-                className="inline-flex items-center justify-center rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5"
+                className={`inline-flex items-center justify-center rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5 ${
+                  isEditing ? "pointer-events-none" : ""
+                }`}
               >
-                Walk through our projects
+                <EditableText id="program.landing.cta.projects" defaultValue="Walk through our projects" />
               </Link>
             </div>
           </div>
@@ -447,29 +516,39 @@ function ProgramImpactLanding() {
               <div>
                 <span className="mb-4 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
                   <span className="h-px w-8 bg-[#F2B33D]" />
-                  Help us grow this page
+                  <EditableText id="program.landing.grow.eyebrow" defaultValue="Help us grow this page" />
                 </span>
-                <h2 className="hero-serif text-[clamp(1.6rem,5.5vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.025em] text-[#FBF7F0]">
-                  Every new project starts with someone deciding to act.
-                </h2>
-                <p className="mt-5 max-w-[520px] text-[0.95rem] leading-[1.85] text-[#FBF7F0]/75 sm:text-[1rem]">
-                  Fund the next borehole. Sponsor the next classroom. Partner on the next idea.
-                  Whether you give monthly, once, or bring a company along — you become part of
-                  every number on this page.
-                </p>
+                <EditableText
+                  as="h2"
+                  id="program.landing.grow.title"
+                  defaultValue="Every new project starts with someone deciding to act."
+                  multiline
+                  className="hero-serif block text-[clamp(1.6rem,5.5vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.025em] text-[#FBF7F0]"
+                />
+                <EditableText
+                  as="p"
+                  id="program.landing.grow.body"
+                  defaultValue="Fund the next borehole. Sponsor the next classroom. Partner on the next idea. Whether you give monthly, once, or bring a company along — you become part of every number on this page."
+                  multiline
+                  className="mt-5 block max-w-[520px] text-[0.95rem] leading-[1.85] text-[#FBF7F0]/75 sm:text-[1rem]"
+                />
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
                 <Link
                   to="/take-action/donate"
-                  className="inline-flex items-center justify-center rounded-full bg-[#F2B33D] px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#1C6B4B] shadow-[0_18px_40px_-16px_rgba(242,179,61,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e0a02e]"
+                  className={`inline-flex items-center justify-center rounded-full bg-[#F2B33D] px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#1C6B4B] shadow-[0_18px_40px_-16px_rgba(242,179,61,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e0a02e] ${
+                    isEditing ? "pointer-events-none" : ""
+                  }`}
                 >
-                  Donate
+                  <EditableText id="program.landing.grow.donate" defaultValue="Donate" />
                 </Link>
                 <Link
                   to="/take-action/sponsor-a-child"
-                  className="inline-flex items-center justify-center rounded-full border border-[#FBF7F0]/30 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#FBF7F0] transition-all duration-300 hover:border-[#FBF7F0]/70 hover:bg-[#FBF7F0]/10"
+                  className={`inline-flex items-center justify-center rounded-full border border-[#FBF7F0]/30 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#FBF7F0] transition-all duration-300 hover:border-[#FBF7F0]/70 hover:bg-[#FBF7F0]/10 ${
+                    isEditing ? "pointer-events-none" : ""
+                  }`}
                 >
-                  Sponsor a child
+                  <EditableText id="program.landing.grow.sponsor" defaultValue="Sponsor a child" />
                 </Link>
               </div>
             </div>
@@ -481,29 +560,41 @@ function ProgramImpactLanding() {
         <section className="relative overflow-hidden px-5 pt-8">
           <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
             <span className="h-px w-6 bg-green-700" />
-            Program Impact
+            <EditableText id="program.hero.eyebrow" defaultValue="Program Impact" />
           </span>
-          <h1 className="hero-serif text-[2.2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]">
-            Every number is a child.{" "}
-            <span className="italic text-green-700">Every project is a promise.</span>
-          </h1>
-          <p className="mt-4 text-[0.95rem] leading-[1.8] text-[#3D3D37]">
-            Our reach, measured honestly. Our projects, told with dignity. Two views into the
-            work MKCDP does every day.
-          </p>
+          <EditableText
+            as="h1"
+            id="program.landing.mobile.title"
+            defaultValue="Every number is a child. Every project is a promise."
+            multiline
+            className="hero-serif block text-[2.2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]"
+          />
+          <EditableText
+            as="p"
+            id="program.landing.mobile.intro"
+            defaultValue="Our reach, measured honestly. Our projects, told with dignity. Two views into the work MKCDP does every day."
+            multiline
+            className="mt-4 block text-[0.95rem] leading-[1.8] text-[#3D3D37]"
+          />
           <div className="mt-7 grid grid-cols-3 divide-x divide-green-700/12 rounded-2xl border border-green-700/12 bg-white/60">
             {[
-              { v: "2,833", l: "Children" },
-              { v: "100+", l: "Projects" },
-              { v: "40K", l: "Lives" },
+              { v: "2,833", l: "Children", key: "children" },
+              { v: "100+", l: "Projects", key: "projects" },
+              { v: "40K", l: "Lives", key: "lives" },
             ].map((item) => (
-              <div key={item.l} className="px-3 py-4 text-center">
-                <p className="hero-serif text-[1.1rem] font-bold leading-none text-green-700">
-                  {item.v}
-                </p>
-                <p className="mt-2 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]/75">
-                  {item.l}
-                </p>
+              <div key={item.key} className="px-3 py-4 text-center">
+                <EditableText
+                  as="p"
+                  id={`program.hero.stat.${item.key}.v`}
+                  defaultValue={item.v}
+                  className="hero-serif block text-[1.1rem] font-bold leading-none text-green-700"
+                />
+                <EditableText
+                  as="p"
+                  id={`program.hero.stat.${item.key}.l`}
+                  defaultValue={item.l}
+                  className="mt-2 block text-[0.6rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]/75"
+                />
               </div>
             ))}
           </div>
@@ -514,25 +605,40 @@ function ProgramImpactLanding() {
             <Link
               key={s.slug}
               to={`/program-impact/${s.slug}`}
-              className="block overflow-hidden rounded-2xl border border-green-700/12 bg-white/80 shadow-[0_20px_50px_-40px_rgba(20,83,45,0.5)] transition-all duration-200 active:scale-[0.99]"
+              className={`block overflow-hidden rounded-2xl border border-green-700/12 bg-white/80 shadow-[0_20px_50px_-40px_rgba(20,83,45,0.5)] transition-all duration-200 active:scale-[0.99] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
               <div className="relative aspect-[16/9] overflow-hidden">
-                <img
-                  src={s.image}
+                <EditableImage
+                  id={`program.sections.${s.slug}.image`}
+                  defaultValue={s.image}
                   alt={s.label}
                   className="h-full w-full object-cover"
-                  loading="lazy"
+                  wrapperClassName="h-full w-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-green-700 backdrop-blur">
-                  {s.tag}
-                </span>
+                <EditableText
+                  as="span"
+                  id={`program.sections.${s.slug}.tag`}
+                  defaultValue={s.tag}
+                  className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-green-700 backdrop-blur"
+                />
               </div>
               <div className="p-5">
-                <h3 className="hero-serif text-[1.45rem] font-bold leading-tight text-[#111111]">
-                  {s.label}
-                </h3>
-                <p className="mt-3 text-[0.88rem] leading-[1.75] text-[#4A4A42]">{s.desc}</p>
+                <EditableText
+                  as="h3"
+                  id={`program.sections.${s.slug}.label`}
+                  defaultValue={s.label}
+                  className="hero-serif block text-[1.45rem] font-bold leading-tight text-[#111111]"
+                />
+                <EditableText
+                  as="p"
+                  id={`program.sections.${s.slug}.desc`}
+                  defaultValue={s.desc}
+                  multiline
+                  className="mt-3 block text-[0.88rem] leading-[1.75] text-[#4A4A42]"
+                />
               </div>
             </Link>
           ))}
@@ -541,39 +647,39 @@ function ProgramImpactLanding() {
         <section className="px-5 pt-14">
           <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
             <span className="h-px w-6 bg-green-700" />
-            Why this matters
+            <EditableText id="program.landing.why.eyebrow" defaultValue="Why this matters" />
           </span>
-          <h2 className="hero-serif text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#111111]">
-            Numbers build the case. Stories build the trust.
-          </h2>
+          <EditableText
+            as="h2"
+            id="program.landing.why.titleMobile"
+            defaultValue="Numbers build the case. Stories build the trust."
+            className="hero-serif block text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#111111]"
+          />
           <div className="mt-6 space-y-3">
-            {[
-              {
-                title: "Verified reach",
-                body: "Every figure we publish is sourced from programme records, school registers, and periodic field monitoring.",
-              },
-              {
-                title: "Real projects",
-                body: "Every featured project has a name, a place, a budget, and a completion note — documented as it happens.",
-              },
-              {
-                title: "Open reporting",
-                body: "Annual reports, donor updates and programme evaluations are published so progress and challenges are both visible.",
-              },
-            ].map((card, i) => (
+            {whyCards.map((card) => (
               <div
-                key={card.title}
+                key={card.key}
                 className="rounded-2xl border border-green-700/12 bg-white/80 p-5"
               >
-                <span className="hero-serif text-[1.6rem] font-bold leading-none text-green-700/25">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p className="hero-serif mt-3 text-[1.05rem] font-bold leading-tight text-[#111111]">
-                  {card.title}
-                </p>
-                <p className="mt-2 text-[0.85rem] leading-[1.75] text-[#4A4A42]">
-                  {card.body}
-                </p>
+                <EditableText
+                  as="span"
+                  id={`program.landing.why.card.${card.key}.n`}
+                  defaultValue={card.n}
+                  className="hero-serif block text-[1.6rem] font-bold leading-none text-green-700/25"
+                />
+                <EditableText
+                  as="p"
+                  id={`program.landing.why.card.${card.key}.title`}
+                  defaultValue={card.title}
+                  className="hero-serif mt-3 block text-[1.05rem] font-bold leading-tight text-[#111111]"
+                />
+                <EditableText
+                  as="p"
+                  id={`program.landing.why.card.${card.key}.body`}
+                  defaultValue={card.body}
+                  multiline
+                  className="mt-2 block text-[0.85rem] leading-[1.75] text-[#4A4A42]"
+                />
               </div>
             ))}
           </div>
@@ -581,18 +687,26 @@ function ProgramImpactLanding() {
 
         <section className="px-5 pt-14 pb-16">
           <div className="grid grid-cols-2 gap-3">
-            {STATS.map((s) => (
+            {STATS.map((s, i) => (
               <div
                 key={s.label}
                 className="rounded-2xl border border-green-700/12 bg-white/80 p-4"
               >
                 <p className="hero-serif text-[1.6rem] font-bold leading-none text-green-700">
-                  {s.value}
-                  <span className="text-[0.6em] align-top text-green-700/70">{s.suffix}</span>
+                  <EditableText id={`program.stats.${i}.value`} defaultValue={s.value} />
+                  <EditableText
+                    as="span"
+                    id={`program.stats.${i}.suffix`}
+                    defaultValue={s.suffix}
+                    className="text-[0.6em] align-top text-green-700/70"
+                  />
                 </p>
-                <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80">
-                  {s.label}
-                </p>
+                <EditableText
+                  as="p"
+                  id={`program.stats.${i}.label`}
+                  defaultValue={s.label}
+                  className="mt-2 block text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80"
+                />
               </div>
             ))}
           </div>
@@ -600,15 +714,19 @@ function ProgramImpactLanding() {
           <div className="mt-8 flex flex-col gap-3">
             <Link
               to="/program-impact/our-reach"
-              className="inline-flex items-center justify-center rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99]"
+              className={`inline-flex items-center justify-center rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              See our reach →
+              <EditableText id="program.landing.cta.reach" defaultValue="See our reach →" />
             </Link>
             <Link
               to="/program-impact/featured-projects"
-              className="inline-flex items-center justify-center rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700"
+              className={`inline-flex items-center justify-center rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Walk through our projects
+              <EditableText id="program.landing.cta.projects" defaultValue="Walk through our projects" />
             </Link>
           </div>
         </section>
@@ -616,28 +734,38 @@ function ProgramImpactLanding() {
         <section className="-mx-5 bg-green-700 px-5 py-14">
           <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
             <span className="h-px w-6 bg-[#F2B33D]" />
-            Help us grow this page
+            <EditableText id="program.landing.grow.eyebrow" defaultValue="Help us grow this page" />
           </span>
-          <h2 className="hero-serif text-[1.8rem] font-bold leading-[1.1] text-[#FBF7F0]">
-            Every new project starts with someone deciding to act.
-          </h2>
-          <p className="mt-4 text-[0.9rem] leading-[1.8] text-[#FBF7F0]/75">
-            Fund the next borehole. Sponsor the next classroom. Partner on the next idea. Whether
-            you give monthly, once, or bring a company along — you become part of every number on
-            this page.
-          </p>
+          <EditableText
+            as="h2"
+            id="program.landing.grow.title"
+            defaultValue="Every new project starts with someone deciding to act."
+            multiline
+            className="hero-serif block text-[1.8rem] font-bold leading-[1.1] text-[#FBF7F0]"
+          />
+          <EditableText
+            as="p"
+            id="program.landing.grow.bodyMobile"
+            defaultValue="Fund the next borehole. Sponsor the next classroom. Partner on the next idea. Whether you give monthly, once, or bring a company along — you become part of every number on this page."
+            multiline
+            className="mt-4 block text-[0.9rem] leading-[1.8] text-[#FBF7F0]/75"
+          />
           <div className="mt-8 flex flex-col gap-3">
             <Link
               to="/take-action/donate"
-              className="inline-flex items-center justify-center rounded-full bg-[#F2B33D] px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#1C6B4B] active:scale-[0.99]"
+              className={`inline-flex items-center justify-center rounded-full bg-[#F2B33D] px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#1C6B4B] active:scale-[0.99] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Donate
+              <EditableText id="program.landing.grow.donate" defaultValue="Donate" />
             </Link>
             <Link
               to="/take-action/sponsor-a-child"
-              className="inline-flex items-center justify-center rounded-full border border-[#FBF7F0]/30 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#FBF7F0]"
+              className={`inline-flex items-center justify-center rounded-full border border-[#FBF7F0]/30 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-[#FBF7F0] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Sponsor a child
+              <EditableText id="program.landing.grow.sponsor" defaultValue="Sponsor a child" />
             </Link>
           </div>
         </section>
@@ -647,6 +775,7 @@ function ProgramImpactLanding() {
 }
 
 function OurReach() {
+  const { isEditing } = useEditor();
   return (
     <>
       <div className="hidden lg:block">
@@ -655,34 +784,46 @@ function OurReach() {
             <div>
               <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
                 <span className="h-px w-8 bg-green-700" />
-                Our Reach
+                <EditableText id="program.reach.hero.eyebrow" defaultValue="Our Reach" />
               </span>
-              <h1 className="hero-serif text-[clamp(2rem,6.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.028em] text-[#111111]">
-                MKCDP&rsquo;s reach reflects the breadth and depth
-                <br />
-                <span className="italic text-green-700">of our commitment to children.</span>
-              </h1>
+              <EditableText
+                as="h1"
+                id="program.reach.hero.title"
+                defaultValue={"MKCDP's reach reflects the breadth and depth\nof our commitment to children."}
+                multiline
+                className="hero-serif block whitespace-pre-line text-[clamp(2rem,6.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.028em] text-[#111111]"
+              />
             </div>
-            <p className="max-w-[520px] text-[1rem] leading-[1.85] text-[#4A4A42]">
-              Across the communities surrounding Mt. Kilimanjaro, our work touches children,
-              families and local leaders — together, we are building a future where every child
-              is safe, in school, and supported to thrive.
-            </p>
+            <EditableText
+              as="p"
+              id="program.reach.hero.intro"
+              defaultValue="Across the communities surrounding Mt. Kilimanjaro, our work touches children, families and local leaders — together, we are building a future where every child is safe, in school, and supported to thrive."
+              multiline
+              className="block max-w-[520px] text-[1rem] leading-[1.85] text-[#4A4A42]"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-            {STATS.map((s) => (
+            {STATS.map((s, i) => (
               <div
                 key={s.label}
                 className="rounded-3xl border border-green-700/12 bg-white/80 p-5 shadow-[0_20px_50px_-40px_rgba(20,83,45,0.4)] sm:p-6"
               >
                 <p className="hero-serif text-[clamp(1.6rem,4.5vw,2.4rem)] font-bold leading-none text-green-700">
-                  {s.value}
-                  <span className="text-[0.6em] align-top text-green-700/70">{s.suffix}</span>
+                  <EditableText id={`program.stats.${i}.value`} defaultValue={s.value} />
+                  <EditableText
+                    as="span"
+                    id={`program.stats.${i}.suffix`}
+                    defaultValue={s.suffix}
+                    className="text-[0.6em] align-top text-green-700/70"
+                  />
                 </p>
-                <p className="mt-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80">
-                  {s.label}
-                </p>
+                <EditableText
+                  as="p"
+                  id={`program.stats.${i}.label`}
+                  defaultValue={s.label}
+                  className="mt-3 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80"
+                />
               </div>
             ))}
           </div>
@@ -692,14 +833,21 @@ function OurReach() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
               <SectionHeading
+                idPrefix="program.reach.who"
                 eyebrow="Who we reach"
                 title="The children, families and communities behind our numbers."
               />
               <ul className="mt-8 space-y-4">
-                {WHO_WE_REACH.map((line) => (
-                  <li key={line} className="flex items-start gap-3">
+                {WHO_WE_REACH.map((line, i) => (
+                  <li key={i} className="flex items-start gap-3">
                     <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-700" />
-                    <p className="text-[0.95rem] leading-[1.75] text-[#4A4A42]">{line}</p>
+                    <EditableText
+                      as="p"
+                      id={`program.reach.who.${i}`}
+                      defaultValue={line}
+                      multiline
+                      className="block text-[0.95rem] leading-[1.75] text-[#4A4A42]"
+                    />
                   </li>
                 ))}
               </ul>
@@ -707,6 +855,7 @@ function OurReach() {
 
             <div>
               <SectionHeading
+                idPrefix="program.reach.measure"
                 eyebrow="How we measure reach"
                 title="Honest, verified data — reviewed again and again."
                 intro="We track our reach through programme records, school and community registers, and regular monitoring activities. Reach data is reviewed periodically to ensure accuracy and accountability."
@@ -716,49 +865,63 @@ function OurReach() {
 
           <div className="rounded-3xl border border-green-700/12 bg-white/80 p-8 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)] sm:p-10">
             <SectionHeading
+              idPrefix="program.reach.impact"
               eyebrow="Impact beyond numbers"
               title="What the numbers actually mean for a child."
             />
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
               {IMPACT_BEYOND_NUMBERS.map((line, i) => (
                 <div
-                  key={line}
+                  key={i}
                   className="rounded-2xl border border-green-700/12 bg-green-700/5 p-5 sm:p-6"
                 >
                   <span className="hero-serif text-[2rem] font-bold leading-none text-green-700/25">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="hero-serif mt-3 text-[1.05rem] font-bold leading-tight text-[#111111]">
-                    {line}
-                  </p>
+                  <EditableText
+                    as="p"
+                    id={`program.reach.impact.${i}`}
+                    defaultValue={line}
+                    multiline
+                    className="hero-serif mt-3 block text-[1.05rem] font-bold leading-tight text-[#111111]"
+                  />
                 </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-3xl border border-green-700/12 border-l-2 border-l-green-700 bg-white/70 p-6 sm:p-8">
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Reporting and transparency
-            </p>
-            <p className="mt-3 max-w-[820px] text-[0.98rem] leading-[1.85] text-[#4A4A42]">
-              Our reach figures are shared through annual reports, donor updates and programme
-              evaluations. We are committed to honest reporting — celebrating progress while
-              openly acknowledging challenges.
-            </p>
+            <EditableText
+              as="p"
+              id="program.reach.reporting.title"
+              defaultValue="Reporting and transparency"
+              className="block text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="program.reach.reporting.body"
+              defaultValue="Our reach figures are shared through annual reports, donor updates and programme evaluations. We are committed to honest reporting — celebrating progress while openly acknowledging challenges."
+              multiline
+              className="mt-3 block max-w-[820px] text-[0.98rem] leading-[1.85] text-[#4A4A42]"
+            />
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               to="/program-impact/featured-projects"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A]"
+              className={`inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-16px_rgba(20,83,45,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              See featured projects →
+              <EditableText id="program.reach.cta.projects" defaultValue="See featured projects →" />
             </Link>
             <a
               href="tel:+254737332219"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5"
+              className={`inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 hover:bg-green-700/5 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Call Us
+              <EditableText id="program.reach.cta.call" defaultValue="Call Us" />
             </a>
           </div>
         </div>
@@ -769,29 +932,42 @@ function OurReach() {
           <div>
             <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
-              Our Reach
+              <EditableText id="program.reach.hero.eyebrow" defaultValue="Our Reach" />
             </span>
-            <h1 className="hero-serif text-[2.1rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]">
-              MKCDP&rsquo;s reach reflects our commitment to children.{" "}
-              <span className="italic text-green-700">Across every community.</span>
-            </h1>
-            <p className="mt-4 text-[0.95rem] leading-[1.8] text-[#4A4A42]">
-              Across the communities surrounding Mt. Kilimanjaro, our work touches children,
-              families and local leaders — together, we are building a future where every child
-              is safe, in school, and supported to thrive.
-            </p>
+            <EditableText
+              as="h1"
+              id="program.reach.hero.titleMobile"
+              defaultValue="MKCDP's reach reflects our commitment to children. Across every community."
+              multiline
+              className="hero-serif block text-[2.1rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]"
+            />
+            <EditableText
+              as="p"
+              id="program.reach.hero.introMobile"
+              defaultValue="Across the communities surrounding Mt. Kilimanjaro, our work touches children, families and local leaders — together, we are building a future where every child is safe, in school, and supported to thrive."
+              multiline
+              className="mt-4 block text-[0.95rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {STATS.map((s) => (
+            {STATS.map((s, i) => (
               <div key={s.label} className="rounded-2xl border border-green-700/12 bg-white/80 p-4">
                 <p className="hero-serif text-[1.6rem] font-bold leading-none text-green-700">
-                  {s.value}
-                  <span className="text-[0.6em] align-top text-green-700/70">{s.suffix}</span>
+                  <EditableText id={`program.stats.${i}.value`} defaultValue={s.value} />
+                  <EditableText
+                    as="span"
+                    id={`program.stats.${i}.suffix`}
+                    defaultValue={s.suffix}
+                    className="text-[0.6em] align-top text-green-700/70"
+                  />
                 </p>
-                <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80">
-                  {s.label}
-                </p>
+                <EditableText
+                  as="p"
+                  id={`program.stats.${i}.label`}
+                  defaultValue={s.label}
+                  className="mt-2 block text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]/80"
+                />
               </div>
             ))}
           </div>
@@ -801,16 +977,25 @@ function OurReach() {
           <div>
             <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
-              Who we reach
+              <EditableText id="program.reach.who.eyebrow" defaultValue="Who we reach" />
             </span>
-            <h2 className="hero-serif text-[1.7rem] font-bold leading-[1.1] text-[#111111]">
-              The people behind our numbers.
-            </h2>
+            <EditableText
+              as="h2"
+              id="program.reach.who.titleMobile"
+              defaultValue="The people behind our numbers."
+              className="hero-serif block text-[1.7rem] font-bold leading-[1.1] text-[#111111]"
+            />
             <ul className="mt-5 space-y-3">
-              {WHO_WE_REACH.map((line) => (
-                <li key={line} className="flex items-start gap-3">
+              {WHO_WE_REACH.map((line, i) => (
+                <li key={i} className="flex items-start gap-3">
                   <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-700" />
-                  <p className="text-[0.9rem] leading-[1.75] text-[#4A4A42]">{line}</p>
+                  <EditableText
+                    as="p"
+                    id={`program.reach.who.${i}`}
+                    defaultValue={line}
+                    multiline
+                    className="block text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+                  />
                 </li>
               ))}
             </ul>
@@ -819,63 +1004,84 @@ function OurReach() {
           <div>
             <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
-              How we measure reach
+              <EditableText id="program.reach.measure.eyebrow" defaultValue="How we measure reach" />
             </span>
-            <h2 className="hero-serif text-[1.7rem] font-bold leading-[1.1] text-[#111111]">
-              Honest, verified data.
-            </h2>
-            <p className="mt-4 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
-              We track our reach through programme records, school and community registers, and
-              regular monitoring activities. Reach data is reviewed periodically to ensure
-              accuracy and accountability.
-            </p>
+            <EditableText
+              as="h2"
+              id="program.reach.measure.titleMobile"
+              defaultValue="Honest, verified data."
+              className="hero-serif block text-[1.7rem] font-bold leading-[1.1] text-[#111111]"
+            />
+            <EditableText
+              as="p"
+              id="program.reach.measure.bodyMobile"
+              defaultValue="We track our reach through programme records, school and community registers, and regular monitoring activities. Reach data is reviewed periodically to ensure accuracy and accountability."
+              multiline
+              className="mt-4 block text-[0.9rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="-mx-5 bg-green-700 px-5 py-14">
             <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
               <span className="h-px w-6 bg-[#F2B33D]" />
-              Impact beyond numbers
+              <EditableText id="program.reach.impact.eyebrow" defaultValue="Impact beyond numbers" />
             </span>
-            <h2 className="hero-serif text-[1.7rem] font-bold leading-[1.1] text-[#FBF7F0]">
-              What the numbers mean for a child.
-            </h2>
+            <EditableText
+              as="h2"
+              id="program.reach.impact.titleMobile"
+              defaultValue="What the numbers mean for a child."
+              className="hero-serif block text-[1.7rem] font-bold leading-[1.1] text-[#FBF7F0]"
+            />
             <div className="mt-8 space-y-3">
               {IMPACT_BEYOND_NUMBERS.map((line, i) => (
-                <div key={line} className="rounded-2xl border border-[#FBF7F0]/12 bg-[#FBF7F0]/5 p-5">
+                <div key={i} className="rounded-2xl border border-[#FBF7F0]/12 bg-[#FBF7F0]/5 p-5">
                   <span className="hero-serif text-[1.6rem] font-bold leading-none text-[#F2B33D]/60">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="hero-serif mt-3 text-[1.05rem] font-bold leading-tight text-[#FBF7F0]">
-                    {line}
-                  </p>
+                  <EditableText
+                    as="p"
+                    id={`program.reach.impact.${i}`}
+                    defaultValue={line}
+                    multiline
+                    className="hero-serif mt-3 block text-[1.05rem] font-bold leading-tight text-[#FBF7F0]"
+                  />
                 </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-3xl border border-green-700/12 border-l-2 border-l-green-700 bg-white/70 p-5">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              Reporting and transparency
-            </p>
-            <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
-              Our reach figures are shared through annual reports, donor updates and programme
-              evaluations. We are committed to honest reporting — celebrating progress while
-              openly acknowledging challenges.
-            </p>
+            <EditableText
+              as="p"
+              id="program.reach.reporting.title"
+              defaultValue="Reporting and transparency"
+              className="block text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="program.reach.reporting.body"
+              defaultValue="Our reach figures are shared through annual reports, donor updates and programme evaluations. We are committed to honest reporting — celebrating progress while openly acknowledging challenges."
+              multiline
+              className="mt-3 block text-[0.9rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="flex flex-col gap-3">
             <Link
               to="/program-impact/featured-projects"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99]"
+              className={`inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              See featured projects →
+              <EditableText id="program.reach.cta.projects" defaultValue="See featured projects →" />
             </Link>
             <a
               href="tel:+254737332219"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700"
+              className={`inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Call Us
+              <EditableText id="program.reach.cta.call" defaultValue="Call Us" />
             </a>
           </div>
         </div>
@@ -884,45 +1090,69 @@ function OurReach() {
   );
 }
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, projectIndex }) {
+  const base = `program.projects.${project.id}`;
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border border-green-700/12 bg-white/80 shadow-[0_24px_60px_-40px_rgba(20,83,45,0.4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-40px_rgba(20,83,45,0.55)]">
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img
-          src={project.image}
+        <EditableImage
+          id={`${base}.image`}
+          defaultValue={project.image}
           alt={project.title}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
+          wrapperClassName="h-full w-full"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-green-700 backdrop-blur">
-          {project.category}
-        </span>
+        <EditableText
+          as="span"
+          id={`${base}.category`}
+          defaultValue={project.category}
+          className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-green-700 backdrop-blur"
+        />
         <div className="absolute bottom-3 left-4 right-4 text-white">
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white/80">
-            {project.location}
-          </p>
+          <EditableText
+            as="p"
+            id={`${base}.location`}
+            defaultValue={project.location}
+            className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white/80"
+          />
         </div>
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700">
-          {project.year}
-        </p>
-        <h3 className="hero-serif mt-2 text-[1.3rem] font-bold leading-tight text-[#111111] sm:text-[1.45rem]">
-          {project.title}
-        </h3>
-        <p className="mt-3 flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]">
-          {project.summary}
-        </p>
+        <EditableText
+          as="p"
+          id={`${base}.year`}
+          defaultValue={project.year}
+          className="block text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700"
+        />
+        <EditableText
+          as="h3"
+          id={`${base}.title`}
+          defaultValue={project.title}
+          className="hero-serif mt-2 block text-[1.3rem] font-bold leading-tight text-[#111111] sm:text-[1.45rem]"
+        />
+        <EditableText
+          as="p"
+          id={`${base}.summary`}
+          defaultValue={project.summary}
+          multiline
+          className="mt-3 block flex-1 text-[0.9rem] leading-[1.75] text-[#4A4A42]"
+        />
         <div className="mt-5 grid grid-cols-3 gap-3 border-t border-green-700/12 pt-5">
-          {project.stats.map((stat) => (
-            <div key={stat.label}>
-              <p className="hero-serif text-[1rem] font-bold leading-none text-green-700">
-                {stat.value}
-              </p>
-              <p className="mt-1.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]/70">
-                {stat.label}
-              </p>
+          {project.stats.map((stat, j) => (
+            <div key={j}>
+              <EditableText
+                as="p"
+                id={`${base}.stat.${j}.value`}
+                defaultValue={stat.value}
+                className="hero-serif block text-[1rem] font-bold leading-none text-green-700"
+              />
+              <EditableText
+                as="p"
+                id={`${base}.stat.${j}.label`}
+                defaultValue={stat.label}
+                className="mt-1.5 block text-[0.6rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]/70"
+              />
             </div>
           ))}
         </div>
@@ -932,6 +1162,7 @@ function ProjectCard({ project }) {
 }
 
 function FeaturedProjects() {
+  const { isEditing } = useEditor();
   return (
     <>
       <div className="hidden lg:block">
@@ -940,44 +1171,55 @@ function FeaturedProjects() {
             <div>
               <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
                 <span className="h-px w-8 bg-green-700" />
-                Featured Projects
+                <EditableText id="program.projects.hero.eyebrow" defaultValue="Featured Projects" />
               </span>
-              <h1 className="hero-serif text-[clamp(2rem,6.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.028em] text-[#111111]">
-                Water. Livelihoods. Learning.
-                <br />
-                <span className="italic text-green-700">Three stories on the ground.</span>
-              </h1>
+              <EditableText
+                as="h1"
+                id="program.projects.hero.title"
+                defaultValue={"Water. Livelihoods. Learning.\nThree stories on the ground."}
+                multiline
+                className="hero-serif block whitespace-pre-line text-[clamp(2rem,6.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.028em] text-[#111111]"
+              />
             </div>
-            <p className="max-w-[520px] text-[1rem] leading-[1.85] text-[#4A4A42]">
-              Some of our work is a borehole. Some is fifty beehives. Some is simply a child in a
-              classroom, day after day. Here are three projects that show what a community can do
-              when it is given the tools to build its own future.
-            </p>
+            <EditableText
+              as="p"
+              id="program.projects.hero.intro"
+              defaultValue="Some of our work is a borehole. Some is fifty beehives. Some is simply a child in a classroom, day after day. Here are three projects that show what a community can do when it is given the tools to build its own future."
+              multiline
+              className="block max-w-[520px] text-[1rem] leading-[1.85] text-[#4A4A42]"
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {FEATURED_PROJECTS.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {FEATURED_PROJECTS.map((project, i) => (
+              <ProjectCard key={project.id} project={project} projectIndex={i} />
             ))}
           </div>
 
           <div className="rounded-3xl border border-green-700/12 border-l-2 border-l-green-700 bg-white/70 p-6 sm:p-8">
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              More projects coming
-            </p>
-            <p className="mt-3 max-w-[820px] text-[0.98rem] leading-[1.85] text-[#4A4A42]">
-              These featured projects are only a small sample of the 100+ initiatives we have
-              delivered since MKCDP began. New projects — water, education, health and
-              livelihoods — are documented here as they launch and complete.
-            </p>
+            <EditableText
+              as="p"
+              id="program.projects.more.title"
+              defaultValue="More projects coming"
+              className="block text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="program.projects.more.body"
+              defaultValue="These featured projects are only a small sample of the 100+ initiatives we have delivered since MKCDP began. New projects — water, education, health and livelihoods — are documented here as they launch and complete."
+              multiline
+              className="mt-3 block max-w-[820px] text-[0.98rem] leading-[1.85] text-[#4A4A42]"
+            />
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               to="/take-action/donate"
-              className="inline-flex items-center hover:bg-green-700 hover:text-white justify-center gap-2 rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60"
+              className={`inline-flex items-center hover:bg-green-700 hover:text-white justify-center gap-2 rounded-full border border-green-700/25 px-8 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 transition-all duration-300 hover:border-green-700/60 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Support the next project
+              <EditableText id="program.projects.cta.support" defaultValue="Support the next project" />
             </Link>
           </div>
         </div>
@@ -988,48 +1230,62 @@ function FeaturedProjects() {
           <div>
             <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
-              Featured Projects
+              <EditableText id="program.projects.hero.eyebrow" defaultValue="Featured Projects" />
             </span>
-            <h1 className="hero-serif text-[2.1rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]">
-              Water. Livelihoods. Learning.{" "}
-              <span className="italic text-green-700">Three stories on the ground.</span>
-            </h1>
-            <p className="mt-4 text-[0.95rem] leading-[1.8] text-[#4A4A42]">
-              Some of our work is a borehole. Some is fifty beehives. Some is simply a child in a
-              classroom, day after day. Here are three projects that show what a community can do
-              when it is given the tools to build its own future.
-            </p>
+            <EditableText
+              as="h1"
+              id="program.projects.hero.titleMobile"
+              defaultValue="Water. Livelihoods. Learning. Three stories on the ground."
+              multiline
+              className="hero-serif block text-[2.1rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]"
+            />
+            <EditableText
+              as="p"
+              id="program.projects.hero.introMobile"
+              defaultValue="Some of our work is a borehole. Some is fifty beehives. Some is simply a child in a classroom, day after day. Here are three projects that show what a community can do when it is given the tools to build its own future."
+              multiline
+              className="mt-4 block text-[0.95rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="space-y-6">
-            {FEATURED_PROJECTS.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {FEATURED_PROJECTS.map((project, i) => (
+              <ProjectCard key={project.id} project={project} projectIndex={i} />
             ))}
           </div>
 
           <div className="rounded-3xl border border-green-700/12 border-l-2 border-l-green-700 bg-white/70 p-5">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              More projects coming
-            </p>
-            <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
-              These featured projects are only a small sample of the 100+ initiatives we have
-              delivered since MKCDP began. New projects are documented here as they launch and
-              complete.
-            </p>
+            <EditableText
+              as="p"
+              id="program.projects.more.title"
+              defaultValue="More projects coming"
+              className="block text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700"
+            />
+            <EditableText
+              as="p"
+              id="program.projects.more.bodyMobile"
+              defaultValue="These featured projects are only a small sample of the 100+ initiatives we have delivered since MKCDP began. New projects are documented here as they launch and complete."
+              multiline
+              className="mt-3 block text-[0.9rem] leading-[1.8] text-[#4A4A42]"
+            />
           </div>
 
           <div className="flex flex-col gap-3">
             <Link
               to="/program-impact/our-reach"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99]"
+              className={`inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white active:scale-[0.99] ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              ← Back to Our Reach
+              <EditableText id="program.projects.cta.back" defaultValue="← Back to Our Reach" />
             </Link>
             <Link
               to="/take-action/donate"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700"
+              className={`inline-flex items-center justify-center gap-2 rounded-full border border-green-700/25 px-8 py-4 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 ${
+                isEditing ? "pointer-events-none" : ""
+              }`}
             >
-              Support the next project
+              <EditableText id="program.projects.cta.support" defaultValue="Support the next project" />
             </Link>
           </div>
         </div>
@@ -1039,20 +1295,30 @@ function FeaturedProjects() {
 }
 
 function NotFound() {
+  const { isEditing } = useEditor();
   return (
     <section className="relative flex min-h-[60vh] items-center justify-center py-20">
       <div className="mx-auto max-w-[600px] px-5 text-center sm:px-6">
-        <p className="text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
-          Page not found
-        </p>
-        <h1 className="hero-serif mt-5 text-[clamp(1.6rem,6vw,2.8rem)] font-bold leading-tight text-[#111111]">
-          We couldn&rsquo;t find that page in the Program Impact section.
-        </h1>
+        <EditableText
+          as="p"
+          id="program.notFound.kicker"
+          defaultValue="Page not found"
+          className="block text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700"
+        />
+        <EditableText
+          as="h1"
+          id="program.notFound.title"
+          defaultValue="We couldn't find that page in the Program Impact section."
+          multiline
+          className="hero-serif mt-5 block text-[clamp(1.6rem,6vw,2.8rem)] font-bold leading-tight text-[#111111]"
+        />
         <Link
           to="/program-impact"
-          className="mt-10 inline-flex items-center rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950"
+          className={`mt-10 inline-flex items-center rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950 ${
+            isEditing ? "pointer-events-none" : ""
+          }`}
         >
-          Back to Program Impact
+          <EditableText id="program.notFound.cta" defaultValue="Back to Program Impact" />
         </Link>
       </div>
     </section>
