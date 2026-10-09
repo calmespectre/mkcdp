@@ -597,20 +597,20 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
         onClick={(e) => {
           if (e.target === e.currentTarget) onCancel();
         }}
-        className="relative mx-auto flex h-full w-full items-center justify-center px-4 py-6"
+        className="relative mx-auto flex h-full w-full items-center justify-center px-3 py-4 sm:px-4 sm:py-6"
       >
         <div
           onClick={(e) => e.stopPropagation()}
           className="w-full max-w-xl overflow-hidden rounded-2xl border border-green-700/15 bg-[#FBF7F0] shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
         >
-          <div className="flex items-center justify-between gap-3 border-b border-green-700/10 px-5 py-3.5">
-            <h3 className="text-[0.9rem] font-bold uppercase tracking-[0.14em] text-green-700">
+          <div className="flex items-center justify-between gap-3 border-b border-green-700/10 px-4 py-3 sm:px-5 sm:py-3.5">
+            <h3 className="text-[0.82rem] font-bold uppercase tracking-[0.14em] text-green-700 sm:text-[0.9rem]">
               Edit image
             </h3>
             <button
               type="button"
               onClick={onCancel}
-              className="grid h-8 w-8 place-items-center rounded-lg text-[#4A4A42] transition-colors hover:bg-green-700/8"
+              className="grid h-9 w-9 place-items-center rounded-lg text-[#4A4A42] transition-colors hover:bg-green-700/8"
               aria-label="Close"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -619,7 +619,7 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
             </button>
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto p-5">
+          <div className="max-h-[70vh] overflow-y-auto p-4 sm:p-5">
             <div className="mb-5">
               <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-green-700/12 bg-white">
                 {preview ? (
@@ -648,7 +648,7 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
                 setPreview(e.target.value);
               }}
               placeholder="https://example.com/image.jpg"
-              className="w-full rounded-xl border border-green-700/15 bg-white px-4 py-3 text-[0.88rem] text-[#111111] outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-700/15"
+              className="w-full rounded-xl border border-green-700/15 bg-white px-4 py-3 text-[0.92rem] text-[#111111] outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-700/15 sm:text-[0.88rem]"
             />
 
             <div className="my-5 flex items-center gap-3">
@@ -674,7 +674,7 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
                 handleFile(e.dataTransfer?.files?.[0]);
               }}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-8 text-center transition-colors ${
+              className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-6 text-center transition-colors sm:py-8 ${
                 dragActive
                   ? "border-green-700 bg-green-700/6"
                   : "border-green-700/25 bg-white/60 hover:border-green-700/50 hover:bg-white/85"
@@ -688,9 +688,9 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
                 </svg>
               </span>
               <p className="text-[0.9rem] font-semibold text-[#111111]">
-                Drop an image here, or click to browse
+                Tap to choose a photo, or drag one here
               </p>
-              <p className="mt-1 text-[0.75rem] text-[#4A4A42]/75">
+              <p className="mt-1 text-[0.72rem] text-[#4A4A42]/75">
                 PNG, JPG, WEBP, GIF · up to {MAX_IMAGE_MB} MB
               </p>
               <input
@@ -707,11 +707,11 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
             )}
           </div>
 
-          <div className="flex items-center justify-end gap-2 border-t border-green-700/10 bg-white/50 px-5 py-3.5">
+          <div className="flex flex-col-reverse gap-2 border-t border-green-700/10 bg-white/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-end sm:px-5">
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-lg border border-green-700/15 px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42] transition hover:bg-green-700/6"
+              className="w-full rounded-lg border border-green-700/15 px-4 py-3 text-[0.74rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42] transition hover:bg-green-700/6 sm:w-auto sm:py-2"
             >
               Cancel
             </button>
@@ -719,7 +719,7 @@ function ImageEditModal({ open, initialValue, onCancel, onSave }) {
               type="button"
               disabled={uploading || !url.trim()}
               onClick={() => onSave(url.trim())}
-              className="rounded-lg bg-amber-500 px-5 py-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-lg bg-amber-500 px-5 py-3 text-[0.74rem] font-bold uppercase tracking-[0.1em] text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:py-2"
             >
               Save image
             </button>
@@ -1064,6 +1064,7 @@ function EditableBase({
 
   const value = hasPathMode ? ctx.getPath(path) : ctx.getValue(key, fallback);
   const ref = useRef(null);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     if (!hasPathMode) return;
@@ -1100,7 +1101,7 @@ function EditableBase({
               hasPathMode ? ctx.resetPath(path) : ctx.resetKey(key);
             }
           }}
-          className="w-28 rounded-sm border-2 border-amber-400 bg-amber-50 px-2 py-0.5 text-[0.9em] tabular-nums text-inherit outline-none"
+          className="w-28 rounded-sm border-2 border-amber-400 bg-amber-50 px-2 py-1 text-[0.9em] tabular-nums text-inherit outline-none sm:py-0.5"
         />
       </Tag>
     );
@@ -1116,7 +1117,9 @@ function EditableBase({
       contentEditable
       suppressContentEditableWarning
       spellCheck={false}
+      onFocus={() => setFocused(true)}
       onBlur={(e) => {
+        setFocused(false);
         const next = e.currentTarget.textContent ?? "";
         if (next !== value) {
           hasPathMode ? ctx.setPath(path, next) : ctx.setValue(key, next);
@@ -1138,8 +1141,11 @@ function EditableBase({
           hasPathMode ? ctx.resetPath(path) : ctx.resetKey(key);
         }
       }}
-      title="Click to edit · Alt + right-click to reset"
-      className={`${className} cursor-text rounded-sm outline-dashed outline-1 outline-amber-400/70 transition hover:outline-amber-500 focus:bg-amber-50/40 focus:outline-2 focus:outline-amber-500`}
+      title="Tap to edit · Alt + right-click to reset"
+      className={`${className} cursor-text rounded-sm outline-dashed outline-1 outline-amber-400/70 transition hover:outline-amber-500 focus:bg-amber-50/40 focus:outline-2 focus:outline-amber-500 ${
+        focused ? "bg-amber-50/40 outline-2 outline-amber-500" : ""
+      }`}
+      style={{ WebkitTapHighlightColor: "rgba(245, 158, 11, 0.15)", minHeight: "1.2em" }}
       {...rest}
     >
       {value}
@@ -1232,14 +1238,14 @@ export function EditableImage({
             <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-full bg-black/20"
+                className="pointer-events-none absolute inset-0 rounded-full bg-black/25"
               />
               <button
                 type="button"
                 onClick={openEditor}
-                className="pointer-events-auto relative rounded-full bg-amber-500 px-3.5 py-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-white shadow-[0_10px_28px_-8px_rgba(0,0,0,0.7)] transition hover:bg-amber-600"
+                className="pointer-events-auto relative rounded-full bg-amber-500 px-4 py-2 text-[0.66rem] font-bold uppercase tracking-wider text-white shadow-[0_10px_28px_-8px_rgba(0,0,0,0.7)] transition hover:bg-amber-600 active:scale-95 sm:px-3.5 sm:py-1.5 sm:text-[0.62rem]"
               >
-                Change image
+                Change
               </button>
             </span>
           ) : (
@@ -1247,7 +1253,7 @@ export function EditableImage({
               <button
                 type="button"
                 onClick={openEditor}
-                className="pointer-events-auto rounded-full bg-amber-500 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-amber-600"
+                className="pointer-events-auto rounded-full bg-amber-500 px-3.5 py-2 text-[0.62rem] font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-amber-600 active:scale-95 sm:py-1"
               >
                 Change image
               </button>
@@ -1285,7 +1291,7 @@ export function EditableVideo({ path, id, defaultValue, youtubeId, title = "", c
       />
       {ctx.isEditing && (
         <div className="absolute inset-x-0 top-0 z-10 flex justify-end p-3">
-          <div className="flex items-center gap-2 rounded-full bg-black/75 px-3 py-2 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/80 px-3 py-2 backdrop-blur">
             <span className="text-[0.58rem] font-bold uppercase tracking-wider text-white/70">
               YouTube ID
             </span>
@@ -1295,7 +1301,7 @@ export function EditableVideo({ path, id, defaultValue, youtubeId, title = "", c
                 const next = e.target.value.trim();
                 hasPathMode ? ctx.setPath(path, next) : ctx.setValue(key, next);
               }}
-              className="w-44 rounded-md bg-white/95 px-2 py-1 text-[0.72rem] text-black outline-none"
+              className="w-40 rounded-md bg-white/95 px-2 py-1.5 text-[0.75rem] text-black outline-none sm:w-44 sm:py-1 sm:text-[0.72rem]"
             />
             <button
               type="button"
@@ -1317,7 +1323,7 @@ function statusLabel(syncMode, saving, pending, lastError, lastSyncedAt) {
   if (syncMode === "local") return { text: "Local only", tone: "text-white/50" };
   if (lastError) return { text: "Save failed", tone: "text-red-400" };
   if (saving) return { text: "Saving…", tone: "text-amber-300" };
-  if (pending) return { text: "Unsaved changes", tone: "text-amber-300" };
+  if (pending) return { text: "Unsaved", tone: "text-amber-300" };
   if (lastSyncedAt) {
     const t = lastSyncedAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
     return { text: `Synced ${t}`, tone: "text-emerald-400" };
@@ -1340,58 +1346,104 @@ export function EditorToolbar() {
     reloadFromServer,
     resetOnServer,
   } = useSiteContent();
+  const [collapsed, setCollapsed] = useState(false);
   const count = Object.keys(edits).length;
 
   if (!isEditing) return null;
 
   const status = statusLabel(syncMode, saving, pending, lastError, lastSyncedAt);
 
+  const handleResetAll = async () => {
+    if (!window.confirm("Discard ALL saved edits across the site, on the server and in this browser?")) return;
+    const result = await resetOnServer();
+    if (result === false) resetAll();
+  };
+
   return (
-    <div className="fixed bottom-4 right-134 z-[9998] flex flex-wrap items-center gap-2 rounded-2xl border border-amber-400/60 bg-[#141414]/95 px-4 py-3 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur">
-      <span className="flex items-center gap-2 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-amber-400">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-        Editing
-      </span>
-      <span className="text-[0.66rem] text-white/50">
-        {count} change{count === 1 ? "" : "s"}
-      </span>
-      <span className={`text-[0.62rem] font-bold uppercase tracking-wider ${status.tone}`}>
-        {status.text}
-      </span>
-      <button
-        type="button"
-        onClick={flushNow}
-        disabled={saving || !pending}
-        className="rounded-lg border border-white/15 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/5 disabled:opacity-40"
-      >
-        Save now
-      </button>
-      <button
-        type="button"
-        onClick={reloadFromServer}
-        disabled={saving}
-        className="rounded-lg border border-white/15 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/5 disabled:opacity-40"
-      >
-        Reload
-      </button>
-      <button
-        type="button"
-        onClick={async () => {
-          if (!window.confirm("Discard ALL saved edits across the site, on the server and in this browser?")) return;
-          const result = await resetOnServer();
-          if (result === false) resetAll();
-        }}
-        className="rounded-lg border border-white/15 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-red-400 transition hover:bg-red-500/10"
-      >
-        Reset all
-      </button>
-      <button
-        type="button"
-        onClick={() => setIsEditing(false)}
-        className="rounded-lg bg-amber-500 px-4 py-1.5 text-[0.62rem] font-bold uppercase tracking-wider text-black transition hover:bg-amber-400"
-      >
-        Done
-      </button>
+    <div
+      className="fixed inset-x-3 bottom-3 z-[9998] sm:inset-x-auto sm:right-135 sm:bottom-4"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="mx-auto w-full max-w-[560px] rounded-2xl border border-amber-400/60 bg-[#141414]/95 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur sm:max-w-none sm:w-auto">
+        {collapsed ? (
+          <button
+            type="button"
+            onClick={() => setCollapsed(false)}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:hidden"
+            aria-label="Expand editor toolbar"
+          >
+            <span className="flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+              <span className="text-[0.66rem] font-bold uppercase tracking-[0.14em] text-amber-400">
+                Editing
+              </span>
+              <span className="text-[0.66rem] text-white/60">
+                {count} change{count === 1 ? "" : "s"}
+              </span>
+            </span>
+            <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="m6 15 6-6 6 6" />
+            </svg>
+          </button>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2 px-3 py-3 sm:px-4 sm:py-3">
+            <span className="flex items-center gap-2 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-amber-400">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+              Editing
+            </span>
+            <span className="text-[0.66rem] text-white/50">
+              {count} change{count === 1 ? "" : "s"}
+            </span>
+            <span className={`text-[0.62rem] font-bold uppercase tracking-wider ${status.tone}`}>
+              {status.text}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setCollapsed(true)}
+              className="ml-auto rounded-lg border border-white/15 p-1.5 text-white/70 transition hover:bg-white/5 sm:hidden"
+              aria-label="Collapse editor toolbar"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:ml-2">
+              <button
+                type="button"
+                onClick={flushNow}
+                disabled={saving || !pending}
+                className="flex-1 rounded-lg border border-white/15 px-3 py-2.5 text-[0.66rem] font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/5 disabled:opacity-40 sm:flex-none sm:py-1.5 sm:text-[0.62rem]"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={reloadFromServer}
+                disabled={saving}
+                className="flex-1 rounded-lg border border-white/15 px-3 py-2.5 text-[0.66rem] font-bold uppercase tracking-wider text-white/80 transition hover:bg-white/5 disabled:opacity-40 sm:flex-none sm:py-1.5 sm:text-[0.62rem]"
+              >
+                Reload
+              </button>
+              <button
+                type="button"
+                onClick={handleResetAll}
+                className="flex-1 rounded-lg border border-white/15 px-3 py-2.5 text-[0.66rem] font-bold uppercase tracking-wider text-red-400 transition hover:bg-red-500/10 sm:flex-none sm:py-1.5 sm:text-[0.62rem]"
+              >
+                Reset all
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="w-full rounded-lg bg-amber-500 px-4 py-2.5 text-[0.68rem] font-bold uppercase tracking-wider text-black transition hover:bg-amber-400 sm:w-auto sm:py-1.5 sm:text-[0.62rem]"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

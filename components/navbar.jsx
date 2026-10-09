@@ -114,6 +114,12 @@ const Icon = {
       <path d="M9 7h8v8" />
     </svg>
   ),
+  Edit: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  ),
   Facebook: (p) => (
     <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
       <path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.24-1.46 1.5-1.46h1.6V4.4A21 21 0 0 0 14.3 4.3c-2.3 0-3.9 1.4-3.9 4v2.2H8v3h2.4V21z" />
@@ -966,15 +972,32 @@ export default function Navbar() {
               <Link to="/take-action/donate" className={`hidden items-center gap-2 rounded-xl bg-green-700 px-6 py-3 text-[0.78rem] font-bold uppercase tracking-[0.09em] text-white shadow-[0_14px_30px_-16px_rgba(28,107,75,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#15543A] lg:inline-flex ${isEditing ? "pointer-events-none" : ""}`}>
                 <EditableText id="navbar.cta.donate" defaultValue="Donate" />
               </Link>
-              <Link to={isAuthed ? "/account" : "/auth"} state={isAuthed ? undefined : authLinkState} aria-label={isAuthed ? "My account" : "Sign in or sign up"} title={isAuthed ? "My account" : "Sign in / Sign up"} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden">
-                <Icon.User className="h-5 w-5" />
-              </Link>
+              {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(!isEditing)}
+                  aria-label={isEditing ? "Exit editor mode" : "Enter editor mode"}
+                  aria-pressed={isEditing}
+                  title={isEditing ? "Exit editor mode" : "Enter editor mode"}
+                  className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 active:scale-95 lg:hidden ${
+                    isEditing
+                      ? "border-amber-500 bg-amber-500 text-black hover:bg-amber-400"
+                      : "border-green-700/20 text-green-700 hover:bg-green-700 hover:text-white"
+                  }`}
+                >
+                  <Icon.Edit className="h-5 w-5" />
+                </button>
+              ) : (
+                <Link to="/take-action/send-a-gift-cart" aria-label={basketCount ? `Basket, ${basketCount} item${basketCount === 1 ? "" : "s"}` : "Basket"} title="Basket" className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden">
+                  <Icon.Basket className="h-5 w-5" />
+                  {basketCount > 0 && <span className="pointer-events-none absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.6rem] font-bold text-white ring-2 ring-[#FBF7F0]">{basketCount > 99 ? "99+" : basketCount}</span>}
+                </Link>
+              )}
               <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" title="Search" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden">
                 <Icon.Search className="h-5 w-5" />
               </button>
-              <Link to="/take-action/send-a-gift-cart" aria-label={basketCount ? `Basket, ${basketCount} item${basketCount === 1 ? "" : "s"}` : "Basket"} title="Basket" className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden">
-                <Icon.Basket className="h-5 w-5" />
-                {basketCount > 0 && <span className="pointer-events-none absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#E2703A] px-1 text-[0.6rem] font-bold text-white ring-2 ring-[#FBF7F0]">{basketCount > 99 ? "99+" : basketCount}</span>}
+              <Link to={isAuthed ? "/account" : "/auth"} state={isAuthed ? undefined : authLinkState} aria-label={isAuthed ? "My account" : "Sign in or sign up"} title={isAuthed ? "My account" : "Sign in / Sign up"} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 lg:hidden">
+                <Icon.User className="h-5 w-5" />
               </Link>
             </div>
           </div>
