@@ -86,11 +86,11 @@ const QUICK_LINKS = [
 ];
 
 const PROGRAMS = [
-  { label: "Education Support", href: "/our-work/education" },
-  { label: "Health & Nutrition", href: "/our-work/health" },
-  { label: "Water & Sanitation", href: "/our-work/water" },
-  { label: "Child Protection", href: "/our-work/child-protection" },
-  { label: "Community Empowerment", href: "/our-work/community" },
+  { label: "Education Support" },
+  { label: "Health & Nutrition" },
+  { label: "Water & Sanitation" },
+  { label: "Child Protection" },
+  { label: "Community Empowerment" },
 ];
 
 export default function Footer() {
@@ -235,8 +235,7 @@ export default function Footer() {
             <ul className="mt-6 space-y-3.5">
               {PROGRAMS.map((program, i) => (
                 <li key={program.label}>
-                  <a
-                    href={program.href}
+                  <p
                     className={`group inline-flex items-center gap-2 text-[0.88rem] font-medium text-[#4A4A42] transition-colors duration-200 hover:text-green-900 ${
                       isEditing ? "pointer-events-none" : ""
                     }`}
@@ -246,7 +245,7 @@ export default function Footer() {
                       id={`footer.programs.${i}.label`}
                       defaultValue={program.label}
                     />
-                  </a>
+                  </p>
                 </li>
               ))}
             </ul>
@@ -288,7 +287,8 @@ export default function Footer() {
             </ul>
             <div className="mt-8 flex items-center gap-3">
               {SOCIALS.map(({ label, href, Icon: SocialIcon }, i) => (
-                <span
+                <a
+                  href={href}
                   key={label}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200"
                   title={label}
@@ -300,7 +300,7 @@ export default function Footer() {
                       defaultValue={label}
                     />
                   </span>
-                </span>
+                </a>
               ))}
             </div>
           </div>
