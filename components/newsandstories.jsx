@@ -46,7 +46,7 @@ const STORIES = [
       "What began as a vision has now transformed into a lifeline: Moilo Water Project. Through this initiative, Mt. Kilimanjaro Child Development Programme (MKCDP) drilled and equipped one borehole, extended a 1.5 km pipeline from the school to the community centre, constructed a water kiosk, installed a solar-powered water ATM, and built an animal trough to support both people and livestock.",
       "But the true success of this project lies beyond the infrastructure — it lives in the spirit of ownership. Moilo Water User Committee, formed during project implementation, continues to manage and sustain the facility, ensuring that clean water remains accessible to all.",
       "Today, children attend school on time, families enjoy better hygiene, and the community thrives — a powerful reminder that when sustainability is built in, impact lasts long after the project ends.",
-      "💧 At MKCDP, we believe every drop counts — for people, for progress, and for generations to come.",
+      "At MKCDP, we believe every drop counts — for people, for progress, and for generations to come.",
     ],
     relatedCategories: ["Charity", "Treatment"],
   },
@@ -91,9 +91,9 @@ const STORIES = [
       "From a single multi-storey garden, to our very first drip irrigation plot, to a vibrant poultry unit and now the arrival of our first egg.",
     image: "/kids-loghing-in-class.jpg",
     content: [
-      "From a single multi-storey garden, to our very first drip irrigation plot, to a vibrant poultry unit and now the arrival of our first egg — what a journey it has been! 🥚✨",
-      "Our Aflatoun project with Isinet 4K Club has grown far beyond what we imagined. 2024 became a defining year: crowned Kajiado County Champions 🏆 and placing 8th nationally in the Presidential Award Scheme. A true testament to what passion, learning and consistency can achieve. 🌟📈",
-      "At Mt. Kilimanjaro Child Development Programme (MKCDP), we are proud to walk this journey with Aflatoun Clubs; nurturing skills, building confidence and proving that when young people are given the right support, they don't just participate… they excel. 🌍",
+      "From a single multi-storey garden, to our very first drip irrigation plot, to a vibrant poultry unit and now the arrival of our first egg — what a journey it has been!",
+      "Our Aflatoun project with Isinet 4K Club has grown far beyond what we imagined. 2024 became a defining year: crowned Kajiado County Champions and placing 8th nationally in the Presidential Award Scheme. A true testament to what passion, learning and consistency can achieve.",
+      "At Mt. Kilimanjaro Child Development Programme (MKCDP), we are proud to walk this journey with Aflatoun Clubs; nurturing skills, building confidence and proving that when young people are given the right support, they don't just participate… they excel.",
     ],
     relatedCategories: ["Food", "Help"],
   },
@@ -741,7 +741,7 @@ function MediaCenter() {
               <div>
                 <span className="mb-3 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
                   <span className="h-px w-8 bg-green-700" />
-                  <EditableText id="news.media.photoGallery.eyebrow" defaultValue="Photo Gallery" />
+                  <EditableText id="news.media.photoGallery.eyebrow" defaultValue="Our Gallery" />
                 </span>
               </div>
             </div>
@@ -750,14 +750,14 @@ function MediaCenter() {
           </div>
 
           <div>
-            <div className="mb-6 flex items-end justify-between gap-4">
+            {/* <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <span className="mb-3 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
                   <span className="h-px w-8 bg-green-700" />
-                  <EditableText id="news.media.featuredVideos.eyebrow" defaultValue="Featured Videos" />
+                  <EditableText id="news.media.featuredVideos.eyebrow" defaultValue="Videos" />
                 </span>
               </div>
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               {MEDIA_VIDEOS.map((video) => (
@@ -792,17 +792,17 @@ function MediaCenter() {
           </div>
 
           <div>
-            <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
+            {/* <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
               <span className="h-px w-6 bg-green-700" />
               <EditableText id="news.media.featuredVideos.eyebrow" defaultValue="Featured Videos" />
-            </span>
+            </span> */}
             <EditableText
               as="h2"
               id="news.media.mobile.videosTitle"
               defaultValue="Watch the work in motion."
               className="hero-serif block text-[1.6rem] font-bold leading-[1.15] text-[#111111]"
             />
-            <div className="mt-6 space-y-5">
+            <div className="mt-6 space-y-8">
               {MEDIA_VIDEOS.map((video) => (
                 <VideoCard key={video.id} video={video} />
               ))}

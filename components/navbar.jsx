@@ -566,7 +566,7 @@ function SearchModal({ open, onClose }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Search the whole site…"
+              placeholder="Enter a key word..."
               className="flex-1 bg-transparent text-base text-[#2A2A26] placeholder-[#2A2A26]/40 outline-none"
               autoComplete="off"
               spellCheck="false"
@@ -582,22 +582,22 @@ function SearchModal({ open, onClose }) {
                 <Icon.Close className="h-4 w-4" />
               </button>
             )}
-            <button
+            {/* <button
               type="button"
               onClick={onClose}
               aria-label="Close search"
               className="hidden flex-shrink-0 items-center gap-1 rounded-lg border border-green-700/15 px-2 py-1 text-xs font-bold uppercase tracking-wider text-[#2A2A26]/60 transition-colors hover:text-green-700 sm:inline-flex"
             >
               Esc
-            </button>
+            </button> */}
           </div>
 
           <div ref={listRef} className="max-h-[65vh] overflow-y-auto py-2 sm:max-h-[60vh]">
-            {!query.trim() && (
+            {/* {!query.trim() && (
               <div className="px-5 py-10 text-center">
                 <p className="text-base font-semibold text-[#2A2A26]">Type to search</p>
               </div>
-            )}
+            )} */}
 
             {query.trim() && !preloading && results.length === 0 && (
               <div className="px-5 py-10 text-center">

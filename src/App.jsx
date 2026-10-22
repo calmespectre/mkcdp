@@ -22,6 +22,80 @@ import { GiftCartProvider } from "../components/giftCart";
 import { EditorProvider, EditorToolbar } from "../components/editorContext";
 import { AuthProvider, useAuth } from "../components/AuthContext";
 
+const ROUTE_TITLES = {
+  "/about": "About",
+  "/take-action": "Take action",
+  "/news-and-stories": "News & stories",
+  "/publications": "Publications",
+  "/account": "My account",
+  "/our-work": "Our work",
+  "/program-impact": "Program impact",
+  "/auth": "Sign in",
+  "/signup": "Sign up",
+  "/signin": "Sign in",
+};
+
+const SECTION_TITLES = {
+  about: {
+    "who-we-are": "Who we are",
+    "strategic-plan": "Our strategic plan",
+    accountability: "Accountability",
+    safeguarding: "Safeguarding",
+    leadership: "Our leadership",
+    partners: "Our development partners",
+  },
+  "take-action": {
+    "donate": "Donate",
+    "sponsor-a-child": "Sponsor a child",
+    "send-a-gift": "Send a gift",
+    "send-a-gift-cart": "My basket",
+    "volunteer": "Volunteer",
+    "partnerships": "Partnerships",
+    "report-safeguarding": "Report a safeguarding concern",
+  },
+  "our-work": {
+    "where-we-work": "Wher we work",
+    "how-we-work": "How we work",
+  },
+  "program-impact": {
+    "our-reach": "Our reach",
+    "featured-projects": "Featured projects",
+  },
+  "news-and-stories": {
+    "stories-of-impact": "Stories of impact",
+    "media-center": "Media center",
+  },
+};
+
+function deriveTitle(pathname) {
+  if (!pathname) return "MKCDP";
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) return "Mt. Kilimanjaro Child Programme | MKCDP";
+
+  const rootPath = `/${segments[0]}`;
+  const rootLabel = ROUTE_TITLES[rootPath] || segments[0];
+  const second = segments[1];
+  const third = segments[2];
+
+  if (second && SECTION_TITLES[segments[0]] && SECTION_TITLES[segments[0]][second]) {
+    return `${SECTION_TITLES[segments[0]][second]} | ${rootLabel} — MKCDP`;
+  }
+
+  if (third) {
+    return `${rootLabel} | Mt. Kilimanjaro Child Programme`;
+  }
+
+  return `${rootLabel} | Mt. Kilimanjaro Child Programme`;
+}
+
+function DocumentTitle() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    document.title = deriveTitle(pathname);
+  }, [pathname]);
+  return null;
+}
+
 function RequireAuth({ children }) {
   const location = useLocation();
   const { isAuthenticated, booting } = useAuth();
@@ -81,6 +155,7 @@ function App() {
         <EditorProvider>
           <BrowserRouter>
             <ScrollToTop />
+            <DocumentTitle />
             <Routes>
               <Route element={<SiteLayout />}>
                 <Route path="/" element={<Home />} />

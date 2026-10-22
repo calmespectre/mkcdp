@@ -623,11 +623,11 @@ function Accountability() {
           <EditableText as="p" id="about.acc.hero.body" defaultValue="At the Mt. Kilimanjaro Child Development Programme, every donation is treated as a trust. We are committed to transparent, efficient and impact-focused use of funds — and to reporting clearly and regularly on how donations are spent." multiline className="mt-7 block max-w-[540px] text-[1.0625rem] leading-[1.8] text-[#3D3D37]" />
 
           <div className="mt-10 flex flex-wrap gap-4">
-            <a href="/publication/annual-reports" className="group inline-flex items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950">
+            <a href="/publications" className="group inline-flex items-center gap-3 rounded-xl bg-green-700 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_34px_-18px_rgba(20,83,45,0.95)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-950">
               <EditableText as="span" id="about.acc.hero.cta1" defaultValue="Read annual reports" />
               <Icon.ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
-            <a href="/donate" className="inline-flex items-center gap-3 rounded-xl border border-green-700/25 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-700 hover:text-white">
+            <a href="/take-action/donate" className="inline-flex items-center gap-3 rounded-xl border border-green-700/25 px-7 py-[1.05rem] text-[0.78rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-700 hover:text-white">
               <EditableText as="span" id="about.acc.hero.cta2" defaultValue="Donate now" />
             </a>
           </div>
@@ -1288,9 +1288,11 @@ export default function About() {
   return (
     <div className="hero-sans relative min-h-screen overflow-x-hidden bg-[#FBF7F0] text-[#141414] antialiased">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&display=swap');
         .hero-serif { font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; }
         .hero-sans { font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        ::selection { background: #14532D; color: #FBF7F0; }
+        html { scroll-behavior: smooth; }
+        ::selection { background: #1C6B4B; color: #FBF7F0; }
       `}</style>
 
       {!section && <AboutHub />}
