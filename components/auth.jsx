@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
+const API_BASE = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
 
 const flagOf = (code) =>
   code.replace(/[A-Z]/g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));

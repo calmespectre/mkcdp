@@ -83,6 +83,7 @@ const QUICK_LINKS = [
   { label: "Program Impact", href: "/program-impact" },
   { label: "News and Stories", href: "/news-and-stories" },
   { label: "Take Action", href: "/take-action" },
+  { label: "Careers", href: "/take-action/career"},
 ];
 
 const PROGRAMS = [

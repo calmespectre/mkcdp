@@ -6,7 +6,7 @@ const USER_KEY = "mkcdp.user";
 const ACCOUNTS_KEY = "mkcdp.accounts";
 const ACTIVE_EMAIL_KEY = "mkcdp.activeAccount";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
+const API_BASE = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
 
 const AuthContext = createContext(null);
 

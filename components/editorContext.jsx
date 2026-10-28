@@ -10,7 +10,7 @@ import {
 import { createPortal } from "react-dom";
 
 const STORAGE_KEY = "mkcdp.edits.v2";
-const AUTH_API = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
+const AUTH_API = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
 const API_BASE = AUTH_API.replace(/\/auth\/?$/, "") + "/site-content";
 const ACCESS_KEY = "mkcdp.access";
 const SAVE_DEBOUNCE_MS = 700;

@@ -88,6 +88,36 @@ function deriveTitle(pathname) {
   return `${rootLabel} | Mt. Kilimanjaro Child Programme`;
 }
 
+function GlobalStyles() {
+  return (
+    <style>{`
+      *, *::before, *::after { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+      html, body, #root { width: 100%; max-width: 100%; min-height: 100%; }
+      body { margin: 0; overflow-x: hidden; }
+      #root { overflow-x: hidden; display: flex; flex-direction: column; }
+      img, picture, video, canvas, svg, iframe, embed, object { max-width: 100%; }
+      table { width: 100%; max-width: 100%; }
+      pre, code { white-space: pre-wrap; word-break: break-word; }
+      textarea, input, select { max-width: 100%; }
+      .app-scale {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100dvh;
+        font-size: clamp(0.875rem, 0.75rem + 0.5556vw, 1.25rem);
+        line-height: 1.5;
+        overflow-x: clip;
+      }
+      @supports not (overflow-x: clip) {
+        .app-scale { overflow-x: hidden; }
+      }
+      @media (max-width: 480px) {
+        .app-scale { font-size: clamp(0.875rem, 3.6vw, 1rem); }
+      }
+    `}</style>
+  );
+}
+
 function DocumentTitle() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -102,7 +132,7 @@ function RequireAuth({ children }) {
 
   if (booting) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-[#FBF7F0]">
+      <div className="flex min-h-[60vh] w-full items-center justify-center bg-[#FBF7F0]">
         <div className="flex items-center gap-3">
           <span className="h-5 w-5 animate-spin rounded-full border-2 border-green-700/20 border-t-green-700" />
           <p className="text-[0.9rem] text-[#4A4A42]">Loading…</p>
@@ -134,12 +164,9 @@ function ScrollToTop() {
 
 function SiteLayout() {
   return (
-    <div
-      style={{ fontSize: "20px" }}
-      className="flex min-h-screen flex-col bg-[#FBF7F0] font-[Montserrat]"
-    >
+    <div className="flex min-h-[100dvh] w-full max-w-full flex-1 flex-col bg-[#FBF7F0] font-[Montserrat]">
       <Navbar />
-      <main className="flex-1">
+      <main className="w-full max-w-full min-w-0 flex-1">
         <Outlet />
       </main>
       <Footer />
@@ -154,40 +181,43 @@ function App() {
       <GiftCartProvider>
         <EditorProvider>
           <BrowserRouter>
+            <GlobalStyles />
             <ScrollToTop />
             <DocumentTitle />
-            <Routes>
-              <Route element={<SiteLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/about/:section" element={<AboutPage />} />
-                <Route path="/take-action" element={<TakeAction />} />
-                <Route path="/take-action/:section" element={<TakeAction />} />
-                <Route path="/news-and-stories" element={<NewsAndStories />} />
-                <Route path="/news-and-stories/:section" element={<NewsAndStories />} />
-                <Route
-                  path="/news-and-stories/:section/:slug"
-                  element={<NewsAndStories />}
-                />
-                <Route path="/publications" element={<Publications />} />
-                <Route
-                  path="/account"
-                  element={
-                    <RequireAuth>
-                      <AccountDashboard />
-                    </RequireAuth>
-                  }
-                />
-                <Route path="/our-work" element={<OurWork />} />
-                <Route path="/our-work/:section" element={<OurWork />} />
-                <Route path="/program-impact" element={<ProgramImpact />} />
-                <Route path="/program-impact/:section" element={<ProgramImpact />} />
-              </Route>
+            <div className="app-scale flex w-full max-w-full flex-1 flex-col">
+              <Routes>
+                <Route element={<SiteLayout />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/about/:section" element={<AboutPage />} />
+                  <Route path="/take-action" element={<TakeAction />} />
+                  <Route path="/take-action/:section" element={<TakeAction />} />
+                  <Route path="/news-and-stories" element={<NewsAndStories />} />
+                  <Route path="/news-and-stories/:section" element={<NewsAndStories />} />
+                  <Route
+                    path="/news-and-stories/:section/:slug"
+                    element={<NewsAndStories />}
+                  />
+                  <Route path="/publications" element={<Publications />} />
+                  <Route
+                    path="/account"
+                    element={
+                      <RequireAuth>
+                        <AccountDashboard />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route path="/our-work" element={<OurWork />} />
+                  <Route path="/our-work/:section" element={<OurWork />} />
+                  <Route path="/program-impact" element={<ProgramImpact />} />
+                  <Route path="/program-impact/:section" element={<ProgramImpact />} />
+                </Route>
 
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/signup" element={<Auth />} />
-              <Route path="/signin" element={<Auth />} />
-            </Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/signup" element={<Auth />} />
+                <Route path="/signin" element={<Auth />} />
+              </Routes>
+            </div>
           </BrowserRouter>
         </EditorProvider>
       </GiftCartProvider>

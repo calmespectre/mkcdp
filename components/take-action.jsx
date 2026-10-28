@@ -1940,7 +1940,7 @@ function mapApiOpportunity(o, index) {
   };
 }
 
-function Volunteer() {
+function Careers() {
   const { getPath } = useSiteContent();
   const { isSuperuser, user } = useAuth();
   const volFilters = getPath("takeAction.volFilters") || [];
@@ -3374,7 +3374,7 @@ export default function TakeAction() {
               {active.id === "sponsor-a-child" && <SponsorAChildAdmin />}
               {active.id === "send-a-gift" && <SendAGift />}
               {active.id === "send-a-gift-cart" && <GiftCart />}
-              {active.id === "volunteer" && <Volunteer />}
+              {active.id === "career" && <Careers />}
               {active.id === "partnerships" && <Partnerships />}
               {active.id === "report-safeguarding" && <ReportSafeguarding />}
             </div>
