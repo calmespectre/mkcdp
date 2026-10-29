@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://mkcdp-backend.onrender.com/api";
 
 let accessToken = typeof window !== "undefined" ? localStorage.getItem("mkcdp.access") || "" : "";
 let refreshToken = typeof window !== "undefined" ? localStorage.getItem("mkcdp.refresh") || "" : "";

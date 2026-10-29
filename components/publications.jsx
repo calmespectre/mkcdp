@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useEditor, EditableText } from "./editorContext";
 import { useAuth } from "./AuthContext";
 
-const AUTH_API = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
+const AUTH_API = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
 const PUBLICATIONS_API = AUTH_API.replace(/\/auth\/?$/, "") + "/publications";
 
 const ICONS = {
