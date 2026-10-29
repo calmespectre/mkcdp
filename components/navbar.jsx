@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useGiftCart, countCartItems } from "./giftCart";
 import { useEditor, EditableText, EditableImage, DEFAULT_CONTENT } from "./editorContext";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8000/api/auth";
+const API_BASE = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
 
 function getAccessToken() {
   try {
