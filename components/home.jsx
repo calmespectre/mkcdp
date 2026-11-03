@@ -229,10 +229,10 @@ function Hero() {
             className="mt-6 block max-w-xl text-[1.0625rem] leading-[1.8] text-white/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
           />
 
-          <div className="mt-9 flex flex-wrap justify-center items-center gap-4">
+          <div className="mt-9 mr-70 flex flex-wrap justify-center items-center gap-4">
             <Link
               to="/take-action/sponsor-a-child"
-              className={`group hidden min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 bg-white lg:inline-flex 2xl:px-6 ${
+              className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 bg-white lg:inline-flex 2xl:px-6 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
@@ -252,7 +252,7 @@ function Hero() {
 
             <Link
               to="/our-work"
-              className={`hidden min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:-translate-y-0.5 bg-orange-400 hover:bg-orange-500 lg:inline-flex 2xl:px-6 ${
+              className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:-translate-y-0.5 bg-orange-400 hover:bg-orange-500 lg:inline-flex 2xl:px-6 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
