@@ -9,7 +9,7 @@ import {
 } from "./editorContext";
 
 const PHOTOS = {
-  main: "/img1.jpg",
+  main: "/img18.jpg",
 };
 
 const YOUTUBE_ID = "ztwN71sY98o";
