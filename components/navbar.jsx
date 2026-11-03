@@ -525,21 +525,14 @@ function SideNavigation({
                   href="mailto:info@mkcdp.org"
                   className="transition hover:text-green-700"
                 >
-                  Email
+                  info@mkcdp.org
                 </a>
                 <a
                   href="tel:+254737332219"
                   className="transition hover:text-green-700"
                 >
-                  Call us
+                  +25473 733 2219
                 </a>
-                <Link
-                  to="/news-and-stories"
-                  onClick={onClose}
-                  className="transition hover:text-green-700"
-                >
-                  Latest stories
-                </Link>
               </div>
             </div>
 
@@ -863,7 +856,7 @@ export default function Navbar() {
               >
                 <Icon.User className="h-5 w-5" />
               </Link>
-              
+
               <Link
                 to="/take-action/sponsor-a-child"
                 className={`hidden min-h-10 items-center justify-center gap-2 rounded-xl border border-green-700/25 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/5 lg:inline-flex 2xl:px-6 ${
