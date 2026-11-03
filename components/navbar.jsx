@@ -536,11 +536,11 @@ function SideNavigation({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-[10px] text-[#788074]">
+            <div className="flex flex-wrap bg-green-700 px-4 py-2 hover:bg-green-800 items-center gap-4 text-[14px] text-white">
               <Link
                 to={isAuthed ? "/account" : "/auth"}
                 onClick={onClose}
-                className="transition hover:text-green-700"
+                className="transition"
               >
                 {isAuthed ? "My account" : "Sign in"}
               </Link>
