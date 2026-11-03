@@ -232,7 +232,7 @@ function Hero() {
           <div className="mt-9 flex flex-wrap justify-center items-center gap-4">
             <Link
               to="/take-action/sponsor-a-child"
-              className={`group inline-flex items-center gap-3 rounded-full bg-white px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-green-700 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F2C94C] ${
+              className={`group hidden min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 bg-white lg:inline-flex 2xl:px-6 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
@@ -252,7 +252,7 @@ function Hero() {
 
             <Link
               to="/our-work"
-              className={`inline-flex items-center gap-3 rounded-full border border-white/40 px-8 py-[1.15rem] text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:border-white hover:bg-white/10 ${
+              className={`hidden min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:-translate-y-0.5 bg-orange-400 hover:bg-orange-500 lg:inline-flex 2xl:px-6 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
