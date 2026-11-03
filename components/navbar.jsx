@@ -386,7 +386,7 @@ function SideNavigation({
         <div className="flex flex-1 flex-col px-5 pb-7 pt-5 sm:px-8">
           <div className="mb-5 flex items-center justify-between">
             <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
-              Navigation
+              
             </span>
             <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
               Loitokitok · Kenya
@@ -705,7 +705,7 @@ export default function Navbar() {
 
       if (Math.abs(difference) < 3) return;
 
-      if (currentY <= 30 || difference < 0) {
+      if (currentY <= 40 || difference < 0) {
         setHidden(false);
         clearTimeout(idleTimer.current);
       } else if (difference > 0) {
