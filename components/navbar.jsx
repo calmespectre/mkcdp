@@ -460,6 +460,42 @@ function SideNavigation({
             </div>
           </div>
 
+          <div className="mt-6 border-t border-green-700/10 pt-5">
+            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.16em] text-[#697367]">
+              Your account
+            </p>
+
+            <Link
+              to={isAuthed ? "/account" : "/auth"}
+              onClick={onClose}
+              className="flex min-h-12 items-center justify-between border border-green-700/20 px-4 text-sm font-semibold text-green-700 transition hover:bg-green-700 hover:text-white"
+            >
+              <span className="flex items-center gap-3">
+                <Icon.User className="h-5 w-5" />
+                {isAuthed ? "My Account" : "Sign In"}
+              </span>
+              <Icon.Arrow className="h-4 w-4" />
+            </Link>
+
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(!isEditing)}
+                className={`mt-3 flex min-h-12 w-full items-center justify-between border px-4 text-sm font-semibold transition ${
+                  isEditing
+                    ? "border-amber-500 bg-amber-500 text-black"
+                    : "border-green-700/20 text-green-700 hover:bg-green-700 hover:text-white"
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="text-base">✎</span>
+                  {isEditing ? "Exit Editor Mode" : "Editor Mode"}
+                </span>
+                <Icon.Arrow className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-green-700/10 pt-5">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#697367]">
@@ -475,26 +511,6 @@ function SideNavigation({
                   +25473 733 2219
                 </a>
               </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 bg-green-700 px-4 py-2 text-[14px] text-white hover:bg-green-800">
-              <Link
-                to={isAuthed ? "/account" : "/auth"}
-                onClick={onClose}
-                className="transition"
-              >
-                {isAuthed ? "My account" : "Sign in"}
-              </Link>
-
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="font-semibold text-white"
-                >
-                  {isEditing ? "Exit editor" : "Editor mode"}
-                </button>
-              )}
             </div>
           </div>
 
@@ -623,7 +639,6 @@ export default function Navbar() {
     };
 
     window.addEventListener("keydown", handleKey);
-
     return () => window.removeEventListener("keydown", handleKey);
   }, [menuOpen, searchOpen, closeMenu]);
 
@@ -633,10 +648,19 @@ export default function Navbar() {
   }, [location.pathname]);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setBackgroundOpacity(
-        Math.min(Math.max(window.scrollY / 160, 0), 1)
-      );
+      if (ticking) return;
+
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        setBackgroundOpacity(
+          Math.min(Math.max(window.scrollY / 160, 0), 1)
+        );
+        ticking = false;
+      });
     };
 
     handleScroll();
@@ -680,12 +704,14 @@ export default function Navbar() {
 
         .mkcdp-header {
           transition:
+            transform 350ms cubic-bezier(.22,1,.36,1),
+            opacity 250ms ease,
             background-color 180ms linear,
             box-shadow 180ms linear,
             backdrop-filter 180ms linear,
             color 250ms ease;
           -webkit-backdrop-filter: blur(0px);
-          will-change: background-color, backdrop-filter;
+          will-change: transform, opacity, background-color;
         }
 
         .mkcdp-header a,
@@ -734,7 +760,11 @@ export default function Navbar() {
           backdropFilter: `blur(${backgroundOpacity * 16}px)`,
           WebkitBackdropFilter: `blur(${backgroundOpacity * 16}px)`,
         }}
-        className={`mkcdp-header fixed inset-x-0 top-0 z-[1100] w-full ${navTextColor}`}
+        className={`mkcdp-header fixed inset-x-0 top-0 z-[1100] w-full ${
+          menuOpen
+            ? "-translate-y-full opacity-0 pointer-events-none"
+            : "translate-y-0 opacity-100"
+        } ${navTextColor}`}
       >
         <nav aria-label="Main navigation" className="mx-auto max-w-[1800px]">
           <div className="flex min-h-[72px] items-center justify-between gap-3 px-4 sm:px-7 lg:min-h-[86px] lg:px-10 xl:px-14">
@@ -819,30 +849,17 @@ export default function Navbar() {
 
               <button
                 type="button"
-                onClick={() => setMenuOpen((current) => !current)}
-                aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+                onClick={() => setMenuOpen(true)}
+                aria-label="Open navigation"
                 aria-expanded={menuOpen}
                 aria-controls="mkcdp-side-navigation"
                 className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 border ${navBorderColor} ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
               >
-                <span className="hidden sm:inline">
-                  {menuOpen ? "Close" : "Explore"}
-                </span>
+                <span className="hidden sm:inline">Explore</span>
 
                 <span className="relative block h-5 w-6">
-                  <span
-                    className={`absolute left-0 h-[1.5px] w-6 bg-current transition-all duration-300 ${
-                      menuOpen ? "top-[9px] rotate-45" : "top-[5px]"
-                    }`}
-                  />
-
-                  <span
-                    className={`absolute left-0 h-[1.5px] bg-current transition-all duration-300 ${
-                      menuOpen
-                        ? "top-[9px] w-6 -rotate-45"
-                        : "top-[15px] w-4"
-                    }`}
-                  />
+                  <span className="absolute left-0 top-[5px] h-[1.5px] w-6 bg-current transition-all duration-300" />
+                  <span className="absolute left-0 top-[15px] h-[1.5px] w-4 bg-current transition-all duration-300" />
                 </span>
               </button>
             </div>

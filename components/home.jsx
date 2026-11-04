@@ -96,18 +96,17 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative isolate flex min-h-[680px] h-[100svh] max-h-[1000px] w-full items-center overflow-hidden sm:min-h-[720px]"
+      className="relative isolate flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
     >
       <motion.div
         className="absolute inset-0 z-0"
         style={{ y: heroY }}
       >
-      {/* <motion.div className="absolute inset-0 z-0" style={{ y: heroY }}> */}
         <EditableImage
           id="home.hero.image"
           defaultValue={PHOTOS.main}
           alt="Children learning together"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-[55%_center] sm:object-center"
           wrapperClassName="h-full w-full"
         />
       </motion.div>
@@ -123,23 +122,28 @@ function Hero() {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-full sm:w-3/5 lg:w-1/2"
+        className="pointer-events-none absolute inset-0 z-[1] hidden sm:block"
         style={{
           background:
             "linear-gradient(90deg, rgba(36, 69, 41, 0.75) 0%, rgba(56, 112, 79, 0.45) 55%, rgba(20,83,45,0) 100%)",
         }}
       />
 
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-32 bg-gradient-to-t from-[#173D29]/40 to-transparent sm:hidden"
+      />
+
       <motion.div
-        className="relative z-30 mx-auto w-full pt-30 max-w-7xl px-6 md:px-12 lg:px-20"
+        className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-16 pt-32 sm:px-10 sm:pb-0 sm:pt-24 md:px-12 lg:px-20"
         style={{ opacity: heroOpacity }}
       >
         <div className="max-w-2xl">
           <EditableText
             as="p"
             id="home.hero.eyebrow"
-            defaultValue="Mt. KIlimanjaro Child Development Programme"
-            className="mb-4 block text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#F2C94C]"
+            defaultValue="Mt. Kilimanjaro Child Development Programme"
+            className="mb-4 inline-flex max-w-full items-center gap-3 text-[9px] font-bold uppercase leading-relaxed tracking-[0.17em] text-[#F2C94C] sm:mb-5 sm:text-[11px] sm:tracking-[0.24em]"
           />
 
           <EditableText
@@ -147,7 +151,7 @@ function Hero() {
             id="home.hero.heading"
             defaultValue="Every child deserves the chance to dream."
             multiline
-            className="block text-[clamp(2.4rem,6.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
+            className="block max-w-[620px] text-[clamp(2.65rem,11vw,5rem)] font-bold leading-[1.04] tracking-[-0.045em] text-white drop-shadow-[0_3px_16px_rgba(0,0,0,0.3)] sm:text-[clamp(3.2rem,6vw,5rem)] sm:leading-[1.02] sm:tracking-[-0.03em]"
           />
 
           <EditableText
@@ -155,17 +159,20 @@ function Hero() {
             id="home.hero.subheading"
             defaultValue="Supporting children, families and communities across Kajiado South to create lasting change — through education, health, protection and livelihoods."
             multiline
-            className="mt-6 block max-w-xl text-[1.0625rem] leading-[1.8] text-white/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
+            className="mt-5 block max-w-[520px] text-[13px] leading-[1.85] text-white/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.3)] sm:mt-6 sm:text-base sm:leading-[1.8]"
           />
 
-          <div className="mt-9 mr-70 flex flex-wrap justify-center items-center gap-4">
+          <div className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:w-fit sm:flex-row sm:items-center sm:gap-4">
             <Link
               to="/take-action/sponsor-a-child"
-              className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 bg-white lg:inline-flex 2xl:px-6 ${
+              className={`group inline-flex min-h-[54px] w-full items-center justify-center gap-3 rounded-xl bg-white px-7 text-[10px] font-extrabold uppercase tracking-[0.12em] text-green-800 shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:bg-[#FBF7F0] sm:w-auto sm:min-h-12 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
-              <EditableText id="home.hero.ctaPrimary" defaultValue="Sponsor a child" />
+              <EditableText
+                id="home.hero.ctaPrimary"
+                defaultValue="Sponsor a child"
+              />
               <svg
                 viewBox="0 0 24 24"
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
@@ -181,22 +188,30 @@ function Hero() {
 
             <Link
               to="/our-work"
-              className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:-translate-y-0.5 bg-orange-400 hover:bg-orange-500 lg:inline-flex 2xl:px-6 ${
+              className={`inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 px-7 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/20 sm:w-auto sm:min-h-12 ${
                 isEditing ? "pointer-events-none" : ""
               }`}
             >
-              <EditableText id="home.hero.ctaSecondary" defaultValue="Explore our work" />
+              <EditableText
+                id="home.hero.ctaSecondary"
+                defaultValue="Explore our work"
+              />
             </Link>
+          </div>
+
+          <div className="mt-9 flex items-center gap-3 sm:hidden">
+            <span className="h-px w-8 bg-[#F2C94C]" />
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/65">
+              Building brighter futures
+            </span>
           </div>
         </div>
       </motion.div>
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-20 bg-gradient-to-t from-[#173D29]/30 to-transparent"
-      />
-
-      <div className="pointer-events-none absolute bottom-7 right-7 z-[3] hidden items-center gap-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/70 lg:flex">
+        className="pointer-events-none absolute bottom-7 right-10 z-[3] hidden items-center gap-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/70 sm:flex"
+      >
         <span className="h-px w-10 bg-[#F2C94C]" />
         <span>Building brighter futures</span>
       </div>
