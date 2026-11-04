@@ -530,6 +530,8 @@ export default function Navbar() {
   const [backgroundOpacity, setBackgroundOpacity] = useState(
     () => Math.min(window.scrollY / 160, 1)
   );
+  const { pathname } = useLocation();
+  const isHomePage = pathname === "/";
   const [isAuthed, setIsAuthed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -676,13 +678,15 @@ export default function Navbar() {
 
   const isTransparent = backgroundOpacity < 0.5 && !searchOpen;
 
-  const navTextColor = isTransparent ? "text-orange-400" : "text-green-700";
+  const navTextColor = isHomePage && isTransparent
+    ? "text-white"
+    : "text-green-700";
 
-  const navBorderColor = isTransparent
-    ? "border-orange-400"
-    : "border-green-700";
+  const navBorderColor = isHomePage && isTransparent
+    ? "border-white"
+    : "border-green-700/30";
 
-  const navHoverColor = isTransparent
+  const navHoverColor = isHomePage && isTransparent
     ? "hover:bg-white/15 hover:text-white hover:border-white/15"
     : "hover:bg-green-700 hover:text-white";
 
@@ -853,9 +857,9 @@ export default function Navbar() {
                 aria-label="Open navigation"
                 aria-expanded={menuOpen}
                 aria-controls="mkcdp-side-navigation"
-                className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 transition border border-orange-400 hover:border-green-700 ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
+                className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 transition hover:border-green-700 ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
               >
-                <span className="hidden sm:inline">Explore</span>
+                {/* <span className="hidden sm:inline">Explore</span> */}
 
                 <span className="relative block h-5 w-6">
                   <span className="absolute left-0 top-[5px] h-[1.5px] w-6 bg-current transition-all duration-300" />

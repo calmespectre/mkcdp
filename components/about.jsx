@@ -1286,7 +1286,7 @@ export default function About() {
   const active = section ? SECTIONS.find((s) => s.slug === section) : null;
 
   return (
-    <div className="hero-sans relative min-h-screen overflow-x-hidden bg-[#FBF7F0] text-[#141414] antialiased">
+    <div className="hero-sans mt-20 relative min-h-screen overflow-x-hidden bg-[#FBF7F0] text-[#141414] antialiased">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&display=swap');
         .hero-serif { font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; }

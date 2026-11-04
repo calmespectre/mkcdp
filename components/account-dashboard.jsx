@@ -1524,7 +1524,7 @@ export default function AccountDashboard() {
   }
 
   return (
-    <div className="hero-sans relative min-h-screen overflow-x-hidden mt-16 bg-[#FBF7F0] text-[#141414] antialiased">
+    <div className="hero-sans mt-20 relative min-h-screen overflow-x-hidden mt-16 bg-[#FBF7F0] text-[#141414] antialiased">
       {pageStyle}
       {backdrop}
 
