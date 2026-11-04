@@ -683,7 +683,7 @@ export default function Navbar() {
     : "border-green-700";
 
   const navHoverColor = isTransparent
-    ? "hover:bg-white/15 hover:text-white"
+    ? "hover:bg-white/15 hover:text-white hover:border-white/15"
     : "hover:bg-green-700 hover:text-white";
 
   const headerBackground = `rgba(251, 247, 240, ${
@@ -853,7 +853,7 @@ export default function Navbar() {
                 aria-label="Open navigation"
                 aria-expanded={menuOpen}
                 aria-controls="mkcdp-side-navigation"
-                className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 border ${navBorderColor} ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
+                className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 transition border border-orange-400 hover:border-green-700 ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
               >
                 <span className="hidden sm:inline">Explore</span>
 
