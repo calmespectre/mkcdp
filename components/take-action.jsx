@@ -2677,43 +2677,123 @@ function Partnerships() {
 
 function ReportSafeguarding() {
   const { getPath } = useSiteContent();
+
   const reportRelationships = getPath("takeAction.reportRelationships") || [];
   const reportConcerns = getPath("takeAction.reportConcerns") || [];
   const reportUrgency = getPath("takeAction.reportUrgency") || [];
   const reportContact = getPath("takeAction.reportContact") || [];
   const helplines = getPath("takeAction.helplines") || [];
   const howSteps = getPath("takeAction.safeguarding.howSteps") || [];
-  const [form, setForm] = useState({ reporterType: "", fullName: "", phone: "", email: "", relationship: "", childName: "", location: "", concerns: [], urgency: "", description: "", contactPreference: "", anonymous: false, acknowledged: false });
+
+  const [form, setForm] = useState({
+    reporterType: "",
+    fullName: "",
+    phone: "",
+    email: "",
+    relationship: "",
+    childName: "",
+    location: "",
+    concerns: [],
+    urgency: "",
+    description: "",
+    contactPreference: "",
+    anonymous: false,
+    acknowledged: false,
+  });
+
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const handleChange = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const handleChange = (field) => (e) => {
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+  };
+
   const toggleConcern = (id) => {
     setForm((f) => {
       const has = f.concerns.includes(id);
-      return { ...f, concerns: has ? f.concerns.filter((c) => c !== id) : [...f.concerns, id] };
+
+      return {
+        ...f,
+        concerns: has
+          ? f.concerns.filter((c) => c !== id)
+          : [...f.concerns, id],
+      };
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const next = {};
-    if (!form.reporterType) next.reporterType = "Please tell us who you are.";
-    if (!form.anonymous) {
-      if (!form.fullName.trim()) next.fullName = "Please enter your name, or choose to remain anonymous.";
-      if (!form.phone.trim() && !form.email.trim()) next.phone = "Give us a phone number or email so we can follow up — or choose to remain anonymous.";
+
+    if (!form.reporterType) {
+      next.reporterType = "Please tell us who you are.";
     }
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = "Enter a valid email address.";
-    if (form.phone && !/^\+?[\d\s()-]{7,20}$/.test(form.phone)) next.phone = "Enter a valid phone number.";
-    if (!form.relationship) next.relationship = "Please tell us your relationship to the child.";
-    if (!form.location.trim()) next.location = "Please tell us roughly where this happened.";
-    if (form.concerns.length === 0) next.concerns = "Please choose at least one type of concern.";
-    if (!form.urgency) next.urgency = "Please tell us how urgent this is.";
-    if (!form.description.trim() || form.description.trim().length < 20) next.description = "Please describe what happened in at least a sentence or two.";
-    if (!form.contactPreference) next.contactPreference = "Please choose how you'd like to be contacted.";
-    if (!form.acknowledged) next.acknowledged = "Please confirm you understand how we handle this report.";
+
+    if (!form.anonymous) {
+      if (!form.fullName.trim()) {
+        next.fullName = "Please enter your name, or choose to remain anonymous.";
+      }
+
+      if (!form.phone.trim() && !form.email.trim()) {
+        next.phone = "Provide a phone number or email address.";
+      }
+    }
+
+    if (
+      form.email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+    ) {
+      next.email = "Enter a valid email address.";
+    }
+
+    if (
+      form.phone &&
+      !/^\+?[\d\s()-]{7,20}$/.test(form.phone)
+    ) {
+      next.phone = "Enter a valid phone number.";
+    }
+
+    if (!form.relationship) {
+      next.relationship = "Please tell us your relationship to the child.";
+    }
+
+    if (!form.location.trim()) {
+      next.location = "Please tell us roughly where this happened.";
+    }
+
+    if (form.concerns.length === 0) {
+      next.concerns = "Please choose at least one type of concern.";
+    }
+
+    if (!form.urgency) {
+      next.urgency = "Please tell us how urgent this is.";
+    }
+
+    if (
+      !form.description.trim() ||
+      form.description.trim().length < 20
+    ) {
+      next.description = "Please describe what happened in at least a sentence or two.";
+    }
+
+    if (!form.contactPreference) {
+      next.contactPreference = "Please choose how you'd like to be contacted.";
+    }
+
+    if (!form.acknowledged) {
+      next.acknowledged = "Please confirm you understand how we handle this report.";
+    }
+
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+
+    if (Object.keys(next).length > 0) {
+      return;
+    }
+
     setSubmitting(true);
+
     try {
       await submitSafeguardingReport({
         reporter_type: form.reporterType,
@@ -2729,486 +2809,885 @@ function ReportSafeguarding() {
         description: form.description.trim(),
         contact_preference: form.contactPreference,
       });
+
       setSubmitted(true);
     } catch (err) {
-      setErrors({ form: err.message || "Could not submit. Please try again." });
+      setErrors({
+        form: err.message || "Could not submit. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
   };
+
   const reset = () => {
-    setForm({ reporterType: "", fullName: "", phone: "", email: "", relationship: "", childName: "", location: "", concerns: [], urgency: "", description: "", contactPreference: "", anonymous: false, acknowledged: false });
+    setForm({
+      reporterType: "",
+      fullName: "",
+      phone: "",
+      email: "",
+      relationship: "",
+      childName: "",
+      location: "",
+      concerns: [],
+      urgency: "",
+      description: "",
+      contactPreference: "",
+      anonymous: false,
+      acknowledged: false,
+    });
+
     setErrors({});
     setSubmitted(false);
   };
-  const optionRowClass = (active) => `rounded-xl border px-4 py-3.5 text-left text-[0.85rem] font-semibold transition-all duration-200 sm:py-3 ${active ? "border-green-700 bg-green-700/6 text-green-700" : "border-green-700/15 bg-white text-[#4A4A42] hover:border-green-700/40"}`;
+
+  const optionRowClass = (active) =>
+    `flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left text-[0.82rem] font-semibold transition-all duration-200 ${
+      active
+        ? "border-green-700 bg-green-700/6 text-green-700 ring-1 ring-green-700/20"
+        : "border-green-700/15 bg-white text-[#4A4A42] hover:border-green-700/40"
+    }`;
+
+  const fieldClass = (error) =>
+    `w-full min-h-[48px] rounded-xl border bg-white px-4 py-3 text-[0.88rem] text-[#111111] outline-none transition-all duration-200 placeholder:text-[#4A4A42]/40 focus:ring-2 ${
+      error
+        ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/15"
+        : "border-green-700/15 focus:border-green-700 focus:ring-green-700/10"
+    }`;
+
+  const labelClass =
+    "mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]";
+
+  const errorText =
+    "mt-1.5 text-[0.72rem] font-medium leading-relaxed text-[#E2703A]";
+
+  const cardClass =
+    "rounded-2xl border border-green-700/12 bg-white/80 p-5 sm:p-6";
+
+  const renderHelpLines = () => (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {helplines.map((h, i) => (
+        <a
+          key={i}
+          href={h.href}
+          className={`group flex items-center justify-between gap-3 rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 ${
+            h.primary
+              ? "border-green-700 bg-green-700 text-white shadow-lg shadow-green-900/10"
+              : "border-green-700/15 bg-white/70 hover:border-green-700/40"
+          }`}
+        >
+          <div className="min-w-0">
+            <EditableText
+              path={`takeAction.helplines.${i}.name`}
+              as="span"
+              className={`block text-[0.65rem] font-bold uppercase tracking-[0.14em] ${
+                h.primary ? "text-white/70" : "text-green-700"
+              }`}
+            />
+
+            <EditableText
+              path={`takeAction.helplines.${i}.note`}
+              as="span"
+              multiline
+              className={`mt-1 block text-[0.78rem] leading-relaxed ${
+                h.primary ? "text-white/75" : "text-[#4A4A42]"
+              }`}
+            />
+          </div>
+
+          <EditableText
+            path={`takeAction.helplines.${i}.number`}
+            as="span"
+            className={`hero-serif flex-shrink-0 text-[1.5rem] font-bold ${
+              h.primary ? "text-[#F2B33D]" : "text-green-700"
+            }`}
+          />
+        </a>
+      ))}
+    </div>
+  );
+
+  const renderHowSteps = () => (
+    <section className="relative overflow-hidden rounded-[28px] border border-green-700/12 bg-white/65 p-6 sm:p-10 lg:p-12">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div>
+          <span className="mb-4 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
+            <span className="h-px w-7 bg-green-700" />
+            <EditableText path="takeAction.safeguarding.howKicker" />
+          </span>
+
+          <EditableText
+            path="takeAction.safeguarding.howTitle"
+            as="h2"
+            className="hero-serif text-[clamp(1.8rem,4vw,2.8rem)] font-bold leading-[1.12] tracking-[-0.025em] text-[#111111]"
+          />
+
+          <EditableText
+            path="takeAction.safeguarding.howIntro"
+            as="p"
+            multiline
+            className="mt-5 max-w-md text-[0.9rem] leading-[1.85] text-[#4A4A42]"
+          />
+        </div>
+
+        <div className="relative space-y-7 before:absolute before:bottom-4 before:left-[1.1rem] before:top-4 before:w-px before:bg-green-700/15">
+          {howSteps.map((_, i) => (
+            <div key={i} className="relative flex gap-5">
+              <span className="z-10 grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[0.68rem] font-bold text-white shadow-sm">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+
+              <div className="pt-1">
+                <EditableText
+                  path={`takeAction.safeguarding.howSteps.${i}.t`}
+                  as="h3"
+                  className="hero-serif text-[1.05rem] font-bold text-[#111111]"
+                />
+
+                <EditableText
+                  path={`takeAction.safeguarding.howSteps.${i}.b`}
+                  as="p"
+                  multiline
+                  className="mt-2 text-[0.85rem] leading-[1.8] text-[#4A4A42]"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 
   if (submitted) {
     return (
-      <>
-        <div className="hidden lg:block">
-          <div className="space-y-12 lg:space-y-20">
-            <div className="relative overflow-hidden rounded-[24px] border border-green-700/20 bg-green-700/6 p-6 sm:rounded-[32px] sm:p-12 lg:p-16">
-              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-8">
-                <div>
-                  <EditableText path="takeAction.safeguarding.successKicker" as="p" className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700" />
-                  <EditableText path="takeAction.safeguarding.successTitle" as="h2" className="hero-serif mt-3 text-[clamp(1.35rem,4.5vw,2rem)] font-bold leading-tight text-[#111111]" />
-                  <EditableText path="takeAction.safeguarding.successBody" as="p" multiline className="mt-3 max-w-[620px] text-[0.95rem] leading-[1.8] text-[#4A4A42]" />
-                </div>
-                <button type="button" onClick={reset} className="inline-flex items-center rounded-xl border border-green-700/20 px-5 py-3.5 text-[0.75rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white sm:px-6">
-                  <EditableText path="takeAction.safeguarding.successAnother" />
-                </button>
-              </div>
-            </div>
+      <div className="space-y-12">
+        <div className="relative overflow-hidden rounded-[28px] border border-green-700/20 bg-green-700/5 p-7 sm:p-12 lg:p-16">
+          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto]">
             <div>
-              <SectionHeading eyebrowPath="takeAction.safeguarding.helpKicker" titlePath="takeAction.safeguarding.helpTitle" introPath="takeAction.safeguarding.helpIntro" />
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-3 sm:gap-5">
-                {helplines.map((h, i) => (
-                  <a key={i} href={h.href} className={`group flex flex-col rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6 ${h.primary ? "border-green-700 bg-green-700 text-white shadow-[0_24px_60px_-40px_rgba(20,83,45,0.6)]" : "border-green-700/15 bg-white/70 hover:border-green-700/40"}`}>
-                    <EditableText path={`takeAction.helplines.${i}.name`} as="span" className={`text-[0.68rem] font-bold uppercase tracking-[0.16em] ${h.primary ? "text-white/70" : "text-green-700"}`} />
-                    <EditableText path={`takeAction.helplines.${i}.number`} as="span" className={`hero-serif mt-3 text-[2rem] font-bold leading-none ${h.primary ? "text-white" : "text-[#111111]"}`} />
-                    <EditableText path={`takeAction.helplines.${i}.note`} as="span" multiline className={`mt-3 text-[0.85rem] leading-[1.7] ${h.primary ? "text-white/80" : "text-[#4A4A42]"}`} />
-                  </a>
-                ))}
-              </div>
+              <EditableText
+                path="takeAction.safeguarding.successKicker"
+                as="p"
+                className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
+              />
+
+              <EditableText
+                path="takeAction.safeguarding.successTitle"
+                as="h2"
+                className="hero-serif mt-4 text-[clamp(1.7rem,4vw,2.5rem)] font-bold leading-tight text-[#111111]"
+              />
+
+              <EditableText
+                path="takeAction.safeguarding.successBody"
+                as="p"
+                multiline
+                className="mt-4 max-w-[620px] text-[0.92rem] leading-[1.85] text-[#4A4A42]"
+              />
             </div>
+
+            <button
+              type="button"
+              onClick={reset}
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-green-700/20 px-6 py-3 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all hover:-translate-y-0.5 hover:bg-white"
+            >
+              <EditableText path="takeAction.safeguarding.successAnother" />
+            </button>
           </div>
         </div>
-        <div className="lg:hidden">
-          <div className="space-y-10">
-            <div className="rounded-3xl border border-green-700/20 bg-green-700/6 p-6">
-              <EditableText path="takeAction.safeguarding.successKicker" as="p" className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-green-700" />
-              <EditableText path="takeAction.safeguarding.successTitle" as="h2" className="hero-serif mt-3 text-[1.5rem] font-bold leading-tight text-[#111111]" />
-              <EditableText path="takeAction.safeguarding.successBody" as="p" multiline className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]" />
-              <button type="button" onClick={reset} className="mt-6 w-full rounded-xl border border-green-700/20 px-5 py-3.5 text-[0.75rem] font-bold uppercase tracking-[0.1em] text-green-700">
-                <EditableText path="takeAction.safeguarding.successAnother" />
-              </button>
-            </div>
-            <div>
-              <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-                <span className="h-px w-6 bg-green-700" />
-                <EditableText path="takeAction.safeguarding.helpKicker" />
-              </span>
-              <EditableText path="takeAction.safeguarding.helpTitle" as="h2" className="hero-serif text-[1.6rem] font-bold leading-[1.12] text-[#111111]" />
-              <div className="mt-6 space-y-3">
-                {helplines.map((h, i) => (
-                  <a key={i} href={h.href} className={`flex items-center justify-between gap-4 rounded-2xl border p-5 active:scale-[0.99] ${h.primary ? "border-green-700 bg-green-700 text-white" : "border-green-700/15 bg-white/70"}`}>
-                    <span>
-                      <EditableText path={`takeAction.helplines.${i}.name`} as="span" className={`block text-[0.65rem] font-bold uppercase tracking-[0.16em] ${h.primary ? "text-white/70" : "text-green-700"}`} />
-                      <EditableText path={`takeAction.helplines.${i}.note`} as="span" multiline className={`mt-1 block text-[0.8rem] leading-[1.6] ${h.primary ? "text-white/80" : "text-[#4A4A42]"}`} />
-                    </span>
-                    <EditableText path={`takeAction.helplines.${i}.number`} as="span" className={`hero-serif flex-shrink-0 text-[1.6rem] font-bold leading-none ${h.primary ? "text-[#F2B33D]" : "text-green-700"}`} />
-                  </a>
-                ))}
-              </div>
-            </div>
+
+        <section>
+          <SectionHeading
+            eyebrowPath="takeAction.safeguarding.helpKicker"
+            titlePath="takeAction.safeguarding.helpTitle"
+            introPath="takeAction.safeguarding.helpIntro"
+          />
+
+          <div className="mt-8">
+            {renderHelpLines()}
           </div>
-        </div>
-      </>
+        </section>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="hidden lg:block">
-        <div className="space-y-12 lg:space-y-20">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-20">
-            <div>
-              <span className="mb-5 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-green-700">
-                <span className="h-px w-8 bg-green-700" />
-                <EditableText path="takeAction.safeguarding.kicker" />
-              </span>
-              <h1 className="hero-serif text-[clamp(1.9rem,6.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.028em] text-[#111111]">
-                <EditableText path="takeAction.safeguarding.titleLine1" />
-                <br />
-                <EditableText path="takeAction.safeguarding.titleLine2" className="italic text-green-700" />
-              </h1>
-              <EditableText path="takeAction.safeguarding.subtitle" as="p" multiline className="mt-6 max-w-[520px] text-[1rem] leading-[1.8] text-[#4A4A42] sm:mt-8 sm:text-[1.0625rem]" />
-              <div className="mt-8 grid grid-cols-3 gap-3 sm:mt-10 sm:gap-4">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="rounded-2xl border border-green-700/12 bg-white/60 p-3 sm:p-4">
-                    <span className="block h-1 w-7 rounded-full bg-green-700/70" />
-                    <EditableText path={`takeAction.safeguarding.badges.${i}.t`} as="p" className="mt-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-green-700 sm:mt-3 sm:text-[0.72rem]" />
-                    <EditableText path={`takeAction.safeguarding.badges.${i}.d`} as="p" className="mt-0.5 text-[0.75rem] leading-snug text-[#4A4A42] sm:mt-1 sm:text-[0.82rem]" />
-                  </div>
-                ))}
+    <div className="space-y-12 lg:space-y-16">
+
+      <section className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <span className="mb-5 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
+            <span className="h-px w-7 bg-green-700" />
+            <EditableText path="takeAction.safeguarding.kicker" />
+          </span>
+
+          <h1 className="hero-serif text-[clamp(2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#111111]">
+            <EditableText path="takeAction.safeguarding.titleLine1" />
+            {" "}
+            <EditableText
+              path="takeAction.safeguarding.titleLine2"
+              className="italic text-green-700"
+            />
+          </h1>
+
+          <EditableText
+            path="takeAction.safeguarding.subtitle"
+            as="p"
+            multiline
+            className="mt-6 max-w-[580px] text-[0.95rem] leading-[1.85] text-[#4A4A42] sm:text-base"
+          />
+
+          <div className="mt-8 grid grid-cols-3 gap-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-green-700/12 bg-white/60 p-3 sm:p-4"
+              >
+                <span className="block h-1 w-7 rounded-full bg-green-700/70" />
+
+                <EditableText
+                  path={`takeAction.safeguarding.badges.${i}.t`}
+                  as="p"
+                  className="mt-3 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-green-700 sm:text-[0.7rem]"
+                />
+
+                <EditableText
+                  path={`takeAction.safeguarding.badges.${i}.d`}
+                  as="p"
+                  className="mt-1 text-[0.7rem] leading-relaxed text-[#4A4A42] sm:text-[0.8rem]"
+                />
               </div>
-            </div>
-            <div className="relative overflow-hidden rounded-[24px] border border-green-700/12 bg-green-700 p-6 text-white shadow-[0_28px_60px_-34px_rgba(20,83,45,0.6)] sm:rounded-[28px] sm:p-10">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.4]" style={{ backgroundImage: "repeating-linear-gradient(90deg, rgba(251,247,240,0.09) 0px, rgba(251,247,240,0.09) 1px, transparent 1px, transparent 22px)", WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 40%, #000 60%, transparent)", maskImage: "linear-gradient(to bottom, transparent, #000 40%, #000 60%, transparent)" }} />
-              <div className="relative">
-                <span className="mb-3 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
-                  <span className="h-px w-6 bg-[#F2B33D]" />
-                  <EditableText path="takeAction.safeguarding.dangerKicker" />
-                </span>
-                <EditableText path="takeAction.safeguarding.dangerTitle" as="h2" className="hero-serif text-[clamp(1.4rem,4.5vw,2rem)] font-bold leading-tight text-white" />
-                <EditableText path="takeAction.safeguarding.dangerBody" as="p" multiline className="mt-4 max-w-[420px] text-[0.92rem] leading-[1.8] text-white/75" />
-                <div className="mt-6 space-y-3 sm:mt-8">
-                  {helplines.map((h, i) => (
-                    <a key={i} href={h.href} className="group flex items-center justify-between gap-4 rounded-2xl border border-white/15 bg-white/5 p-4 transition-all duration-300 hover:border-white/40 hover:bg-white/10 sm:p-5">
-                      <div>
-                        <EditableText path={`takeAction.helplines.${i}.name`} as="p" className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-white/70 sm:text-[0.68rem]" />
-                        <EditableText path={`takeAction.helplines.${i}.note`} as="p" multiline className="mt-1 text-[0.82rem] text-white/80 sm:text-[0.85rem]" />
-                      </div>
-                      <EditableText path={`takeAction.helplines.${i}.number`} as="span" className="hero-serif flex-shrink-0 text-[1.4rem] font-bold leading-none text-[#F2B33D] sm:text-[1.5rem]" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-green-700/12 bg-white/55 p-5 sm:p-12 lg:p-14">
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
-              <div className="lg:sticky lg:top-40 lg:self-start">
-                <SectionHeading eyebrowPath="takeAction.safeguarding.howKicker" titlePath="takeAction.safeguarding.howTitle" introPath="takeAction.safeguarding.howIntro" />
-                <ul className="mt-8 space-y-5 sm:mt-10 sm:space-y-6">
-                  {howSteps.map((_, i) => (
-                    <li key={i} className="flex items-start gap-4 sm:gap-5">
-                      <span className="mt-0.5 grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[0.68rem] font-bold text-white sm:h-9 sm:w-9 sm:text-[0.72rem]">{String(i + 1).padStart(2, "0")}</span>
-                      <div>
-                        <EditableText path={`takeAction.safeguarding.howSteps.${i}.t`} as="p" className="hero-serif text-[1rem] font-bold text-[#111111] sm:text-[1.05rem]" />
-                        <EditableText path={`takeAction.safeguarding.howSteps.${i}.b`} as="p" multiline className="mt-2 text-[0.9rem] leading-[1.8] text-[#4A4A42]" />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 rounded-2xl border border-[#E2703A]/25 border-l-2 border-l-[#E2703A] bg-[#E2703A]/5 p-4 sm:mt-10 sm:p-5">
-                  <EditableText path="takeAction.safeguarding.investigateTitle" as="p" className="text-[0.92rem] font-bold text-[#111111]" />
-                  <EditableText path="takeAction.safeguarding.investigateBody" as="p" multiline className="mt-1 text-[0.88rem] leading-[1.75] text-[#4A4A42]" />
-                </div>
-              </div>
-              <form onSubmit={handleSubmit} noValidate className="relative rounded-[24px] border border-green-700/12 bg-white/85 p-5 shadow-[0_36px_80px_-44px_rgba(20,83,45,0.45)] backdrop-blur-sm sm:rounded-[28px] sm:p-8 lg:p-10">
-                <div className="rounded-2xl border border-green-700/12 border-l-2 border-l-green-700 bg-green-700/5 p-4">
-                  <EditableText path="takeAction.safeguarding.confidential" as="p" multiline className="text-[0.85rem] leading-[1.7] text-[#4A4A42]" />
-                </div>
-                <div className="mt-7 space-y-6 sm:mt-8">
-                  <div>
-                    <EditableText path="takeAction.safeguarding.formWhoAreYou" as="label" className="mb-3 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-                      {reportRelationships.map((opt, i) => (
-                        <button key={i} type="button" onClick={() => setForm((f) => ({ ...f, reporterType: opt }))} className={optionRowClass(form.reporterType === opt)}>
-                          <EditableText path={`takeAction.reportRelationships.${i}`} />
-                        </button>
-                      ))}
-                    </div>
-                    {errors.reporterType && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.reporterType}</p>}
-                  </div>
-
-                  <label htmlFor="anonymous" className="group flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4 transition-colors duration-200 hover:border-green-700/25 hover:bg-white/85">
-                    <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                      <input id="anonymous" type="checkbox" checked={form.anonymous} onChange={(e) => setForm((f) => ({ ...f, anonymous: e.target.checked }))} className="peer sr-only" />
-                      <span className={`h-5 w-5 rounded-md border transition-all duration-200 ${form.anonymous ? "border-green-700 bg-green-700" : "border-green-700/25 bg-white"}`} />
-                    </span>
-                    <span>
-                      <EditableText path="takeAction.safeguarding.formAnonymous" as="span" className="block text-[0.88rem] font-semibold text-[#111111]" />
-                      <EditableText path="takeAction.safeguarding.formAnonymousHint" as="span" multiline className="mt-1 block text-[0.78rem] leading-[1.6] text-[#4A4A42]/80" />
-                    </span>
-                  </label>
-
-                  {!form.anonymous && (
-                    <>
-                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-                        <div>
-                          <EditableText path="takeAction.safeguarding.formYourName" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                          <input type="text" value={form.fullName} onChange={handleChange("fullName")} placeholder={getPath("takeAction.safeguarding.formYourNamePlaceholder")} autoComplete="name" className={`${inputClass} ${errors.fullName ? "border-[#E2703A]/60" : ""}`} />
-                          {errors.fullName && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.fullName}</p>}
-                        </div>
-                        <div>
-                          <EditableText path="takeAction.safeguarding.formPhone" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                          <input type="tel" value={form.phone} onChange={handleChange("phone")} placeholder={getPath("takeAction.safeguarding.formPhonePlaceholder")} autoComplete="tel" inputMode="tel" className={`${inputClass} ${errors.phone ? "border-[#E2703A]/60" : ""}`} />
-                          {errors.phone && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.phone}</p>}
-                        </div>
-                      </div>
-                      <div>
-                        <EditableText path="takeAction.safeguarding.formEmail" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                        <input type="email" value={form.email} onChange={handleChange("email")} placeholder={getPath("takeAction.safeguarding.formEmailPlaceholder")} autoComplete="email" inputMode="email" className={`${inputClass} ${errors.email ? "border-[#E2703A]/60" : ""}`} />
-                        {errors.email && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.email}</p>}
-                      </div>
-                    </>
-                  )}
-
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-                    <div>
-                      <EditableText path="takeAction.safeguarding.formRelationship" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                      <input type="text" value={form.relationship} onChange={handleChange("relationship")} placeholder={getPath("takeAction.safeguarding.formRelationshipPlaceholder")} className={`${inputClass} ${errors.relationship ? "border-[#E2703A]/60" : ""}`} />
-                      {errors.relationship && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.relationship}</p>}
-                    </div>
-                    <div>
-                      <EditableText path="takeAction.safeguarding.formLocation" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                      <input type="text" value={form.location} onChange={handleChange("location")} placeholder={getPath("takeAction.safeguarding.formLocationPlaceholder")} className={`${inputClass} ${errors.location ? "border-[#E2703A]/60" : ""}`} />
-                      {errors.location && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.location}</p>}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]">
-                      <EditableText path="takeAction.safeguarding.formChildName" /> <EditableText path="takeAction.safeguarding.formChildNameOptional" className="font-medium normal-case tracking-normal text-[#4A4A42]/60" />
-                    </p>
-                    <input type="text" value={form.childName} onChange={handleChange("childName")} placeholder={getPath("takeAction.safeguarding.formChildNamePlaceholder")} className={inputClass} />
-                  </div>
-                  <div>
-                    <EditableText path="takeAction.safeguarding.formConcernType" as="label" className="mb-3 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                      {reportConcerns.map((c, i) => (
-                        <button key={c.id} type="button" onClick={() => toggleConcern(c.id)} className={optionRowClass(form.concerns.includes(c.id))}>
-                          <EditableText path={`takeAction.reportConcerns.${i}.label`} />
-                        </button>
-                      ))}
-                    </div>
-                    {errors.concerns && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.concerns}</p>}
-                  </div>
-                  <div>
-                    <EditableText path="takeAction.safeguarding.formUrgency" as="label" className="mb-3 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                      {reportUrgency.map((u, i) => {
-                        const active = form.urgency === u.id;
-                        const isImmediate = u.id === "immediate";
-                        return (
-                          <button key={u.id} type="button" onClick={() => setForm((f) => ({ ...f, urgency: u.id }))} className={`rounded-xl border px-4 py-3.5 text-left transition-all duration-200 sm:py-3.5 ${active ? isImmediate ? "border-[#E2703A] bg-[#E2703A]/8" : "border-green-700 bg-green-700/6" : "border-green-700/15 bg-white hover:border-green-700/40"}`}>
-                            <EditableText path={`takeAction.reportUrgency.${i}.label`} as="span" className={`block text-[0.88rem] font-bold ${active ? isImmediate ? "text-[#E2703A]" : "text-green-700" : "text-[#111111]"}`} />
-                            <EditableText path={`takeAction.reportUrgency.${i}.hint`} as="span" className="mt-0.5 block text-[0.7rem] leading-snug text-[#4A4A42]/80" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {errors.urgency && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.urgency}</p>}
-                  </div>
-                  <div>
-                    <EditableText path="takeAction.safeguarding.formDescription" as="label" className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                    <textarea value={form.description} onChange={handleChange("description")} rows={6} placeholder={getPath("takeAction.safeguarding.formDescriptionPlaceholder")} className={`w-full resize-none rounded-xl border bg-white px-4 py-4 text-[1rem] text-[#111111] outline-none transition-all duration-200 placeholder:text-[#4A4A42]/40 focus:ring-2 sm:py-3.5 sm:text-[0.92rem] ${errors.description ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/20" : "border-green-700/15 focus:border-green-700 focus:ring-green-700/15"}`} />
-                    {errors.description ? <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.description}</p> : <EditableText path="takeAction.safeguarding.formDescriptionHint" as="p" className="mt-1.5 text-[0.75rem] text-[#4A4A42]/70" />}
-                  </div>
-                  <div>
-                    <EditableText path="takeAction.safeguarding.formContactPref" as="label" className="mb-3 block text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#4A4A42]" />
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-                      {reportContact.map((c, i) => (
-                        <button key={c.id} type="button" onClick={() => setForm((f) => ({ ...f, contactPreference: c.id }))} className={optionRowClass(form.contactPreference === c.id)}>
-                          <EditableText path={`takeAction.reportContact.${i}.label`} />
-                        </button>
-                      ))}
-                    </div>
-                    {errors.contactPreference && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.contactPreference}</p>}
-                  </div>
-                  <label htmlFor="acknowledged" className="group flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4 transition-colors duration-200 hover:border-green-700/25 hover:bg-white/85">
-                    <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                      <input id="acknowledged" type="checkbox" checked={form.acknowledged} onChange={(e) => setForm((f) => ({ ...f, acknowledged: e.target.checked }))} className="peer sr-only" />
-                      <span className={`h-5 w-5 rounded-md border transition-all duration-200 ${form.acknowledged ? "border-green-700 bg-green-700" : errors.acknowledged ? "border-[#E2703A]/60 bg-white" : "border-green-700/25 bg-white"}`} />
-                    </span>
-                    <EditableText path="takeAction.safeguarding.formAcknowledge" as="span" multiline className="text-[0.82rem] leading-[1.7] text-[#4A4A42]" />
-                  </label>
-                  {errors.acknowledged && <p className="-mt-3 text-[0.75rem] font-medium text-[#E2703A]">{errors.acknowledged}</p>}
-                  {errors.form && <p className="text-[0.8rem] font-medium text-[#E2703A]">{errors.form}</p>}
-                </div>
-                <button type="submit" disabled={submitting} className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-[#E2703A] px-6 py-4 text-[0.82rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_20px_40px_-18px_rgba(226,112,58,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#c95c2b] active:scale-[0.99] disabled:opacity-60 sm:mt-9 sm:px-8 sm:py-[1.15rem]">
-                  {submitting ? "Submitting…" : <EditableText path="takeAction.safeguarding.formSubmit" />}
-                </button>
-                <p className="mt-5 border-l-2 border-green-700/40 pl-4 text-[0.78rem] leading-[1.7] text-[#4A4A42]/80">
-                  <EditableText path="takeAction.safeguarding.formFootnote" />{" "}
-                  <a href="tel:116" className="font-bold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">116</a>{" "}
-                  <EditableText path="takeAction.safeguarding.formFootnoteMiddle" />{" "}
-                  <a href="tel:999" className="font-bold text-green-700 underline decoration-green-700/30 underline-offset-4 hover:decoration-green-700">999</a>{" "}
-                  <EditableText path="takeAction.safeguarding.formFootnoteEnd" />
-                </p>
-              </form>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="lg:hidden">
-        <div className="space-y-12">
-          <div>
-            <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              <span className="h-px w-6 bg-green-700" />
-              <EditableText path="takeAction.safeguarding.kicker" />
-            </span>
-            <h1 className="hero-serif text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#111111]">
-              <EditableText path="takeAction.safeguarding.titleLine1" /> <EditableText path="takeAction.safeguarding.titleLine2" className="italic text-green-700" />
-            </h1>
-            <EditableText path="takeAction.safeguarding.subtitle" as="p" multiline className="mt-4 text-[0.95rem] leading-[1.8] text-[#4A4A42]" />
-            <div className="mt-6 grid grid-cols-3 divide-x divide-green-700/12 rounded-2xl border border-green-700/12 bg-white/60">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="px-3 py-4 text-center">
-                  <EditableText path={`takeAction.safeguarding.badges.${i}.t`} as="p" className="text-[0.62rem] font-bold uppercase tracking-[0.12em] text-green-700" />
-                  <EditableText path={`takeAction.safeguarding.badges.${i}.d`} as="p" className="mt-1 text-[0.72rem] text-[#4A4A42]" />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="-mx-5 bg-green-700 px-5 py-10">
-            <span className="mb-3 inline-flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-[#F2B33D]">
-              <span className="h-px w-5 bg-[#F2B33D]" />
+        <div className="relative overflow-hidden rounded-[26px] bg-green-700 p-6 text-white shadow-[0_28px_60px_-34px_rgba(20,83,45,0.6)] sm:p-9">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-30"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, rgba(251,247,240,0.09) 0px, rgba(251,247,240,0.09) 1px, transparent 1px, transparent 22px)",
+            }}
+          />
+
+          <div className="relative">
+            <span className="mb-4 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#F2B33D]">
+              <span className="h-px w-6 bg-[#F2B33D]" />
               <EditableText path="takeAction.safeguarding.dangerKicker" />
             </span>
-            <EditableText path="takeAction.safeguarding.mobileCallTo" as="h2" className="hero-serif text-[1.5rem] font-bold leading-tight text-white" />
-            <div className="mt-6 space-y-3">
+
+            <EditableText
+              path="takeAction.safeguarding.dangerTitle"
+              as="h2"
+              className="hero-serif text-[1.65rem] font-bold leading-tight text-white sm:text-[2rem]"
+            />
+
+            <EditableText
+              path="takeAction.safeguarding.dangerBody"
+              as="p"
+              multiline
+              className="mt-4 text-[0.88rem] leading-[1.8] text-white/75"
+            />
+
+            <div className="mt-7 space-y-3">
               {helplines.map((h, i) => (
-                <a key={i} href={h.href} className="flex items-center justify-between gap-4 rounded-2xl border border-white/15 bg-white/5 p-4 active:scale-[0.99] active:bg-white/10">
-                  <span>
-                    <EditableText path={`takeAction.helplines.${i}.name`} as="span" className="block text-[0.65rem] font-bold uppercase tracking-[0.16em] text-white/70" />
-                    <EditableText path={`takeAction.helplines.${i}.note`} as="span" multiline className="mt-1 block text-[0.78rem] leading-[1.55] text-white/80" />
-                  </span>
-                  <EditableText path={`takeAction.helplines.${i}.number`} as="span" className="hero-serif flex-shrink-0 text-[1.5rem] font-bold leading-none text-[#F2B33D]" />
+                <a
+                  key={i}
+                  href={h.href}
+                  className="flex items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/5 p-4 transition-all duration-300 hover:border-white/40 hover:bg-white/10"
+                >
+                  <div>
+                    <EditableText
+                      path={`takeAction.helplines.${i}.name`}
+                      as="p"
+                      className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/70"
+                    />
+
+                    <EditableText
+                      path={`takeAction.helplines.${i}.note`}
+                      as="p"
+                      multiline
+                      className="mt-1 text-[0.78rem] leading-relaxed text-white/75"
+                    />
+                  </div>
+
+                  <EditableText
+                    path={`takeAction.helplines.${i}.number`}
+                    as="span"
+                    className="hero-serif flex-shrink-0 text-[1.4rem] font-bold text-[#F2B33D]"
+                  />
                 </a>
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="mb-4 inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-              <span className="h-px w-6 bg-green-700" />
-              <EditableText path="takeAction.safeguarding.howKicker" />
+            <span className="mb-3 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-green-700">
+              <span className="h-px w-7 bg-green-700" />
+              <EditableText path="takeAction.safeguarding.formKicker" />
             </span>
-            <EditableText path="takeAction.safeguarding.howTitle" as="h2" className="hero-serif text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#111111]" />
-            <div className="relative mt-7 space-y-6 before:absolute before:bottom-2 before:left-[1.05rem] before:top-2 before:w-px before:bg-green-700/15">
-              {howSteps.map((_, i) => (
-                <div key={i} className="relative flex gap-4">
-                  <span className="z-10 grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[0.68rem] font-bold text-white">{String(i + 1).padStart(2, "0")}</span>
-                  <div>
-                    <EditableText path={`takeAction.safeguarding.howSteps.${i}.t`} as="p" className="hero-serif text-[1rem] font-bold text-[#111111]" />
-                    <EditableText path={`takeAction.safeguarding.howSteps.${i}.b`} as="p" multiline className="mt-1.5 text-[0.88rem] leading-[1.75] text-[#4A4A42]" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-7 rounded-2xl border border-[#E2703A]/25 border-l-2 border-l-[#E2703A] bg-[#E2703A]/5 p-4">
-              <EditableText path="takeAction.safeguarding.investigateTitle" as="p" className="text-[0.9rem] font-bold text-[#111111]" />
-              <EditableText path="takeAction.safeguarding.investigateBody" as="p" multiline className="mt-1 text-[0.85rem] leading-[1.75] text-[#4A4A42]" />
-            </div>
+
+            <EditableText
+              path="takeAction.safeguarding.formTitle"
+              as="h2"
+              className="hero-serif text-[clamp(1.7rem,4vw,2.5rem)] font-bold leading-tight text-[#111111]"
+            />
           </div>
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            <div className="rounded-2xl border border-green-700/12 border-l-2 border-l-green-700 bg-green-700/5 p-4">
-              <EditableText path="takeAction.safeguarding.confidential" as="p" multiline className="text-[0.85rem] leading-[1.7] text-[#4A4A42]" />
-            </div>
-            <div className="rounded-3xl border border-green-700/12 bg-white/85 p-5">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
-                <EditableText path="takeAction.safeguarding.formWhoAreYou" />
-              </p>
-              <div className="mt-4 space-y-2.5">
-                {reportRelationships.map((opt, i) => {
-                  const active = form.reporterType === opt;
-                  return (
-                    <button key={i} type="button" onClick={() => setForm((f) => ({ ...f, reporterType: opt }))} className={`flex w-full items-center justify-between rounded-xl border px-4 py-4 text-left text-[0.88rem] font-semibold transition-all duration-200 ${active ? "border-green-700 bg-green-700/6 text-green-700 ring-1 ring-green-700" : "border-green-700/15 bg-white text-[#4A4A42]"}`}>
-                      <EditableText path={`takeAction.reportRelationships.${i}`} />
-                      <span className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${active ? "bg-green-700" : "bg-green-700/20"}`} />
-                    </button>
-                  );
-                })}
-              </div>
-              {errors.reporterType && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.reporterType}</p>}
-              <label htmlFor="anonymous-m" className="mt-5 flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4">
-                <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                  <input id="anonymous-m" type="checkbox" checked={form.anonymous} onChange={(e) => setForm((f) => ({ ...f, anonymous: e.target.checked }))} className="peer sr-only" />
-                  <span className={`h-5 w-5 rounded-md border transition-all duration-200 ${form.anonymous ? "border-green-700 bg-green-700" : "border-green-700/25 bg-white"}`} />
+
+          <p className="max-w-sm text-[0.8rem] leading-relaxed text-[#4A4A42]/70">
+            Fields marked as required must be completed before submitting your report.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="rounded-[24px] border border-green-700/12 bg-white/70 p-4 shadow-[0_30px_80px_-55px_rgba(20,83,45,0.5)] backdrop-blur-sm sm:rounded-[28px] sm:p-7 lg:p-9"
+        >
+          <div className="mb-7 rounded-xl border border-green-700/12 border-l-[3px] border-l-green-700 bg-green-700/5 p-4 sm:p-5">
+            <EditableText
+              path="takeAction.safeguarding.confidential"
+              as="p"
+              multiline
+              className="text-[0.82rem] leading-[1.8] text-[#4A4A42]"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+
+            <div className={cardClass}>
+              <div className="mb-5 flex items-center gap-3">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
+                  01
                 </span>
+
+                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
+                  Your details
+                </h3>
+              </div>
+
+              <div>
+                <EditableText
+                  path="takeAction.safeguarding.formWhoAreYou"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <div className="grid grid-cols-1 gap-2">
+                  {reportRelationships.map((opt, i) => {
+                    const active = form.reporterType === opt;
+
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({ ...f, reporterType: opt }))
+                        }
+                        className={optionRowClass(active)}
+                      >
+                        <EditableText
+                          path={`takeAction.reportRelationships.${i}`}
+                        />
+
+                        <span
+                          className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${
+                            active ? "bg-green-700" : "bg-green-700/15"
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {errors.reporterType && (
+                  <p className={errorText}>{errors.reporterType}</p>
+                )}
+              </div>
+
+              <label
+                htmlFor="anonymous"
+                className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-green-700/12 bg-green-700/[0.025] p-4"
+              >
+                <input
+                  id="anonymous"
+                  type="checkbox"
+                  checked={form.anonymous}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      anonymous: e.target.checked,
+                    }))
+                  }
+                  className="mt-1 h-4 w-4 accent-green-700"
+                />
+
                 <span>
-                  <EditableText path="takeAction.safeguarding.formAnonymous" as="span" className="block text-[0.88rem] font-semibold text-[#111111]" />
-                  <EditableText path="takeAction.safeguarding.formAnonymousHint" as="span" multiline className="mt-1 block text-[0.76rem] leading-[1.6] text-[#4A4A42]/80" />
+                  <EditableText
+                    path="takeAction.safeguarding.formAnonymous"
+                    as="span"
+                    className="block text-[0.82rem] font-bold text-[#111111]"
+                  />
+
+                  <EditableText
+                    path="takeAction.safeguarding.formAnonymousHint"
+                    as="span"
+                    multiline
+                    className="mt-1 block text-[0.75rem] leading-relaxed text-[#4A4A42]/80"
+                  />
                 </span>
               </label>
-            </div>
-            {!form.anonymous && (
-              <div className="rounded-3xl border border-green-700/12 bg-white/85 p-5">
-                <EditableText path="takeAction.safeguarding.formYourName" as="p" className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]" />
-                <div className="mt-4 space-y-5">
+
+              {!form.anonymous && (
+                <div className="mt-5 space-y-4">
                   <div>
-                    <input type="text" value={form.fullName} onChange={handleChange("fullName")} placeholder={getPath("takeAction.safeguarding.formYourNamePlaceholder")} autoComplete="name" className={`${inputClass} ${errors.fullName ? "border-[#E2703A]/60" : ""}`} />
-                    {errors.fullName && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.fullName}</p>}
+                    <EditableText
+                      path="takeAction.safeguarding.formYourName"
+                      as="label"
+                      className={labelClass}
+                    />
+
+                    <input
+                      type="text"
+                      value={form.fullName}
+                      onChange={handleChange("fullName")}
+                      placeholder={getPath("takeAction.safeguarding.formYourNamePlaceholder")}
+                      autoComplete="name"
+                      className={fieldClass(errors.fullName)}
+                    />
+
+                    {errors.fullName && (
+                      <p className={errorText}>{errors.fullName}</p>
+                    )}
                   </div>
+
                   <div>
-                    <input type="tel" value={form.phone} onChange={handleChange("phone")} placeholder={getPath("takeAction.safeguarding.formPhonePlaceholder")} autoComplete="tel" inputMode="tel" className={`${inputClass} ${errors.phone ? "border-[#E2703A]/60" : ""}`} />
-                    {errors.phone && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.phone}</p>}
+                    <EditableText
+                      path="takeAction.safeguarding.formPhone"
+                      as="label"
+                      className={labelClass}
+                    />
+
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleChange("phone")}
+                      placeholder={getPath("takeAction.safeguarding.formPhonePlaceholder")}
+                      autoComplete="tel"
+                      inputMode="tel"
+                      className={fieldClass(errors.phone)}
+                    />
+
+                    {errors.phone && (
+                      <p className={errorText}>{errors.phone}</p>
+                    )}
                   </div>
+
                   <div>
-                    <input type="email" value={form.email} onChange={handleChange("email")} placeholder={getPath("takeAction.safeguarding.formEmailPlaceholder")} autoComplete="email" inputMode="email" className={`${inputClass} ${errors.email ? "border-[#E2703A]/60" : ""}`} />
-                    {errors.email && <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.email}</p>}
+                    <EditableText
+                      path="takeAction.safeguarding.formEmail"
+                      as="label"
+                      className={labelClass}
+                    />
+
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange("email")}
+                      placeholder={getPath("takeAction.safeguarding.formEmailPlaceholder")}
+                      autoComplete="email"
+                      inputMode="email"
+                      className={fieldClass(errors.email)}
+                    />
+
+                    {errors.email && (
+                      <p className={errorText}>{errors.email}</p>
+                    )}
                   </div>
                 </div>
+              )}
+
+              <div className="mt-5">
+                <EditableText
+                  path="takeAction.safeguarding.formRelationship"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <input
+                  type="text"
+                  value={form.relationship}
+                  onChange={handleChange("relationship")}
+                  placeholder={getPath("takeAction.safeguarding.formRelationshipPlaceholder")}
+                  className={fieldClass(errors.relationship)}
+                />
+
+                {errors.relationship && (
+                  <p className={errorText}>{errors.relationship}</p>
+                )}
               </div>
-            )}
-            <div className="rounded-3xl border border-green-700/12 bg-white/85 p-5">
-              <EditableText path="takeAction.safeguarding.formRelationship" as="p" className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]" />
-              <div className="mt-4 space-y-5">
-                <input type="text" value={form.relationship} onChange={handleChange("relationship")} placeholder={getPath("takeAction.safeguarding.formRelationshipPlaceholder")} className={`${inputClass} ${errors.relationship ? "border-[#E2703A]/60" : ""}`} />
-                {errors.relationship && <p className="text-[0.75rem] font-medium text-[#E2703A]">{errors.relationship}</p>}
-                <input type="text" value={form.location} onChange={handleChange("location")} placeholder={getPath("takeAction.safeguarding.formLocationPlaceholder")} className={`${inputClass} ${errors.location ? "border-[#E2703A]/60" : ""}`} />
-                {errors.location && <p className="text-[0.75rem] font-medium text-[#E2703A]">{errors.location}</p>}
-                <input type="text" value={form.childName} onChange={handleChange("childName")} placeholder={getPath("takeAction.safeguarding.formChildNamePlaceholder")} className={inputClass} />
+
+              <div className="mt-5">
+                <EditableText
+                  path="takeAction.safeguarding.formContactPref"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <div className="grid grid-cols-2 gap-2">
+                  {reportContact.map((c, i) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          contactPreference: c.id,
+                        }))
+                      }
+                      className={optionRowClass(
+                        form.contactPreference === c.id
+                      )}
+                    >
+                      <EditableText
+                        path={`takeAction.reportContact.${i}.label`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                {errors.contactPreference && (
+                  <p className={errorText}>{errors.contactPreference}</p>
+                )}
               </div>
             </div>
-            <div className="rounded-3xl border border-green-700/12 bg-white/85 p-5">
-              <EditableText path="takeAction.safeguarding.formConcernType" as="p" className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]" />
-              <div className="mt-4 grid grid-cols-2 gap-2.5">
-                {reportConcerns.map((c, i) => {
-                  const active = form.concerns.includes(c.id);
-                  return (
-                    <button key={c.id} type="button" onClick={() => toggleConcern(c.id)} className={`rounded-xl border px-3.5 py-3.5 text-left text-[0.82rem] font-semibold transition-all duration-200 ${active ? "border-green-700 bg-green-700/6 text-green-700 ring-1 ring-green-700" : "border-green-700/15 bg-white text-[#4A4A42]"}`}>
-                      <EditableText path={`takeAction.reportConcerns.${i}.label`} />
-                    </button>
-                  );
-                })}
+
+            <div className={cardClass}>
+              <div className="mb-5 flex items-center gap-3">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
+                  02
+                </span>
+
+                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
+                  About the concern
+                </h3>
               </div>
-              {errors.concerns && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.concerns}</p>}
-              <p className="mt-6 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
-                <EditableText path="takeAction.safeguarding.formUrgency" />
-              </p>
-              <div className="mt-3 space-y-2.5">
-                {reportUrgency.map((u, i) => {
-                  const active = form.urgency === u.id;
-                  const isImmediate = u.id === "immediate";
-                  return (
-                    <button key={u.id} type="button" onClick={() => setForm((f) => ({ ...f, urgency: u.id }))} className={`w-full rounded-xl border px-4 py-4 text-left transition-all duration-200 ${active ? isImmediate ? "border-[#E2703A] bg-[#E2703A]/8 ring-1 ring-[#E2703A]" : "border-green-700 bg-green-700/6 ring-1 ring-green-700" : "border-green-700/15 bg-white"}`}>
-                      <EditableText path={`takeAction.reportUrgency.${i}.label`} as="span" className={`block text-[0.9rem] font-bold ${active ? isImmediate ? "text-[#E2703A]" : "text-green-700" : "text-[#111111]"}`} />
-                      <EditableText path={`takeAction.reportUrgency.${i}.hint`} as="span" className="mt-0.5 block text-[0.72rem] leading-snug text-[#4A4A42]/80" />
-                    </button>
-                  );
-                })}
+
+              <div>
+                <EditableText
+                  path="takeAction.safeguarding.formChildName"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <EditableText
+                  path="takeAction.safeguarding.formChildNameOptional"
+                  as="span"
+                  className="mb-2 block text-[0.72rem] text-[#4A4A42]/60"
+                />
+
+                <input
+                  type="text"
+                  value={form.childName}
+                  onChange={handleChange("childName")}
+                  placeholder={getPath("takeAction.safeguarding.formChildNamePlaceholder")}
+                  className={fieldClass(false)}
+                />
               </div>
-              {errors.urgency && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.urgency}</p>}
+
+              <div className="mt-5">
+                <EditableText
+                  path="takeAction.safeguarding.formLocation"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <input
+                  type="text"
+                  value={form.location}
+                  onChange={handleChange("location")}
+                  placeholder={getPath("takeAction.safeguarding.formLocationPlaceholder")}
+                  className={fieldClass(errors.location)}
+                />
+
+                {errors.location && (
+                  <p className={errorText}>{errors.location}</p>
+                )}
+              </div>
+
+              <div className="mt-6">
+                <EditableText
+                  path="takeAction.safeguarding.formConcernType"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <div className="grid grid-cols-1 gap-2">
+                  {reportConcerns.map((c, i) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => toggleConcern(c.id)}
+                      className={optionRowClass(
+                        form.concerns.includes(c.id)
+                      )}
+                    >
+                      <EditableText
+                        path={`takeAction.reportConcerns.${i}.label`}
+                      />
+
+                      <span
+                        className={`grid h-5 w-5 flex-shrink-0 place-items-center rounded-md border text-[0.65rem] ${
+                          form.concerns.includes(c.id)
+                            ? "border-green-700 bg-green-700 text-white"
+                            : "border-green-700/20 bg-white"
+                        }`}
+                      >
+                        {form.concerns.includes(c.id) ? "✓" : ""}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {errors.concerns && (
+                  <p className={errorText}>{errors.concerns}</p>
+                )}
+              </div>
+
+              <div className="mt-6">
+                <EditableText
+                  path="takeAction.safeguarding.formUrgency"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <div className="space-y-2">
+                  {reportUrgency.map((u, i) => {
+                    const active = form.urgency === u.id;
+                    const immediate = u.id === "immediate";
+
+                    return (
+                      <button
+                        key={u.id}
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            urgency: u.id,
+                          }))
+                        }
+                        className={`w-full rounded-xl border p-3.5 text-left transition-all ${
+                          active
+                            ? immediate
+                              ? "border-[#E2703A] bg-[#E2703A]/5 ring-1 ring-[#E2703A]/20"
+                              : "border-green-700 bg-green-700/5 ring-1 ring-green-700/20"
+                            : "border-green-700/15 bg-white hover:border-green-700/40"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <EditableText
+                            path={`takeAction.reportUrgency.${i}.label`}
+                            as="span"
+                            className={`text-[0.82rem] font-bold ${
+                              active
+                                ? immediate
+                                  ? "text-[#E2703A]"
+                                  : "text-green-700"
+                                : "text-[#111111]"
+                            }`}
+                          />
+
+                          {active && (
+                            <span className="text-green-700">✓</span>
+                          )}
+                        </div>
+
+                        <EditableText
+                          path={`takeAction.reportUrgency.${i}.hint`}
+                          as="span"
+                          className="mt-1 block text-[0.72rem] leading-relaxed text-[#4A4A42]/75"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {errors.urgency && (
+                  <p className={errorText}>{errors.urgency}</p>
+                )}
+              </div>
             </div>
-            <div className="rounded-3xl border border-green-700/12 bg-white/85 p-5">
-              <EditableText path="takeAction.safeguarding.formDescription" as="p" className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]" />
-              <textarea value={form.description} onChange={handleChange("description")} rows={6} placeholder={getPath("takeAction.safeguarding.formDescriptionPlaceholder")} className={`mt-4 w-full resize-none rounded-xl border bg-white px-4 py-4 text-[1rem] text-[#111111] outline-none transition-all duration-200 placeholder:text-[#4A4A42]/40 focus:ring-2 ${errors.description ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/20" : "border-green-700/15 focus:border-green-700 focus:ring-green-700/15"}`} />
-              {errors.description ? <p className="mt-1.5 text-[0.75rem] font-medium text-[#E2703A]">{errors.description}</p> : <EditableText path="takeAction.safeguarding.formDescriptionHint" as="p" className="mt-1.5 text-[0.75rem] text-[#4A4A42]/70" />}
-              <p className="mt-6 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#4A4A42]">
-                <EditableText path="takeAction.safeguarding.formContactPref" />
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2.5">
-                {reportContact.map((c, i) => {
-                  const active = form.contactPreference === c.id;
-                  return (
-                    <button key={c.id} type="button" onClick={() => setForm((f) => ({ ...f, contactPreference: c.id }))} className={`rounded-xl border px-3.5 py-3.5 text-left text-[0.82rem] font-semibold transition-all duration-200 ${active ? "border-green-700 bg-green-700/6 text-green-700 ring-1 ring-green-700" : "border-green-700/15 bg-white text-[#4A4A42]"}`}>
-                      <EditableText path={`takeAction.reportContact.${i}.label`} />
-                    </button>
-                  );
-                })}
+
+            <div className={cardClass}>
+              <div className="mb-5 flex items-center gap-3">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
+                  03
+                </span>
+
+                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
+                  Report details
+                </h3>
               </div>
-              {errors.contactPreference && <p className="mt-2 text-[0.75rem] font-medium text-[#E2703A]">{errors.contactPreference}</p>}
-            </div>
-            <label htmlFor="acknowledged-m" className="flex cursor-pointer items-start gap-3.5 rounded-xl border border-green-700/12 bg-white/55 p-4">
-              <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-                <input id="acknowledged-m" type="checkbox" checked={form.acknowledged} onChange={(e) => setForm((f) => ({ ...f, acknowledged: e.target.checked }))} className="peer sr-only" />
-                <span className={`h-5 w-5 rounded-md border transition-all duration-200 ${form.acknowledged ? "border-green-700 bg-green-700" : errors.acknowledged ? "border-[#E2703A]/60 bg-white" : "border-green-700/25 bg-white"}`} />
-              </span>
-              <EditableText path="takeAction.safeguarding.formAcknowledge" as="span" multiline className="text-[0.8rem] leading-[1.7] text-[#4A4A42]" />
-            </label>
-            {errors.acknowledged && <p className="-mt-3 text-[0.75rem] font-medium text-[#E2703A]">{errors.acknowledged}</p>}
-            {errors.form && <p className="text-[0.8rem] font-medium text-[#E2703A]">{errors.form}</p>}
-            <div className="sticky bottom-3 z-30">
-              <button type="submit" disabled={submitting} className="w-full rounded-xl bg-[#E2703A] px-6 py-4 text-[0.82rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_20px_40px_-18px_rgba(226,112,58,0.9)] active:scale-[0.99] disabled:opacity-60">
-                {submitting ? "Submitting…" : <EditableText path="takeAction.safeguarding.formSubmit" />}
+
+              <div>
+                <EditableText
+                  path="takeAction.safeguarding.formDescription"
+                  as="label"
+                  className={labelClass}
+                />
+
+                <textarea
+                  value={form.description}
+                  onChange={handleChange("description")}
+                  rows={9}
+                  placeholder={getPath("takeAction.safeguarding.formDescriptionPlaceholder")}
+                  className={`w-full resize-y rounded-xl border bg-white px-4 py-4 text-[0.88rem] leading-[1.8] text-[#111111] outline-none transition-all placeholder:text-[#4A4A42]/40 focus:ring-2 ${
+                    errors.description
+                      ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/15"
+                      : "border-green-700/15 focus:border-green-700 focus:ring-green-700/10"
+                  }`}
+                />
+
+                {errors.description ? (
+                  <p className={errorText}>{errors.description}</p>
+                ) : (
+                  <EditableText
+                    path="takeAction.safeguarding.formDescriptionHint"
+                    as="p"
+                    className="mt-2 text-[0.72rem] leading-relaxed text-[#4A4A42]/65"
+                  />
+                )}
+              </div>
+
+              <div className="mt-6">
+                <label
+                  htmlFor="acknowledged"
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-green-700/12 bg-green-700/[0.025] p-4"
+                >
+                  <input
+                    id="acknowledged"
+                    type="checkbox"
+                    checked={form.acknowledged}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        acknowledged: e.target.checked,
+                      }))
+                    }
+                    className="mt-1 h-4 w-4 flex-shrink-0 accent-green-700"
+                  />
+
+                  <EditableText
+                    path="takeAction.safeguarding.formAcknowledge"
+                    as="span"
+                    multiline
+                    className="text-[0.78rem] leading-[1.75] text-[#4A4A42]"
+                  />
+                </label>
+
+                {errors.acknowledged && (
+                  <p className={errorText}>{errors.acknowledged}</p>
+                )}
+              </div>
+
+              {errors.form && (
+                <div className="mt-5 rounded-xl border border-[#E2703A]/20 bg-[#E2703A]/5 p-4">
+                  <p className="text-[0.78rem] leading-relaxed text-[#E2703A]">
+                    {errors.form}
+                  </p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-[#E2703A] px-6 py-4 text-[0.76rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_35px_-18px_rgba(226,112,58,0.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#c95c2b] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Submitting report...
+                  </>
+                ) : (
+                  <>
+                    <EditableText path="takeAction.safeguarding.formSubmit" />
+
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </>
+                )}
               </button>
+
+              <p className="mt-5 border-l-2 border-green-700/40 pl-4 text-[0.75rem] leading-[1.8] text-[#4A4A42]/75">
+                <EditableText path="takeAction.safeguarding.formFootnote" />{" "}
+                <a
+                  href="tel:116"
+                  className="font-bold text-green-700 underline underline-offset-4"
+                >
+                  116
+                </a>{" "}
+                <EditableText path="takeAction.safeguarding.formFootnoteMiddle" />{" "}
+                <a
+                  href="tel:999"
+                  className="font-bold text-green-700 underline underline-offset-4"
+                >
+                  999
+                </a>{" "}
+                <EditableText path="takeAction.safeguarding.formFootnoteEnd" />
+              </p>
             </div>
-            <p className="border-l-2 border-green-700/40 pl-4 text-[0.78rem] leading-[1.7] text-[#4A4A42]/80">
-              <EditableText path="takeAction.safeguarding.formFootnote" />{" "}
-              <a href="tel:116" className="font-bold text-green-700 underline decoration-green-700/30 underline-offset-4">116</a>{" "}
-              <EditableText path="takeAction.safeguarding.formFootnoteMiddle" />{" "}
-              <a href="tel:999" className="font-bold text-green-700 underline decoration-green-700/30 underline-offset-4">999</a>{" "}
-              <EditableText path="takeAction.safeguarding.formFootnoteEnd" />
-            </p>
-          </form>
+          </div>
+        </form>
+      </section>
+
+      <section className="space-y-6">
+        <div className="max-w-2xl">
+          <span className="mb-3 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
+            <span className="h-px w-7 bg-green-700" />
+            How we handle your report
+          </span>
+
+          <h2 className="hero-serif text-[clamp(1.7rem,4vw,2.6rem)] font-bold leading-tight text-[#111111]">
+            Your report matters. Here's what happens next.
+          </h2>
+
+          <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
+            Every concern is treated seriously, handled with care and reviewed
+            through our safeguarding procedures.
+          </p>
         </div>
-      </div>
-    </>
+
+        {renderHowSteps()}
+
+        <div className="rounded-2xl border border-[#E2703A]/20 border-l-[3px] border-l-[#E2703A] bg-[#E2703A]/5 p-5 sm:p-6">
+          <EditableText
+            path="takeAction.safeguarding.investigateTitle"
+            as="h3"
+            className="text-[0.9rem] font-bold text-[#111111]"
+          />
+
+          <EditableText
+            path="takeAction.safeguarding.investigateBody"
+            as="p"
+            multiline
+            className="mt-2 text-[0.85rem] leading-[1.8] text-[#4A4A42]"
+          />
+        </div>
+      </section>
+
+    </div>
   );
 }
 
