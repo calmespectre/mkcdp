@@ -680,7 +680,7 @@ export default function Navbar() {
 
   const navBorderColor = isTransparent
     ? "border-orange-400"
-    : "border-green-700/20";
+    : "border-green-700";
 
   const navHoverColor = isTransparent
     ? "hover:bg-white/15 hover:text-white"
