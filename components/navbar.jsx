@@ -262,6 +262,7 @@ function SearchModal({ open, onClose }) {
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            placeholder="Enter a keyword..."
             className="min-w-0 flex-1 bg-transparent text-sm text-[#20241F] outline-none placeholder:text-[#85877E]"
           />
 
@@ -269,7 +270,6 @@ function SearchModal({ open, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close search"
-            placeholder="Enter a keyword..."
             className="rounded-full p-1 text-[#697367] transition hover:bg-green-700/10 hover:text-green-700"
           >
             <Icon.Close className="h-5 w-5" />
@@ -279,6 +279,7 @@ function SearchModal({ open, onClose }) {
         <div className="max-h-[65vh] overflow-y-auto p-2">
           {!query.trim() && (
             <p className="px-4 py-8 text-center text-sm text-[#697367]">
+              Search our website.
             </p>
           )}
 
@@ -305,11 +306,6 @@ function SearchModal({ open, onClose }) {
             </Link>
           ))}
         </div>
-
-        {/* <div className="flex items-center justify-between border-t border-green-700/10 px-5 py-3 text-[10px] text-[#85877E]">
-          <span>MKCDP Website Search</span>
-          <span>↑ ↓ Navigate · Enter Select · Esc Close</span>
-        </div> */}
       </div>
     </div>,
     document.body
@@ -385,9 +381,8 @@ function SideNavigation({
 
         <div className="flex flex-1 flex-col px-5 pb-7 pt-5 sm:px-8">
           <div className="mb-5 flex items-center justify-between">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
-              
-            </span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]" />
+
             <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
               Loitokitok · Kenya
             </span>
@@ -527,6 +522,7 @@ function SideNavigation({
                 >
                   info@mkcdp.org
                 </a>
+
                 <a
                   href="tel:+254737332219"
                   className="transition hover:text-green-700"
@@ -536,7 +532,7 @@ function SideNavigation({
               </div>
             </div>
 
-            <div className="flex flex-wrap bg-green-700 px-4 py-2 hover:bg-green-800 items-center gap-4 text-[14px] text-white">
+            <div className="flex flex-wrap items-center gap-4 bg-green-700 px-4 py-2 text-[14px] text-white hover:bg-green-800">
               <Link
                 to={isAuthed ? "/account" : "/auth"}
                 onClick={onClose}
@@ -549,7 +545,7 @@ function SideNavigation({
                 <button
                   type="button"
                   onClick={() => setIsEditing(!isEditing)}
-                  className="font-semibold text-green-700"
+                  className="font-semibold text-white"
                 >
                   {isEditing ? "Exit editor" : "Editor mode"}
                 </button>
@@ -571,7 +567,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(0);
   const [isAuthed, setIsAuthed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -689,13 +685,16 @@ export default function Navbar() {
   }, [menuOpen, searchOpen, closeMenu]);
 
   useEffect(() => {
-    lastScrollY.current = window.scrollY;
+    const initialY = window.scrollY;
+
+    lastScrollY.current = initialY;
+    setBackgroundOpacity(Math.min(initialY / 160, 1));
 
     const handleScroll = () => {
       const currentY = window.scrollY;
       const difference = currentY - lastScrollY.current;
 
-      setScrolled(currentY > 20);
+      setBackgroundOpacity(Math.min(Math.max(currentY / 160, 0), 1));
 
       if (menuOpen || searchOpen) {
         setHidden(false);
@@ -738,6 +737,10 @@ export default function Navbar() {
     setSearchOpen(false);
   }, [location.pathname]);
 
+  const headerBackground = `rgba(251, 247, 240, ${
+    Math.max(backgroundOpacity, searchOpen ? 0.97 : 0) * 0.97
+  })`;
+
   return (
     <>
       <style>{`
@@ -752,10 +755,13 @@ export default function Navbar() {
 
         .mkcdp-header {
           transition:
-            transform 420ms cubic-bezier(.22,1,.36,1),
-            background-color 300ms ease,
-            box-shadow 300ms ease;
-          will-change: transform;
+            transform 500ms cubic-bezier(.22,1,.36,1),
+            opacity 350ms ease,
+            background-color 180ms linear,
+            box-shadow 180ms linear,
+            backdrop-filter 180ms linear;
+          -webkit-backdrop-filter: blur(0px);
+          will-change: transform, opacity, background-color, backdrop-filter;
         }
 
         .mkcdp-menu-trigger {
@@ -788,15 +794,22 @@ export default function Navbar() {
 
       <header
         ref={headerRef}
+        style={{
+          backgroundColor: headerBackground,
+          boxShadow:
+            backgroundOpacity > 0.1
+              ? `0 4px 30px rgba(20, 30, 20, ${
+                  backgroundOpacity * 0.08
+                })`
+              : "none",
+          backdropFilter: `blur(${backgroundOpacity * 16}px)`,
+          WebkitBackdropFilter: `blur(${backgroundOpacity * 16}px)`,
+        }}
         className={`mkcdp-header fixed inset-x-0 top-0 z-[1100] ${
-          hidden && !menuOpen && !searchOpen
-            ? "-translate-y-full"
-            : "translate-y-0"
-        } ${
-          scrolled || menuOpen || searchOpen
-            ? "bg-[#FBF7F0]/95 text-[#20241F] shadow-[0_4px_30px_rgba(20,30,20,0.08)] backdrop-blur-xl"
-            : "bg-[#FBF7F0]/90 text-[#20241F] backdrop-blur-md"
-        }`}
+          hidden || menuOpen
+            ? "-translate-y-full opacity-0 pointer-events-none"
+            : "translate-y-0 opacity-100 pointer-events-auto"
+        } text-[#20241F]`}
       >
         <nav aria-label="Main navigation" className="mx-auto max-w-[1800px]">
           <div className="flex min-h-[72px] items-center justify-between gap-3 px-4 sm:px-7 lg:min-h-[86px] lg:px-10 xl:px-14">
@@ -873,7 +886,9 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setIsEditing(!isEditing)}
-                  aria-label={isEditing ? "Exit editor mode" : "Enter editor mode"}
+                  aria-label={
+                    isEditing ? "Exit editor mode" : "Enter editor mode"
+                  }
                   title={isEditing ? "Exit editor mode" : "Editor"}
                   className={`hidden h-10 shrink-0 items-center justify-center border px-3 text-[9px] font-bold uppercase tracking-wider transition-colors sm:inline-flex ${
                     isEditing
@@ -888,6 +903,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => {
+                  clearTimeout(idleTimer.current);
                   setHidden(false);
                   setMenuOpen((current) => !current);
                 }}
