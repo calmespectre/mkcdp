@@ -123,10 +123,10 @@ function Hero() {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-[1] hidden sm:block"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(36, 69, 41, 0.75) 0%, rgba(56, 112, 79, 0.45) 55%, rgba(20,83,45,0) 100%)",
-        }}
+        // style={{
+        //   background:
+        //     "linear-gradient(90deg, rgba(36, 69, 41, 0.75) 0%, rgba(56, 112, 79, 0.45) 25%, rgba(20,83,45,0) 100%)",
+        // }}
       />
 
       <div
