@@ -679,7 +679,7 @@ export default function Navbar() {
   const navTextColor = isTransparent ? "text-orange-400" : "text-green-700";
 
   const navBorderColor = isTransparent
-    ? "border-orange-400/20"
+    ? "border-orange-400"
     : "border-green-700/20";
 
   const navHoverColor = isTransparent
