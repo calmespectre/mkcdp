@@ -1,6 +1,8 @@
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  "https://mkcdp-backend.onrender.com/api";
+const AUTH_API =
+  import.meta.env.VITE_API_URL ||
+  "https://mkcdp-backend.onrender.com/api/auth";
+
+const API_BASE = AUTH_API.replace(/\/auth\/?$/, "");
 
 const ACCESS_KEY = "mkcdp.access";
 const REFRESH_KEY = "mkcdp.refresh";
@@ -58,7 +60,7 @@ async function tryRefresh() {
   if (!refreshToken) return false;
 
   try {
-    const res = await fetch(`${API_BASE}/auth/refresh/`, {
+    const response = await fetch(`${AUTH_API.replace(/\/$/, "")}/refresh/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,9 +70,15 @@ async function tryRefresh() {
       }),
     });
 
-    if (!res.ok) return false;
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        clearTokens();
+      }
 
-    const data = await res.json();
+      return false;
+    }
+
+    const data = await response.json();
 
     if (!data.access) return false;
 
@@ -100,25 +108,27 @@ export async function apiFetch(path, options = {}) {
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  let res = await fetch(`${API_BASE}${path}`, {
+  let response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
   });
 
-  if (res.status === 401) {
+  if (response.status === 401) {
     const refreshed = await tryRefresh();
 
     if (refreshed) {
+      syncTokens();
+
       headers.set("Authorization", `Bearer ${accessToken}`);
 
-      res = await fetch(`${API_BASE}${path}`, {
+      response = await fetch(`${API_BASE}${path}`, {
         ...options,
         headers,
       });
     }
   }
 
-  return res;
+  return response;
 }
 
 function extractError(data) {
@@ -155,28 +165,26 @@ function extractError(data) {
 }
 
 export async function api(path, options = {}) {
-  const res = await apiFetch(path, options);
+  const response = await apiFetch(path, options);
 
   const isJson = (
-    res.headers.get("content-type") || ""
+    response.headers.get("content-type") || ""
   ).includes("application/json");
 
   const data = isJson
-    ? await res.json().catch(() => ({}))
+    ? await response.json().catch(() => ({}))
     : {};
 
-  if (!res.ok || data?.success === false) {
-    const err = new Error(extractError(data));
+  if (!response.ok || data?.success === false) {
+    const error = new Error(extractError(data));
 
-    err.status = res.status;
-    err.errors = data?.errors || {};
+    error.status = response.status;
+    error.errors = data?.errors || {};
 
-    throw err;
+    throw error;
   }
 
-  return data &&
-    typeof data === "object" &&
-    "data" in data
+  return data && typeof data === "object" && "data" in data
     ? data.data
     : data;
 }

@@ -498,6 +498,92 @@ function fileToDataUrl(file) {
   });
 }
 
+async function contentFetch(path, options = {}) {
+  const url = path.startsWith("http")
+    ? path
+    : `${API_BASE}${path}`;
+
+  const buildHeaders = (token) => {
+    const headers = new Headers(options.headers || {});
+
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    } else {
+      headers.delete("Authorization");
+    }
+
+    return headers;
+  };
+
+  let token = readAccessToken();
+
+  let response = await fetch(url, {
+    ...options,
+    headers: buildHeaders(token),
+  });
+
+  if (response.status !== 401) return response;
+
+  let refreshToken = null;
+
+  try {
+    refreshToken = window.localStorage.getItem("mkcdp.refresh");
+  } catch {
+    return response;
+  }
+
+  if (!refreshToken) return response;
+
+  try {
+    const refreshResponse = await contentFetch(
+      `${AUTH_API.replace(/\/$/, "")}/refresh/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
+      }
+    );
+
+    if (!refreshResponse.ok) {
+      if (
+        refreshResponse.status === 401 ||
+        refreshResponse.status === 403
+      ) {
+        window.localStorage.removeItem(ACCESS_KEY);
+        window.localStorage.removeItem("mkcdp.refresh");
+      }
+
+      return response;
+    }
+
+    const refreshed = await refreshResponse.json();
+
+    if (!refreshed?.access) return response;
+
+    token = refreshed.access;
+
+    window.localStorage.setItem(ACCESS_KEY, token);
+
+    if (refreshed.refresh) {
+      window.localStorage.setItem(
+        "mkcdp.refresh",
+        refreshed.refresh
+      );
+    }
+
+    return await contentFetch(url, {
+      ...options,
+      headers: buildHeaders(token),
+    });
+  } catch {
+    return response;
+  }
+}
+
 async function uploadImageFile(file) {
   const token = readAccessToken();
 
@@ -508,7 +594,7 @@ async function uploadImageFile(file) {
   const fd = new FormData();
   fd.append("file", file);
 
-  const res = await fetch(`${API_BASE}/upload/`, {
+  const res = await contentFetch(`${API_BASE}/upload/`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
@@ -769,7 +855,7 @@ export function EditorProvider({ children }) {
       try {
         const headers = { Accept: "application/json" };
         if (token) headers.Authorization = `Bearer ${token}`;
-        const res = await fetch(`${API_BASE}/`, { headers });
+        const res = await contentFetch(`${API_BASE}/`, { headers });
         if (!res.ok) throw new Error("load failed");
         const data = await res.json();
         const serverEdits = data?.edits && typeof data.edits === "object" ? data.edits : {};
@@ -820,7 +906,7 @@ export function EditorProvider({ children }) {
       const payload = { edits: updates, deletes };
 
       try {
-        const res = await fetch(`${API_BASE}/bulk/`, {
+        const res = await contentFetch(`${API_BASE}/bulk/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -915,7 +1001,7 @@ export function EditorProvider({ children }) {
     setSaving(true);
     setLastError(null);
     try {
-      const res = await fetch(`${API_BASE}/bulk/`, {
+      const res = await contentFetch(`${API_BASE}/bulk/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -945,7 +1031,7 @@ export function EditorProvider({ children }) {
     try {
       const headers = { Accept: "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/`, { headers });
+      const res = await contentFetch(`${API_BASE}/`, { headers });
       if (!res.ok) throw new Error("Reload failed.");
       const data = await res.json();
       const serverEdits = data?.edits && typeof data.edits === "object" ? data.edits : {};
@@ -968,7 +1054,7 @@ export function EditorProvider({ children }) {
     const token = readAccessToken();
     if (!token) return false;
     try {
-      const res = await fetch(`${API_BASE}/reset/`, {
+      const res = await contentFetch(`${API_BASE}/reset/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

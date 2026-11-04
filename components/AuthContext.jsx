@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const ACCESS_KEY = "mkcdp.access";
 const REFRESH_KEY = "mkcdp.refresh";
@@ -6,7 +13,9 @@ const USER_KEY = "mkcdp.user";
 const ACCOUNTS_KEY = "mkcdp.accounts";
 const ACTIVE_EMAIL_KEY = "mkcdp.activeAccount";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "https://mkcdp-backend.onrender.com/api/auth";
+const API_BASE =
+  import.meta.env?.VITE_API_URL ||
+  "https://mkcdp-backend.onrender.com/api/auth";
 
 const AuthContext = createContext(null);
 
@@ -34,10 +43,13 @@ function readTokens() {
   if (typeof window === "undefined") {
     return { access: null, refresh: null, user: null };
   }
+
   const access = safeLocalGet(ACCESS_KEY);
   const refresh = safeLocalGet(REFRESH_KEY);
+
   let user = null;
   const rawUser = safeLocalGet(USER_KEY);
+
   if (rawUser) {
     try {
       user = JSON.parse(rawUser);
@@ -45,11 +57,13 @@ function readTokens() {
       user = null;
     }
   }
+
   return { access, refresh, user };
 }
 
 function writeTokens({ access, refresh, user }) {
   if (typeof window === "undefined") return;
+
   if (access) safeLocalSet(ACCESS_KEY, access);
   else safeLocalRemove(ACCESS_KEY);
 
@@ -62,8 +76,10 @@ function writeTokens({ access, refresh, user }) {
 
 function readAccounts() {
   if (typeof window === "undefined") return [];
+
   const raw = safeLocalGet(ACCOUNTS_KEY);
   if (!raw) return [];
+
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -74,6 +90,7 @@ function readAccounts() {
 
 function writeAccounts(accounts) {
   if (typeof window === "undefined") return;
+
   try {
     safeLocalSet(ACCOUNTS_KEY, JSON.stringify(accounts));
   } catch {}
@@ -86,20 +103,28 @@ function readActiveEmail() {
 
 function writeActiveEmail(email) {
   if (typeof window === "undefined") return;
+
   if (email) safeLocalSet(ACTIVE_EMAIL_KEY, email);
   else safeLocalRemove(ACTIVE_EMAIL_KEY);
 }
 
 export function initialsOf(account) {
   if (!account) return "?";
+
   const name = (account.full_name || account.username || "").trim();
+
   if (name) {
     const parts = name.split(/\s+/).filter(Boolean);
+
     if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      return (
+        parts[0][0] + parts[parts.length - 1][0]
+      ).toUpperCase();
     }
+
     return name.slice(0, 2).toUpperCase();
   }
+
   const email = account.email || "";
   return (email.slice(0, 2) || "?").toUpperCase();
 }
@@ -117,35 +142,63 @@ const AVATAR_COLORS = [
 
 export function colorForEmail(email) {
   if (!email) return AVATAR_COLORS[0];
+
   let hash = 0;
+
   for (let i = 0; i < email.length; i += 1) {
     hash = (hash * 31 + email.charCodeAt(i)) >>> 0;
   }
+
   return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
 async function unwrap(res) {
   let body = null;
+
   try {
     body = await res.json();
   } catch {
     body = null;
   }
-  if (body && typeof body === "object" && "success" in body && "data" in body) {
-    return { ok: res.ok, status: res.status, data: body.data, errors: body.errors || null, body };
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "success" in body &&
+    "data" in body
+  ) {
+    return {
+      ok: res.ok,
+      status: res.status,
+      data: body.data,
+      errors: body.errors || null,
+      body,
+    };
   }
-  return { ok: res.ok, status: res.status, data: body, errors: null, body };
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    data: body,
+    errors: null,
+    body,
+  };
 }
 
 export function AuthProvider({ children }) {
   const initial = readTokens();
+
   const [access, setAccess] = useState(initial.access);
   const [refresh, setRefresh] = useState(initial.refresh);
   const [user, setUser] = useState(initial.user);
   const [accounts, setAccounts] = useState(() => readAccounts());
-  const [activeEmail, setActiveEmail] = useState(() => readActiveEmail());
+  const [activeEmail, setActiveEmail] = useState(() =>
+    readActiveEmail()
+  );
   const [booting, setBooting] = useState(Boolean(initial.refresh));
+
   const refreshingRef = useRef(false);
+  const refreshPromiseRef = useRef(null);
 
   useEffect(() => {
     writeTokens({ access, refresh, user });
@@ -161,8 +214,13 @@ export function AuthProvider({ children }) {
 
   const upsertAccount = useCallback((entry) => {
     if (!entry?.email) return;
+
     setAccounts((prev) => {
-      const idx = prev.findIndex((a) => a.email.toLowerCase() === entry.email.toLowerCase());
+      const idx = prev.findIndex(
+        (a) =>
+          a.email.toLowerCase() === entry.email.toLowerCase()
+      );
+
       const nextEntry = {
         email: entry.email,
         username: entry.username || "",
@@ -173,15 +231,19 @@ export function AuthProvider({ children }) {
         user: entry.user || null,
         lastUsed: Date.now(),
       };
+
       if (idx === -1) return [nextEntry, ...prev];
+
       const next = [...prev];
       next[idx] = { ...prev[idx], ...nextEntry };
+
       return next;
     });
   }, []);
 
   const patchAccountTokens = useCallback((email, tokens) => {
     if (!email) return;
+
     setAccounts((prev) =>
       prev.map((a) =>
         a.email.toLowerCase() === email.toLowerCase()
@@ -192,109 +254,192 @@ export function AuthProvider({ children }) {
   }, []);
 
   const doRefresh = useCallback(async () => {
-    const currentRefresh =
-      typeof window !== "undefined" ? safeLocalGet(REFRESH_KEY) : refresh;
-    if (!currentRefresh || refreshingRef.current) return null;
-    refreshingRef.current = true;
-    try {
-      const res = await fetch(`${API_BASE}/refresh/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh: currentRefresh }),
-      });
-      if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
-          setAccess(null);
-          setRefresh(null);
-          setUser(null);
-          setActiveEmail(null);
-          writeTokens({ access: null, refresh: null, user: null });
-        }
-        return null;
-      }
-      const data = await res.json();
-      const nextAccess = data.access;
-      const nextRefresh = data.refresh || currentRefresh;
-      setAccess(nextAccess);
-      if (data.refresh) setRefresh(data.refresh);
-      if (activeEmail) {
-        patchAccountTokens(activeEmail, { access: nextAccess, refresh: nextRefresh });
-      }
-      return nextAccess;
-    } catch {
-      return null;
-    } finally {
-      refreshingRef.current = false;
+    if (refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
     }
+
+    const currentRefresh = safeLocalGet(REFRESH_KEY) || refresh;
+
+    if (!currentRefresh) return null;
+
+    refreshPromiseRef.current = (async () => {
+      refreshingRef.current = true;
+
+      try {
+        const res = await fetch(
+          `${API_BASE.replace(/\/$/, "")}/refresh/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              refresh: currentRefresh,
+            }),
+          }
+        );
+
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            writeTokens({
+              access: null,
+              refresh: null,
+              user: null,
+            });
+
+            setAccess(null);
+            setRefresh(null);
+            setUser(null);
+            setActiveEmail(null);
+          }
+
+          return null;
+        }
+
+        const data = await res.json();
+
+        if (!data.access) return null;
+
+        const nextAccess = data.access;
+        const nextRefresh = data.refresh || currentRefresh;
+        const currentUser = readTokens().user;
+
+        writeTokens({
+          access: nextAccess,
+          refresh: nextRefresh,
+          user: currentUser,
+        });
+
+        setAccess(nextAccess);
+        setRefresh(nextRefresh);
+
+        if (activeEmail) {
+          patchAccountTokens(activeEmail, {
+            access: nextAccess,
+            refresh: nextRefresh,
+          });
+        }
+
+        return nextAccess;
+      } catch {
+        return null;
+      } finally {
+        refreshingRef.current = false;
+        refreshPromiseRef.current = null;
+      }
+    })();
+
+    return refreshPromiseRef.current;
   }, [refresh, activeEmail, patchAccountTokens]);
 
   useEffect(() => {
     if (!refresh) return undefined;
+
     const id = window.setInterval(() => {
-      if (document.visibilityState === "visible") doRefresh();
+      if (document.visibilityState === "visible") {
+        doRefresh();
+      }
     }, 20 * 60 * 1000);
+
     return () => window.clearInterval(id);
   }, [refresh, doRefresh]);
 
   useEffect(() => {
     if (!refresh) return undefined;
+
     const onVisible = () => {
-      if (document.visibilityState === "visible") doRefresh();
+      if (document.visibilityState === "visible") {
+        doRefresh();
+      }
     };
+
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", onVisible);
+
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onVisible);
     };
   }, [refresh, doRefresh]);
 
-  const fetchMe = useCallback(
-    async (token) => {
-      if (!token) return null;
-      const res = await fetch(`${API_BASE}/me/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  const fetchMe = useCallback(async (token) => {
+    if (!token) return null;
+
+    try {
+      const res = await fetch(
+        `${API_BASE.replace(/\/$/, "")}/me/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const { ok, data } = await unwrap(res);
+
       if (!ok) return null;
+
       return data;
-    },
-    []
-  );
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
       const stored = readTokens();
+
       if (!stored.refresh) {
         if (!cancelled) setBooting(false);
         return;
       }
+
       let token = stored.access;
-      if (!token) token = await doRefresh();
+
+      if (!token) {
+        token = await doRefresh();
+      }
+
       if (!token) {
         if (!cancelled) setBooting(false);
         return;
       }
-      const me = await fetchMe(token);
+
+      let me = await fetchMe(token);
+
+      if (!me) {
+        token = await doRefresh();
+
+        if (token) {
+          me = await fetchMe(token);
+        }
+      }
+
       if (cancelled) return;
+
       if (me) {
         setUser(me);
+
         if (me.email) {
           setActiveEmail(me.email);
+
           upsertAccount({
             email: me.email,
             username: me.username,
             full_name: me.full_name,
             is_superuser: me.is_superuser,
             access: token,
-            refresh: stored.refresh,
+            refresh: safeLocalGet(REFRESH_KEY),
             user: me,
           });
         }
       }
+
       if (!cancelled) setBooting(false);
     })();
+
     return () => {
       cancelled = true;
     };
@@ -303,19 +448,37 @@ export function AuthProvider({ children }) {
   const signInWithTokens = useCallback(
     (payload) => {
       if (!payload) return;
-      if (payload.access) setAccess(payload.access);
-      if (payload.refresh) setRefresh(payload.refresh);
-      if (payload.user) setUser(payload.user);
-      if (payload.user?.email) {
-        setActiveEmail(payload.user.email);
+
+      const nextAccess =
+        payload.access ?? safeLocalGet(ACCESS_KEY);
+
+      const nextRefresh =
+        payload.refresh ?? safeLocalGet(REFRESH_KEY);
+
+      const nextUser =
+        payload.user ?? readTokens().user;
+
+      writeTokens({
+        access: nextAccess,
+        refresh: nextRefresh,
+        user: nextUser,
+      });
+
+      setAccess(nextAccess || null);
+      setRefresh(nextRefresh || null);
+      setUser(nextUser || null);
+
+      if (nextUser?.email) {
+        setActiveEmail(nextUser.email);
+
         upsertAccount({
-          email: payload.user.email,
-          username: payload.user.username,
-          full_name: payload.user.full_name,
-          is_superuser: payload.user.is_superuser,
-          access: payload.access,
-          refresh: payload.refresh,
-          user: payload.user,
+          email: nextUser.email,
+          username: nextUser.username,
+          full_name: nextUser.full_name,
+          is_superuser: nextUser.is_superuser,
+          access: nextAccess,
+          refresh: nextRefresh,
+          user: nextUser,
         });
       }
     },
@@ -323,18 +486,20 @@ export function AuthProvider({ children }) {
   );
 
   const signOut = useCallback(async () => {
-    const currentAccess = typeof window !== "undefined" ? safeLocalGet(ACCESS_KEY) : access;
-    const currentRefresh = typeof window !== "undefined" ? safeLocalGet(REFRESH_KEY) : refresh;
+    const currentAccess = safeLocalGet(ACCESS_KEY);
+    const currentRefresh = safeLocalGet(REFRESH_KEY);
 
     try {
       if (currentAccess) {
-        await fetch(`${API_BASE}/logout/`, {
+        await fetch(`${API_BASE.replace(/\/$/, "")}/logout/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${currentAccess}`,
           },
-          body: JSON.stringify({ refresh: currentRefresh }),
+          body: JSON.stringify({
+            refresh: currentRefresh,
+          }),
         });
       }
     } catch {}
@@ -343,31 +508,53 @@ export function AuthProvider({ children }) {
       setAccounts((prev) =>
         prev.map((a) =>
           a.email.toLowerCase() === activeEmail.toLowerCase()
-            ? { ...a, access: "", refresh: "", lastUsed: Date.now() }
+            ? {
+                ...a,
+                access: "",
+                refresh: "",
+                lastUsed: Date.now(),
+              }
             : a
         )
       );
     }
 
+    writeTokens({
+      access: null,
+      refresh: null,
+      user: null,
+    });
+
     setAccess(null);
     setRefresh(null);
     setUser(null);
     setActiveEmail(null);
-    writeTokens({ access: null, refresh: null, user: null });
-  }, [access, refresh, activeEmail]);
+  }, [activeEmail]);
 
   const switchToAccount = useCallback(
     async (email) => {
       if (!email) return false;
-      const target = accounts.find((a) => a.email.toLowerCase() === email.toLowerCase());
+
+      const target = accounts.find(
+        (a) =>
+          a.email.toLowerCase() === email.toLowerCase()
+      );
+
       if (!target) return false;
 
       if (!target.refresh) {
         setActiveEmail(null);
-        writeTokens({ access: null, refresh: null, user: null });
+
+        writeTokens({
+          access: null,
+          refresh: null,
+          user: null,
+        });
+
         setAccess(null);
         setRefresh(null);
         setUser(null);
+
         return false;
       }
 
@@ -375,6 +562,7 @@ export function AuthProvider({ children }) {
       setAccess(target.access || null);
       setRefresh(target.refresh);
       setUser(target.user || null);
+
       writeTokens({
         access: target.access || null,
         refresh: target.refresh,
@@ -385,43 +573,68 @@ export function AuthProvider({ children }) {
       let me = token ? await fetchMe(token) : null;
 
       if (!me) {
-        const refreshedAccess = await fetch(`${API_BASE}/refresh/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh: target.refresh }),
-        })
-          .then(async (r) => (r.ok ? (await r.json()).access : null))
-          .catch(() => null);
+        try {
+          const response = await fetch(
+            `${API_BASE.replace(/\/$/, "")}/refresh/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                refresh: target.refresh,
+              }),
+            }
+          );
 
-        if (refreshedAccess) {
-          token = refreshedAccess;
-          setAccess(refreshedAccess);
-          writeTokens({
-            access: refreshedAccess,
-            refresh: target.refresh,
-            user: target.user || null,
-          });
-          patchAccountTokens(target.email, {
-            access: refreshedAccess,
-            refresh: target.refresh,
-          });
-          me = await fetchMe(refreshedAccess);
+          if (response.ok) {
+            const data = await response.json();
+
+            if (data.access) {
+              token = data.access;
+
+              const nextRefresh =
+                data.refresh || target.refresh;
+
+              writeTokens({
+                access: token,
+                refresh: nextRefresh,
+                user: target.user || null,
+              });
+
+              setAccess(token);
+              setRefresh(nextRefresh);
+
+              patchAccountTokens(target.email, {
+                access: token,
+                refresh: nextRefresh,
+              });
+
+              me = await fetchMe(token);
+            }
+          }
+        } catch {
+          return false;
         }
       }
 
       if (me) {
         setUser(me);
+
         upsertAccount({
           email: me.email,
           username: me.username,
           full_name: me.full_name,
           is_superuser: me.is_superuser,
           access: token,
-          refresh: target.refresh,
+          refresh: safeLocalGet(REFRESH_KEY),
           user: me,
         });
+
+        return true;
       }
-      return true;
+
+      return false;
     },
     [accounts, patchAccountTokens, upsertAccount, fetchMe]
   );
@@ -429,13 +642,28 @@ export function AuthProvider({ children }) {
   const removeAccount = useCallback(
     (email) => {
       if (!email) return;
-      setAccounts((prev) => prev.filter((a) => a.email.toLowerCase() !== email.toLowerCase()));
-      if (activeEmail && activeEmail.toLowerCase() === email.toLowerCase()) {
+
+      setAccounts((prev) =>
+        prev.filter(
+          (a) =>
+            a.email.toLowerCase() !== email.toLowerCase()
+        )
+      );
+
+      if (
+        activeEmail &&
+        activeEmail.toLowerCase() === email.toLowerCase()
+      ) {
+        writeTokens({
+          access: null,
+          refresh: null,
+          user: null,
+        });
+
         setAccess(null);
         setRefresh(null);
         setUser(null);
         setActiveEmail(null);
-        writeTokens({ access: null, refresh: null, user: null });
       }
     },
     [activeEmail]
@@ -443,37 +671,66 @@ export function AuthProvider({ children }) {
 
   const forgetAllAccounts = useCallback(() => {
     setAccounts([]);
+
+    writeTokens({
+      access: null,
+      refresh: null,
+      user: null,
+    });
+
     setAccess(null);
     setRefresh(null);
     setUser(null);
     setActiveEmail(null);
-    writeTokens({ access: null, refresh: null, user: null });
+
     safeLocalRemove(ACCOUNTS_KEY);
     safeLocalRemove(ACTIVE_EMAIL_KEY);
   }, []);
 
   const authedFetch = useCallback(
     async (path, options = {}) => {
-      const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
+      const url = path.startsWith("http")
+        ? path
+        : `${API_BASE.replace(/\/$/, "")}${path}`;
 
-      let token = typeof window !== "undefined" ? safeLocalGet(ACCESS_KEY) : access;
-      if (!token) token = await doRefresh();
+      let token = safeLocalGet(ACCESS_KEY) || access;
 
-      const buildHeaders = (t) => {
-        const h = new Headers(options.headers || {});
-        if (t) h.set("Authorization", `Bearer ${t}`);
-        return h;
+      if (!token) {
+        token = await doRefresh();
+      }
+
+      const buildHeaders = (currentToken) => {
+        const headers = new Headers(options.headers || {});
+
+        if (currentToken) {
+          headers.set(
+            "Authorization",
+            `Bearer ${currentToken}`
+          );
+        } else {
+          headers.delete("Authorization");
+        }
+
+        return headers;
       };
 
-      let res = await fetch(url, { ...options, headers: buildHeaders(token) });
+      let response = await fetch(url, {
+        ...options,
+        headers: buildHeaders(token),
+      });
 
-      if (res.status === 401) {
+      if (response.status === 401) {
         token = await doRefresh();
+
         if (token) {
-          res = await fetch(url, { ...options, headers: buildHeaders(token) });
+          response = await fetch(url, {
+            ...options,
+            headers: buildHeaders(token),
+          });
         }
       }
-      return res;
+
+      return response;
     },
     [access, doRefresh]
   );
@@ -497,11 +754,21 @@ export function AuthProvider({ children }) {
     refreshNow: doRefresh,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+
+  if (!ctx) {
+    throw new Error(
+      "useAuth must be used inside <AuthProvider>"
+    );
+  }
+
   return ctx;
 }
