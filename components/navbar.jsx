@@ -676,10 +676,10 @@ export default function Navbar() {
 
   const isTransparent = backgroundOpacity < 0.5 && !searchOpen;
 
-  const navTextColor = isTransparent ? "text-white" : "text-green-700";
+  const navTextColor = isTransparent ? "text-orange-400" : "text-green-700";
 
   const navBorderColor = isTransparent
-    ? "border-white/40"
+    ? "border-orange-400/20"
     : "border-green-700/20";
 
   const navHoverColor = isTransparent
