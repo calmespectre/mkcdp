@@ -322,7 +322,7 @@ function StatsSection() {
   return (
     <section
       ref={ref}
-      className="relative isolate overflow-hidden bg-[#155B38]"
+      className="relative isolate overflow-hidden bg-green-700"
       style={{ marginTop: "-1px" }}
     >
       <div
@@ -342,7 +342,7 @@ function StatsSection() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 flex justify-center"
       >
-        <svg
+        {/* <svg
           viewBox="0 0 1440 460"
           preserveAspectRatio="xMidYMax meet"
           className="h-auto w-full max-h-[460px] max-w-[1440px] opacity-[0.13]"
@@ -356,7 +356,7 @@ function StatsSection() {
             d="M600 208 C604 200 610 194 616 188 C620 184 624 180 628 178 C632 176 636 176 640 178 C644 180 648 184 652 188 C658 194 664 200 670 208 C662 204 654 200 646 198 C642 196 638 194 634 194 C630 194 626 196 622 198 C616 202 608 206 600 208 Z"
             fill="#FFFFFF"
           />
-        </svg>
+        </svg> */}
       </div>
 
       <svg

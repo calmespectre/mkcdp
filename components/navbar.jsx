@@ -69,43 +69,21 @@ const NAV_LINKS = [
 
 const Icon = {
   Search: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" {...props}>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-4-4" />
     </svg>
   ),
 
   User: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" {...props}>
       <circle cx="12" cy="8" r="3.5" />
       <path d="M4.5 20c.8-3.8 3.7-6 7.5-6s6.7 2.2 7.5 6" />
     </svg>
   ),
 
   Basket: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M4.5 10h15l-1.3 8.4a2 2 0 0 1-2 1.6H7.8a2 2 0 0 1-2-1.6L4.5 10Z" />
       <path d="M9 10 12 4l3 6" />
       <path d="M9.5 14v3M14.5 14v3" />
@@ -113,42 +91,19 @@ const Icon = {
   ),
 
   Arrow: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M7 17 17 7M9 7h8v8" />
     </svg>
   ),
 
   Chevron: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="m6 9 6 6 6-6" />
     </svg>
   ),
 
   Close: (props) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" {...props}>
       <path d="m6 6 12 12M18 6 6 18" />
     </svg>
   ),
@@ -206,7 +161,6 @@ function SearchModal({ open, onClose }) {
     setActiveIndex(0);
 
     const timer = setTimeout(() => inputRef.current?.focus(), 100);
-
     return () => clearTimeout(timer);
   }, [open]);
 
@@ -239,7 +193,6 @@ function SearchModal({ open, onClose }) {
     };
 
     window.addEventListener("keydown", handleKey);
-
     return () => window.removeEventListener("keydown", handleKey);
   }, [open, results, activeIndex, onClose, navigate]);
 
@@ -380,9 +333,7 @@ function SideNavigation({
         </div>
 
         <div className="flex flex-1 flex-col px-5 pb-7 pt-5 sm:px-8">
-          <div className="mb-5 flex items-center justify-between">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]" />
-
+          <div className="mb-5 flex items-center justify-end">
             <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
               Loitokitok · Kenya
             </span>
@@ -516,17 +467,11 @@ function SideNavigation({
               </p>
 
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-semibold text-[#41483F]">
-                <a
-                  href="mailto:info@mkcdp.org"
-                  className="transition hover:text-green-700"
-                >
+                <a href="mailto:info@mkcdp.org" className="transition hover:text-green-700">
                   info@mkcdp.org
                 </a>
 
-                <a
-                  href="tel:+254737332219"
-                  className="transition hover:text-green-700"
-                >
+                <a href="tel:+254737332219" className="transition hover:text-green-700">
                   +25473 733 2219
                 </a>
               </div>
@@ -566,14 +511,11 @@ function SideNavigation({
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [backgroundOpacity, setBackgroundOpacity] = useState(0);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(
+    () => Math.min(window.scrollY / 160, 1)
+  );
   const [isAuthed, setIsAuthed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-
-  const headerRef = useRef(null);
-  const lastScrollY = useRef(0);
-  const idleTimer = useRef(null);
 
   const location = useLocation();
   const { cart } = useGiftCart();
@@ -587,7 +529,6 @@ export default function Navbar() {
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
-    setHidden(false);
   }, []);
 
   const closeSearch = useCallback(() => {
@@ -676,7 +617,9 @@ export default function Navbar() {
         setSearchOpen(true);
       }
 
-      if (event.key === "Escape" && menuOpen) closeMenu();
+      if (event.key === "Escape" && menuOpen) {
+        closeMenu();
+      }
     };
 
     window.addEventListener("keydown", handleKey);
@@ -685,42 +628,18 @@ export default function Navbar() {
   }, [menuOpen, searchOpen, closeMenu]);
 
   useEffect(() => {
-    const initialY = window.scrollY;
+    setMenuOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
 
-    lastScrollY.current = initialY;
-    setBackgroundOpacity(Math.min(initialY / 160, 1));
-
+  useEffect(() => {
     const handleScroll = () => {
-      const currentY = window.scrollY;
-      const difference = currentY - lastScrollY.current;
-
-      setBackgroundOpacity(Math.min(Math.max(currentY / 160, 0), 1));
-
-      if (menuOpen || searchOpen) {
-        setHidden(false);
-        lastScrollY.current = currentY;
-        return;
-      }
-
-      if (Math.abs(difference) < 3) return;
-
-      if (currentY <= 40 || difference < 0) {
-        setHidden(false);
-        clearTimeout(idleTimer.current);
-      } else if (difference > 0) {
-        if (!headerRef.current?.contains(document.activeElement)) {
-          setHidden(true);
-        }
-
-        clearTimeout(idleTimer.current);
-
-        idleTimer.current = setTimeout(() => {
-          setHidden(false);
-        }, 850);
-      }
-
-      lastScrollY.current = currentY;
+      setBackgroundOpacity(
+        Math.min(Math.max(window.scrollY / 160, 0), 1)
+      );
     };
+
+    handleScroll();
 
     window.addEventListener("scroll", handleScroll, {
       passive: true,
@@ -728,14 +647,20 @@ export default function Navbar() {
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(idleTimer.current);
     };
-  }, [menuOpen, searchOpen]);
+  }, []);
 
-  useEffect(() => {
-    setMenuOpen(false);
-    setSearchOpen(false);
-  }, [location.pathname]);
+  const isTransparent = backgroundOpacity < 0.5 && !searchOpen;
+
+  const navTextColor = isTransparent ? "text-white" : "text-green-700";
+
+  const navBorderColor = isTransparent
+    ? "border-white/40"
+    : "border-green-700/20";
+
+  const navHoverColor = isTransparent
+    ? "hover:bg-white/15 hover:text-white"
+    : "hover:bg-green-700 hover:text-white";
 
   const headerBackground = `rgba(251, 247, 240, ${
     Math.max(backgroundOpacity, searchOpen ? 0.97 : 0) * 0.97
@@ -755,13 +680,20 @@ export default function Navbar() {
 
         .mkcdp-header {
           transition:
-            transform 500ms cubic-bezier(.22,1,.36,1),
-            opacity 350ms ease,
             background-color 180ms linear,
             box-shadow 180ms linear,
-            backdrop-filter 180ms linear;
+            backdrop-filter 180ms linear,
+            color 250ms ease;
           -webkit-backdrop-filter: blur(0px);
-          will-change: transform, opacity, background-color, backdrop-filter;
+          will-change: background-color, backdrop-filter;
+        }
+
+        .mkcdp-header a,
+        .mkcdp-header button {
+          transition:
+            color 250ms ease,
+            border-color 250ms ease,
+            background-color 250ms ease;
         }
 
         .mkcdp-menu-trigger {
@@ -793,30 +725,22 @@ export default function Navbar() {
       `}</style>
 
       <header
-        ref={headerRef}
         style={{
           backgroundColor: headerBackground,
           boxShadow:
             backgroundOpacity > 0.1
-              ? `0 4px 30px rgba(20, 30, 20, ${
-                  backgroundOpacity * 0.08
-                })`
+              ? `0 4px 30px rgba(20, 30, 20, ${backgroundOpacity * 0.08})`
               : "none",
           backdropFilter: `blur(${backgroundOpacity * 16}px)`,
           WebkitBackdropFilter: `blur(${backgroundOpacity * 16}px)`,
         }}
-        className={`mkcdp-header fixed inset-x-0 top-0 z-[1100] ${
-          hidden || menuOpen
-            ? "-translate-y-full opacity-0 pointer-events-none"
-            : "translate-y-0 opacity-100 pointer-events-auto"
-        } text-[#20241F]`}
+        className={`mkcdp-header fixed inset-x-0 top-0 z-[1100] w-full ${navTextColor}`}
       >
         <nav aria-label="Main navigation" className="mx-auto max-w-[1800px]">
           <div className="flex min-h-[72px] items-center justify-between gap-3 px-4 sm:px-7 lg:min-h-[86px] lg:px-10 xl:px-14">
             <Link
               to="/"
               aria-label="MKCDP home"
-              onClick={closeMenu}
               className={`flex min-w-0 shrink-0 items-center ${
                 isEditing ? "pointer-events-none" : ""
               }`}
@@ -833,13 +757,9 @@ export default function Navbar() {
             <div className="ml-auto flex min-w-0 items-center justify-end gap-2 sm:gap-2.5 lg:gap-3">
               <Link
                 to="/take-action/send-a-gift-cart"
-                aria-label={
-                  basketCount
-                    ? `Basket, ${basketCount} items`
-                    : "Basket"
-                }
+                aria-label={basketCount ? `Basket, ${basketCount} items` : "Basket"}
                 title="Basket"
-                className="relative hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 sm:inline-flex"
+                className={`relative hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border ${navBorderColor} ${navTextColor} ${navHoverColor} active:scale-95 sm:inline-flex`}
               >
                 <Icon.Basket className="h-5 w-5" />
 
@@ -855,7 +775,7 @@ export default function Navbar() {
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
                 title="Search"
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95"
+                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${navBorderColor} ${navTextColor} ${navHoverColor} active:scale-95`}
               >
                 <Icon.Search className="h-5 w-5" />
               </button>
@@ -865,14 +785,14 @@ export default function Navbar() {
                 state={isAuthed ? undefined : authLinkState}
                 aria-label={isAuthed ? "My account" : "Sign in"}
                 title={isAuthed ? "My account" : "Sign in"}
-                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-green-700/20 text-green-700 transition-all duration-200 hover:bg-green-700 hover:text-white active:scale-95 sm:inline-flex"
+                className={`hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border ${navBorderColor} ${navTextColor} ${navHoverColor} sm:inline-flex`}
               >
                 <Icon.User className="h-5 w-5" />
               </Link>
 
               <Link
                 to="/take-action/sponsor-a-child"
-                className={`hidden min-h-10 items-center justify-center gap-2 rounded-xl border border-green-700/25 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-700 hover:bg-green-700/5 lg:inline-flex 2xl:px-6 ${
+                className={`hidden min-h-10 items-center justify-center gap-2 rounded-xl border ${navBorderColor} ${navTextColor} px-4 text-[10px] font-bold uppercase tracking-[0.1em] ${navHoverColor} lg:inline-flex 2xl:px-6 ${
                   isEditing ? "pointer-events-none" : ""
                 }`}
               >
@@ -886,14 +806,11 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setIsEditing(!isEditing)}
-                  aria-label={
-                    isEditing ? "Exit editor mode" : "Enter editor mode"
-                  }
-                  title={isEditing ? "Exit editor mode" : "Editor"}
-                  className={`hidden h-10 shrink-0 items-center justify-center border px-3 text-[9px] font-bold uppercase tracking-wider transition-colors sm:inline-flex ${
+                  aria-label={isEditing ? "Exit editor mode" : "Enter editor mode"}
+                  className={`hidden h-10 shrink-0 items-center justify-center border px-3 text-[9px] font-bold uppercase tracking-wider sm:inline-flex ${
                     isEditing
                       ? "border-amber-500 bg-amber-500 text-black"
-                      : "border-green-700/20 text-green-700 hover:bg-green-700 hover:text-white"
+                      : `${navBorderColor} ${navTextColor} ${navHoverColor}`
                   }`}
                 >
                   {isEditing ? "Exit editor" : "Editor"}
@@ -902,15 +819,11 @@ export default function Navbar() {
 
               <button
                 type="button"
-                onClick={() => {
-                  clearTimeout(idleTimer.current);
-                  setHidden(false);
-                  setMenuOpen((current) => !current);
-                }}
+                onClick={() => setMenuOpen((current) => !current)}
                 aria-label={menuOpen ? "Close navigation" : "Open navigation"}
                 aria-expanded={menuOpen}
                 aria-controls="mkcdp-side-navigation"
-                className="mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 border border-green-700/25 px-3 text-[9px] font-bold uppercase tracking-[0.14em] text-green-700 transition-colors hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]"
+                className={`mkcdp-menu-trigger group ml-1 flex h-10 shrink-0 items-center justify-center gap-2 border ${navBorderColor} ${navTextColor} px-3 text-[9px] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-white sm:ml-2 sm:px-4 sm:text-[10px]`}
               >
                 <span className="hidden sm:inline">
                   {menuOpen ? "Close" : "Explore"}
