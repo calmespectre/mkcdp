@@ -2678,14 +2678,25 @@ function Partnerships() {
 function ReportSafeguarding() {
   const { getPath } = useSiteContent();
 
-  const reportRelationships = getPath("takeAction.reportRelationships") || [];
-  const reportConcerns = getPath("takeAction.reportConcerns") || [];
-  const reportUrgency = getPath("takeAction.reportUrgency") || [];
-  const reportContact = getPath("takeAction.reportContact") || [];
-  const helplines = getPath("takeAction.helplines") || [];
-  const howSteps = getPath("takeAction.safeguarding.howSteps") || [];
+  const reportRelationships =
+    getPath("takeAction.reportRelationships") || [];
 
-  const [form, setForm] = useState({
+  const reportConcerns =
+    getPath("takeAction.reportConcerns") || [];
+
+  const reportUrgency =
+    getPath("takeAction.reportUrgency") || [];
+
+  const reportContact =
+    getPath("takeAction.reportContact") || [];
+
+  const helplines =
+    getPath("takeAction.helplines") || [];
+
+  const howSteps =
+    getPath("takeAction.safeguarding.howSteps") || [];
+
+  const initialForm = {
     reporterType: "",
     fullName: "",
     phone: "",
@@ -2699,103 +2710,132 @@ function ReportSafeguarding() {
     contactPreference: "",
     anonymous: false,
     acknowledged: false,
-  });
+  };
 
+  const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (field) => (e) => {
-    setForm((f) => ({ ...f, [field]: e.target.value }));
+    const value =
+      e.target.type === "checkbox"
+        ? e.target.checked
+        : e.target.value;
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [field]: "",
+      form: "",
+    }));
   };
 
   const toggleConcern = (id) => {
-    setForm((f) => {
-      const has = f.concerns.includes(id);
+    setForm((prev) => ({
+      ...prev,
+      concerns: prev.concerns.includes(id)
+        ? prev.concerns.filter((item) => item !== id)
+        : [...prev.concerns, id],
+    }));
 
-      return {
-        ...f,
-        concerns: has
-          ? f.concerns.filter((c) => c !== id)
-          : [...f.concerns, id],
-      };
-    });
+    setErrors((prev) => ({
+      ...prev,
+      concerns: "",
+    }));
+  };
+
+  const resetForm = () => {
+    setForm(initialForm);
+    setErrors({});
+    setSubmitted(false);
+  };
+
+  const validateForm = () => {
+    const nextErrors = {};
+
+    if (!form.reporterType) {
+      nextErrors.reporterType = "Please select who you are.";
+    }
+
+    if (!form.anonymous) {
+      if (!form.fullName.trim()) {
+        nextErrors.fullName = "Please enter your name.";
+      }
+
+      if (!form.phone.trim() && !form.email.trim()) {
+        nextErrors.contact =
+          "Please provide either a phone number or email address.";
+      }
+
+      if (
+        form.email.trim() &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+      ) {
+        nextErrors.email = "Please enter a valid email address.";
+      }
+
+      if (
+        form.phone.trim() &&
+        !/^\+?[\d\s()-]{7,20}$/.test(form.phone)
+      ) {
+        nextErrors.phone = "Please enter a valid phone number.";
+      }
+    }
+
+    if (!form.relationship) {
+      nextErrors.relationship = "Please select your relationship.";
+    }
+
+    if (!form.location.trim()) {
+      nextErrors.location = "Please enter the location.";
+    }
+
+    if (form.concerns.length === 0) {
+      nextErrors.concerns = "Please select at least one concern.";
+    }
+
+    if (!form.urgency) {
+      nextErrors.urgency = "Please select the urgency level.";
+    }
+
+    if (!form.description.trim()) {
+      nextErrors.description = "Please describe your concern.";
+    } else if (form.description.trim().length < 20) {
+      nextErrors.description =
+        "Please provide at least 20 characters.";
+    }
+
+    if (!form.contactPreference) {
+      nextErrors.contactPreference =
+        "Please select your preferred contact method.";
+    }
+
+    if (!form.acknowledged) {
+      nextErrors.acknowledged =
+        "Please confirm that the information provided is accurate.";
+    }
+
+    setErrors(nextErrors);
+
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const next = {};
-
-    if (!form.reporterType) {
-      next.reporterType = "Please tell us who you are.";
-    }
-
-    if (!form.anonymous) {
-      if (!form.fullName.trim()) {
-        next.fullName = "Please enter your name, or choose to remain anonymous.";
-      }
-
-      if (!form.phone.trim() && !form.email.trim()) {
-        next.phone = "Provide a phone number or email address.";
-      }
-    }
-
-    if (
-      form.email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
-    ) {
-      next.email = "Enter a valid email address.";
-    }
-
-    if (
-      form.phone &&
-      !/^\+?[\d\s()-]{7,20}$/.test(form.phone)
-    ) {
-      next.phone = "Enter a valid phone number.";
-    }
-
-    if (!form.relationship) {
-      next.relationship = "Please tell us your relationship to the child.";
-    }
-
-    if (!form.location.trim()) {
-      next.location = "Please tell us roughly where this happened.";
-    }
-
-    if (form.concerns.length === 0) {
-      next.concerns = "Please choose at least one type of concern.";
-    }
-
-    if (!form.urgency) {
-      next.urgency = "Please tell us how urgent this is.";
-    }
-
-    if (
-      !form.description.trim() ||
-      form.description.trim().length < 20
-    ) {
-      next.description = "Please describe what happened in at least a sentence or two.";
-    }
-
-    if (!form.contactPreference) {
-      next.contactPreference = "Please choose how you'd like to be contacted.";
-    }
-
-    if (!form.acknowledged) {
-      next.acknowledged = "Please confirm you understand how we handle this report.";
-    }
-
-    setErrors(next);
-
-    if (Object.keys(next).length > 0) {
+    if (!validateForm()) {
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await submitSafeguardingReport({
+      const payload = {
         reporter_type: form.reporterType,
         anonymous: form.anonymous,
         full_name: form.anonymous ? "" : form.fullName.trim(),
@@ -2808,886 +2848,818 @@ function ReportSafeguarding() {
         urgency: form.urgency,
         description: form.description.trim(),
         contact_preference: form.contactPreference,
-      });
+      };
+
+      await submitSafeguardingReport(payload);
 
       setSubmitted(true);
+      setErrors({});
     } catch (err) {
       setErrors({
-        form: err.message || "Could not submit. Please try again.",
+        form:
+          err.message ||
+          "Could not submit your report. Please try again.",
       });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const reset = () => {
-    setForm({
-      reporterType: "",
-      fullName: "",
-      phone: "",
-      email: "",
-      relationship: "",
-      childName: "",
-      location: "",
-      concerns: [],
-      urgency: "",
-      description: "",
-      contactPreference: "",
-      anonymous: false,
-      acknowledged: false,
-    });
+  const inputStyle =
+    "w-full rounded-xl border border-green-700/15 bg-white px-4 py-3.5 text-sm text-[#111111] outline-none transition-all placeholder:text-[#999990] focus:border-green-700 focus:ring-2 focus:ring-green-700/10";
 
-    setErrors({});
-    setSubmitted(false);
-  };
+  const labelStyle =
+    "mb-2 block text-sm font-semibold text-[#22221E]";
+
+  const errorStyle =
+    "mt-1.5 text-xs font-medium text-red-600";
 
   const optionRowClass = (active) =>
-    `flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left text-[0.82rem] font-semibold transition-all duration-200 ${
+    `rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition-all duration-200 ${
       active
-        ? "border-green-700 bg-green-700/6 text-green-700 ring-1 ring-green-700/20"
+        ? "border-green-700 bg-green-700/6 text-green-700"
         : "border-green-700/15 bg-white text-[#4A4A42] hover:border-green-700/40"
     }`;
 
-  const fieldClass = (error) =>
-    `w-full min-h-[48px] rounded-xl border bg-white px-4 py-3 text-[0.88rem] text-[#111111] outline-none transition-all duration-200 placeholder:text-[#4A4A42]/40 focus:ring-2 ${
-      error
-        ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/15"
-        : "border-green-700/15 focus:border-green-700 focus:ring-green-700/10"
-    }`;
-
-  const labelClass =
-    "mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#4A4A42]";
-
-  const errorText =
-    "mt-1.5 text-[0.72rem] font-medium leading-relaxed text-[#E2703A]";
-
-  const cardClass =
-    "rounded-2xl border border-green-700/12 bg-white/80 p-5 sm:p-6";
-
-  const renderHelpLines = () => (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {helplines.map((h, i) => (
-        <a
-          key={i}
-          href={h.href}
-          className={`group flex items-center justify-between gap-3 rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 ${
-            h.primary
-              ? "border-green-700 bg-green-700 text-white shadow-lg shadow-green-900/10"
-              : "border-green-700/15 bg-white/70 hover:border-green-700/40"
-          }`}
-        >
-          <div className="min-w-0">
-            <EditableText
-              path={`takeAction.helplines.${i}.name`}
-              as="span"
-              className={`block text-[0.65rem] font-bold uppercase tracking-[0.14em] ${
-                h.primary ? "text-white/70" : "text-green-700"
-              }`}
-            />
-
-            <EditableText
-              path={`takeAction.helplines.${i}.note`}
-              as="span"
-              multiline
-              className={`mt-1 block text-[0.78rem] leading-relaxed ${
-                h.primary ? "text-white/75" : "text-[#4A4A42]"
-              }`}
-            />
-          </div>
-
-          <EditableText
-            path={`takeAction.helplines.${i}.number`}
-            as="span"
-            className={`hero-serif flex-shrink-0 text-[1.5rem] font-bold ${
-              h.primary ? "text-[#F2B33D]" : "text-green-700"
-            }`}
-          />
-        </a>
-      ))}
-    </div>
-  );
-
-  const renderHowSteps = () => (
-    <section className="relative overflow-hidden rounded-[28px] border border-green-700/12 bg-white/65 p-6 sm:p-10 lg:p-12">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div>
-          <span className="mb-4 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-            <span className="h-px w-7 bg-green-700" />
-            <EditableText path="takeAction.safeguarding.howKicker" />
-          </span>
-
-          <EditableText
-            path="takeAction.safeguarding.howTitle"
-            as="h2"
-            className="hero-serif text-[clamp(1.8rem,4vw,2.8rem)] font-bold leading-[1.12] tracking-[-0.025em] text-[#111111]"
-          />
-
-          <EditableText
-            path="takeAction.safeguarding.howIntro"
-            as="p"
-            multiline
-            className="mt-5 max-w-md text-[0.9rem] leading-[1.85] text-[#4A4A42]"
-          />
-        </div>
-
-        <div className="relative space-y-7 before:absolute before:bottom-4 before:left-[1.1rem] before:top-4 before:w-px before:bg-green-700/15">
-          {howSteps.map((_, i) => (
-            <div key={i} className="relative flex gap-5">
-              <span className="z-10 grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-green-700 text-[0.68rem] font-bold text-white shadow-sm">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-
-              <div className="pt-1">
-                <EditableText
-                  path={`takeAction.safeguarding.howSteps.${i}.t`}
-                  as="h3"
-                  className="hero-serif text-[1.05rem] font-bold text-[#111111]"
-                />
-
-                <EditableText
-                  path={`takeAction.safeguarding.howSteps.${i}.b`}
-                  as="p"
-                  multiline
-                  className="mt-2 text-[0.85rem] leading-[1.8] text-[#4A4A42]"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  const FieldError = ({ name }) =>
+    errors[name] ? (
+      <p className={errorStyle}>{errors[name]}</p>
+    ) : null;
 
   if (submitted) {
     return (
-      <div className="space-y-12">
-        <div className="relative overflow-hidden rounded-[28px] border border-green-700/20 bg-green-700/5 p-7 sm:p-12 lg:p-16">
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto]">
-            <div>
-              <EditableText
-                path="takeAction.safeguarding.successKicker"
-                as="p"
-                className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700"
-              />
-
-              <EditableText
-                path="takeAction.safeguarding.successTitle"
-                as="h2"
-                className="hero-serif mt-4 text-[clamp(1.7rem,4vw,2.5rem)] font-bold leading-tight text-[#111111]"
-              />
-
-              <EditableText
-                path="takeAction.safeguarding.successBody"
-                as="p"
-                multiline
-                className="mt-4 max-w-[620px] text-[0.92rem] leading-[1.85] text-[#4A4A42]"
-              />
+      <section className="bg-[#F2F7F0] px-5 py-20 sm:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-3xl border border-green-700/10 bg-white p-8 text-center shadow-sm sm:p-12">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-700/10">
+              <svg
+                className="h-10 w-10 text-green-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
+
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+              <EditableText path="takeAction.safeguarding.successKicker">
+                Report received
+              </EditableText>
+            </p>
+
+            <h2 className="hero-serif mb-5 text-3xl leading-tight text-[#111111] sm:text-5xl">
+              <EditableText path="takeAction.safeguarding.successTitle">
+                Thank you for speaking up.
+              </EditableText>
+            </h2>
+
+            <p className="mx-auto mb-8 max-w-xl text-sm leading-7 text-[#68685F]">
+              <EditableText path="takeAction.safeguarding.successBody">
+                Your report has been submitted confidentially. Our safeguarding team will review the information and take appropriate action.
+              </EditableText>
+            </p>
 
             <button
               type="button"
-              onClick={reset}
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-green-700/20 px-6 py-3 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-green-700 transition-all hover:-translate-y-0.5 hover:bg-white"
+              onClick={resetForm}
+              className="rounded-xl bg-green-700 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-green-800"
             >
-              <EditableText path="takeAction.safeguarding.successAnother" />
+              <EditableText path="takeAction.safeguarding.successAnother">
+                Submit another report
+              </EditableText>
             </button>
           </div>
+
+          {helplines.length > 0 && (
+            <div className="mt-8 rounded-2xl border border-green-700/10 bg-white p-6">
+              <h3 className="mb-5 text-lg font-bold text-[#111111]">
+                <EditableText path="takeAction.safeguarding.helpTitle">
+                  Need immediate assistance?
+                </EditableText>
+              </h3>
+
+              <div className="space-y-4">
+                {helplines.map((line, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col justify-between gap-2 border-b border-green-700/10 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
+                  >
+                    <div>
+                      <p className="text-sm font-bold text-[#22221E]">
+                        <EditableText path={`takeAction.helplines.${i}.name`}>
+                          {line.name}
+                        </EditableText>
+                      </p>
+
+                      <p className="mt-1 text-xs text-[#77776E]">
+                        <EditableText path={`takeAction.helplines.${i}.note`}>
+                          {line.note}
+                        </EditableText>
+                      </p>
+                    </div>
+
+                    <a
+                      href={`tel:${line.number}`}
+                      className="text-sm font-bold text-green-700"
+                    >
+                      <EditableText path={`takeAction.helplines.${i}.number`}>
+                        {line.number}
+                      </EditableText>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
-        <section>
-          <SectionHeading
-            eyebrowPath="takeAction.safeguarding.helpKicker"
-            titlePath="takeAction.safeguarding.helpTitle"
-            introPath="takeAction.safeguarding.helpIntro"
-          />
-
-          <div className="mt-8">
-            {renderHelpLines()}
-          </div>
-        </section>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="space-y-12 lg:space-y-16">
+    <section className="overflow-hidden">
+      <div className="mx-auto max-w-5xl pb-20 pt-6 sm:px-8">
 
-      <section className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <div>
-          <span className="mb-5 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-            <span className="h-px w-7 bg-green-700" />
-            <EditableText path="takeAction.safeguarding.kicker" />
-          </span>
+        <div className="mb-12 text-center">
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-green-700">
+            <EditableText path="takeAction.safeguarding.kicker">
+              Safeguarding and protection
+            </EditableText>
+          </p>
 
-          <h1 className="hero-serif text-[clamp(2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#111111]">
-            <EditableText path="takeAction.safeguarding.titleLine1" />
-            {" "}
-            <EditableText
-              path="takeAction.safeguarding.titleLine2"
-              className="italic text-green-700"
-            />
+          {/* <h1 className="hero-serif mx-auto max-w-3xl text-4xl leading-tight text-[#111111] sm:text-6xl">
+            <EditableText path="takeAction.safeguarding.titleLine1">
+              Your voice
+            </EditableText>{" "}
+            <span className="text-green-700">
+              <EditableText path="takeAction.safeguarding.titleLine2">
+                matters.
+              </EditableText>
+            </span>
           </h1>
 
-          <EditableText
-            path="takeAction.safeguarding.subtitle"
-            as="p"
-            multiline
-            className="mt-6 max-w-[580px] text-[0.95rem] leading-[1.85] text-[#4A4A42] sm:text-base"
-          />
-
-          <div className="mt-8 grid grid-cols-3 gap-3">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-green-700/12 bg-white/60 p-3 sm:p-4"
-              >
-                <span className="block h-1 w-7 rounded-full bg-green-700/70" />
-
-                <EditableText
-                  path={`takeAction.safeguarding.badges.${i}.t`}
-                  as="p"
-                  className="mt-3 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-green-700 sm:text-[0.7rem]"
-                />
-
-                <EditableText
-                  path={`takeAction.safeguarding.badges.${i}.d`}
-                  as="p"
-                  className="mt-1 text-[0.7rem] leading-relaxed text-[#4A4A42] sm:text-[0.8rem]"
-                />
-              </div>
-            ))}
-          </div>
+          <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#68685F] sm:text-base">
+            <EditableText path="takeAction.safeguarding.subtitle">
+              If you have a concern about the safety or wellbeing of a child, please let us know. Every report matters and will be treated with care and confidentiality.
+            </EditableText>
+          </p> */}
         </div>
 
-        <div className="relative overflow-hidden rounded-[26px] bg-green-700 p-6 text-white shadow-[0_28px_60px_-34px_rgba(20,83,45,0.6)] sm:p-9">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(90deg, rgba(251,247,240,0.09) 0px, rgba(251,247,240,0.09) 1px, transparent 1px, transparent 22px)",
-            }}
-          />
+        <div className="mt-6 mb-6 grid gap-3 sm:grid-cols-2">
+          <a
+            href="tel:116"
+            className="flex items-center justify-between rounded-xl border border-[#E2703A]/20 bg-white px-5 py-4 transition hover:border-[#E2703A]/50 hover:shadow-sm"
+          >
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#999990]">
+                Kenya Child Helpline
+              </p>
+              <p className="mt-1 text-xl font-bold text-[#E2703A]">
+                116
+              </p>
+              <p className="mt-1 text-xs text-[#77776E]">
+                Free, 24-hour child protection support
+              </p>
+            </div>
 
-          <div className="relative">
-            <span className="mb-4 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#F2B33D]">
-              <span className="h-px w-6 bg-[#F2B33D]" />
-              <EditableText path="takeAction.safeguarding.dangerKicker" />
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E2703A]/10 text-[#E2703A]">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.2 3.6a1 1 0 01-.5 1.2l-2.1 1.05a11 11 0 005.2 5.2l1.05-2.1a1 1 0 011.2-.5l3.6 1.2a1 1 0 01.68.95V18a2 2 0 01-2 2h-1C9.27 20 4 14.73 4 8V7a2 2 0 01-1-2z"
+                />
+              </svg>
             </span>
+          </a>
 
-            <EditableText
-              path="takeAction.safeguarding.dangerTitle"
-              as="h2"
-              className="hero-serif text-[1.65rem] font-bold leading-tight text-white sm:text-[2rem]"
-            />
+          <a
+            href="tel:999"
+            className="flex items-center justify-between rounded-xl border border-[#E2703A]/20 bg-white px-5 py-4 transition hover:border-[#E2703A]/50 hover:shadow-sm"
+          >
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#999990]">
+                Emergency Services
+              </p>
+              <p className="mt-1 text-xl font-bold text-[#E2703A]">
+                999 / 112
+              </p>
+              <p className="mt-1 text-xs text-[#77776E]">
+                For immediate emergencies
+              </p>
+            </div>
 
-            <EditableText
-              path="takeAction.safeguarding.dangerBody"
-              as="p"
-              multiline
-              className="mt-4 text-[0.88rem] leading-[1.8] text-white/75"
-            />
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E2703A]/10 text-[#E2703A]">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.2 3.6a1 1 0 01-.5 1.2l-2.1 1.05a11 11 0 005.2 5.2l1.05-2.1a1 1 0 011.2-.5l3.6 1.2a1 1 0 01.68.95V18a2 2 0 01-2 2h-1C9.27 20 4 14.73 4 8V7a2 2 0 01-1-2z"
+                />
+              </svg>
+            </span>
+          </a>
+        </div>
 
-            <div className="mt-7 space-y-3">
-              {helplines.map((h, i) => (
-                <a
-                  key={i}
-                  href={h.href}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/5 p-4 transition-all duration-300 hover:border-white/40 hover:bg-white/10"
-                >
-                  <div>
-                    <EditableText
-                      path={`takeAction.helplines.${i}.name`}
-                      as="p"
-                      className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/70"
-                    />
+        {/* <div className="mb-8 rounded-2xl border border-green-700/10 bg-white p-5 sm:p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-700/10 text-green-700">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 11V7m0 8h.01M5.5 20h13a2 2 0 001.8-2.9l-6.5-12a2 2 0 00-3.6 0l-6.5 12A2 2 0 005.5 20z"
+                />
+              </svg>
+            </div>
 
-                    <EditableText
-                      path={`takeAction.helplines.${i}.note`}
-                      as="p"
-                      multiline
-                      className="mt-1 text-[0.78rem] leading-relaxed text-white/75"
-                    />
-                  </div>
+            <div>
+              <h3 className="mb-1 text-sm font-bold text-[#111111]">
+                <EditableText path="takeAction.safeguarding.confidential">
+                  Your report is treated confidentially.
+                </EditableText>
+              </h3>
 
-                  <EditableText
-                    path={`takeAction.helplines.${i}.number`}
-                    as="span"
-                    className="hero-serif flex-shrink-0 text-[1.4rem] font-bold text-[#F2B33D]"
-                  />
-                </a>
-              ))}
+              <p className="text-xs leading-6 text-[#77776E]">
+                Information is handled responsibly and shared only with those who need it to assess and respond to the concern.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </div> */}
 
-      <section>
-        <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <span className="mb-3 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-green-700">
-              <span className="h-px w-7 bg-green-700" />
-              <EditableText path="takeAction.safeguarding.formKicker" />
-            </span>
-
-            <EditableText
-              path="takeAction.safeguarding.formTitle"
-              as="h2"
-              className="hero-serif text-[clamp(1.7rem,4vw,2.5rem)] font-bold leading-tight text-[#111111]"
-            />
-          </div>
-
-          <p className="max-w-sm text-[0.8rem] leading-relaxed text-[#4A4A42]/70">
-            Fields marked as required must be completed before submitting your report.
-          </p>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="rounded-[24px] border border-green-700/12 bg-white/70 p-4 shadow-[0_30px_80px_-55px_rgba(20,83,45,0.5)] backdrop-blur-sm sm:rounded-[28px] sm:p-7 lg:p-9"
+        <div
+          id="safeguarding-report"
+          className="rounded-3xl border border-green-700/10 bg-white p-6 shadow-sm sm:p-10"
         >
-          <div className="mb-7 rounded-xl border border-green-700/12 border-l-[3px] border-l-green-700 bg-green-700/5 p-4 sm:p-5">
-            <EditableText
-              path="takeAction.safeguarding.confidential"
-              as="p"
-              multiline
-              className="text-[0.82rem] leading-[1.8] text-[#4A4A42]"
-            />
+          <div className="mb-9 border-b border-green-700/10 pb-7">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-green-700">
+              Safeguarding report
+            </p>
+
+            <h2 className="hero-serif text-3xl text-[#111111] sm:text-4xl">
+              <EditableText path="takeAction.safeguarding.formWhoAreYou">
+                Tell us what happened.
+              </EditableText>
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-[#77776E]">
+              Please provide as much information as you can. Fields marked as required must be completed.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
 
-            <div className={cardClass}>
-              <div className="mb-5 flex items-center gap-3">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
-                  01
-                </span>
+            <div>
+              <label className={labelStyle}>
+                Who are you? <span className="text-red-500">*</span>
+              </label>
 
-                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
-                  Your details
-                </h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  { value: "staff", label: "Staff member" },
+                  { value: "parent", label: "Parent or guardian" },
+                  { value: "community", label: "Community member" },
+                  { value: "child", label: "Child or young person" },
+                  { value: "other", label: "Other" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        reporterType: option.value,
+                      }))
+                    }
+                    className={`${optionRowClass(
+                      form.reporterType === option.value
+                    )} flex min-h-[58px] items-center gap-3`}
+                  >
+                    <span
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                        form.reporterType === option.value
+                          ? "border-green-700"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {form.reporterType === option.value && (
+                        <span className="h-2 w-2 rounded-full bg-green-700" />
+                      )}
+                    </span>
+
+                    {option.label}
+                  </button>
+                ))}
               </div>
 
-              <div>
-                <EditableText
-                  path="takeAction.safeguarding.formWhoAreYou"
-                  as="label"
-                  className={labelClass}
-                />
+              <FieldError name="reporterType" />
+            </div>
 
-                <div className="grid grid-cols-1 gap-2">
-                  {reportRelationships.map((opt, i) => {
-                    const active = form.reporterType === opt;
-
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() =>
-                          setForm((f) => ({ ...f, reporterType: opt }))
-                        }
-                        className={optionRowClass(active)}
-                      >
-                        <EditableText
-                          path={`takeAction.reportRelationships.${i}`}
-                        />
-
-                        <span
-                          className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${
-                            active ? "bg-green-700" : "bg-green-700/15"
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {errors.reporterType && (
-                  <p className={errorText}>{errors.reporterType}</p>
-                )}
-              </div>
-
-              <label
-                htmlFor="anonymous"
-                className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-green-700/12 bg-green-700/[0.025] p-4"
-              >
+            <div className="rounded-xl border border-green-700/10 bg-[#F2F7F0] p-5">
+              <label className="flex cursor-pointer items-start gap-3">
                 <input
-                  id="anonymous"
                   type="checkbox"
                   checked={form.anonymous}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      anonymous: e.target.checked,
-                    }))
-                  }
+                  onChange={handleChange("anonymous")}
                   className="mt-1 h-4 w-4 accent-green-700"
                 />
 
                 <span>
-                  <EditableText
-                    path="takeAction.safeguarding.formAnonymous"
-                    as="span"
-                    className="block text-[0.82rem] font-bold text-[#111111]"
+                  <span className="block text-sm font-bold text-[#22221E]">
+                    <EditableText path="takeAction.safeguarding.formAnonymous">
+                      Submit anonymously
+                    </EditableText>
+                  </span>
+
+                  <span className="mt-1 block text-xs leading-6 text-[#77776E]">
+                    <EditableText path="takeAction.safeguarding.formAnonymousHint">
+                      You can submit a report without providing your personal contact details.
+                    </EditableText>
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            {!form.anonymous && (
+              <div className="space-y-7">
+                <div>
+                  <label className={labelStyle}>
+                    <EditableText path="takeAction.safeguarding.formYourName">
+                      Your full name
+                    </EditableText>{" "}
+                    <span className="text-red-500">*</span>
+                  </label>
+
+                  <input
+                    type="text"
+                    value={form.fullName}
+                    onChange={handleChange("fullName")}
+                    placeholder="Enter your full name"
+                    className={inputStyle}
                   />
 
-                  <EditableText
-                    path="takeAction.safeguarding.formAnonymousHint"
-                    as="span"
-                    multiline
-                    className="mt-1 block text-[0.75rem] leading-relaxed text-[#4A4A42]/80"
+                  <FieldError name="fullName" />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>
+                    <EditableText path="takeAction.safeguarding.formPhone">
+                      Phone number
+                    </EditableText>
+                  </label>
+
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={handleChange("phone")}
+                    placeholder="e.g. +254 700 000 000"
+                    className={inputStyle}
                   />
+
+                  <FieldError name="phone" />
+                </div>
+
+                <div>
+                  <label className={labelStyle}>
+                    <EditableText path="takeAction.safeguarding.formEmail">
+                      Email address
+                    </EditableText>
+                  </label>
+
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange("email")}
+                    placeholder="you@example.com"
+                    className={inputStyle}
+                  />
+
+                  <FieldError name="email" />
+                  <FieldError name="contact" />
+
+                  <p className="mt-2 text-xs text-[#999990]">
+                    Please provide at least one contact method.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formRelationship">
+                  Your relationship to the child
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <select
+                value={form.relationship}
+                onChange={handleChange("relationship")}
+                className={inputStyle}
+              >
+                <option value="">Select your relationship</option>
+
+                {reportRelationships.map((item, i) => (
+                  <option key={i} value={item.value || item}>
+                    {item.label || item}
+                  </option>
+                ))}
+              </select>
+
+              <FieldError name="relationship" />
+            </div>
+
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formChildName">
+                  Child's name
+                </EditableText>{" "}
+                <span className="text-xs font-normal text-[#999990]">
+                  <EditableText path="takeAction.safeguarding.formChildNameOptional">
+                    (Optional)
+                  </EditableText>
                 </span>
               </label>
 
-              {!form.anonymous && (
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <EditableText
-                      path="takeAction.safeguarding.formYourName"
-                      as="label"
-                      className={labelClass}
-                    />
+              <input
+                type="text"
+                value={form.childName}
+                onChange={handleChange("childName")}
+                placeholder="Enter the child's name if known"
+                className={inputStyle}
+              />
+            </div>
 
-                    <input
-                      type="text"
-                      value={form.fullName}
-                      onChange={handleChange("fullName")}
-                      placeholder={getPath("takeAction.safeguarding.formYourNamePlaceholder")}
-                      autoComplete="name"
-                      className={fieldClass(errors.fullName)}
-                    />
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formLocation">
+                  Where did this happen?
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
 
-                    {errors.fullName && (
-                      <p className={errorText}>{errors.fullName}</p>
-                    )}
-                  </div>
+              <input
+                type="text"
+                value={form.location}
+                onChange={handleChange("location")}
+                placeholder="Village, school, community or location"
+                className={inputStyle}
+              />
 
-                  <div>
-                    <EditableText
-                      path="takeAction.safeguarding.formPhone"
-                      as="label"
-                      className={labelClass}
-                    />
+              <FieldError name="location" />
+            </div>
 
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={handleChange("phone")}
-                      placeholder={getPath("takeAction.safeguarding.formPhonePlaceholder")}
-                      autoComplete="tel"
-                      inputMode="tel"
-                      className={fieldClass(errors.phone)}
-                    />
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formConcernType">
+                  What is your concern about?
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
 
-                    {errors.phone && (
-                      <p className={errorText}>{errors.phone}</p>
-                    )}
-                  </div>
+              <p className="mb-4 text-xs text-[#77776E]">
+                Select all that apply.
+              </p>
 
-                  <div>
-                    <EditableText
-                      path="takeAction.safeguarding.formEmail"
-                      as="label"
-                      className={labelClass}
-                    />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {reportConcerns.map((item, i) => {
+                  const id = item.value || item.id || item.label;
 
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange("email")}
-                      placeholder={getPath("takeAction.safeguarding.formEmailPlaceholder")}
-                      autoComplete="email"
-                      inputMode="email"
-                      className={fieldClass(errors.email)}
-                    />
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => toggleConcern(id)}
+                      className={`${optionRowClass(
+                        form.concerns.includes(id)
+                      )} flex min-h-[62px] items-center gap-3`}
+                    >
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                          form.concerns.includes(id)
+                            ? "border-green-700 bg-green-700 text-white"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {form.concerns.includes(id) && (
+                          <svg
+                            viewBox="0 0 16 16"
+                            className="h-3 w-3"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M3 8l3 3 7-7" />
+                          </svg>
+                        )}
+                      </span>
 
-                    {errors.email && (
-                      <p className={errorText}>{errors.email}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-5">
-                <EditableText
-                  path="takeAction.safeguarding.formRelationship"
-                  as="label"
-                  className={labelClass}
-                />
-
-                <input
-                  type="text"
-                  value={form.relationship}
-                  onChange={handleChange("relationship")}
-                  placeholder={getPath("takeAction.safeguarding.formRelationshipPlaceholder")}
-                  className={fieldClass(errors.relationship)}
-                />
-
-                {errors.relationship && (
-                  <p className={errorText}>{errors.relationship}</p>
-                )}
+                      <span>{item.label || item}</span>
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="mt-5">
-                <EditableText
-                  path="takeAction.safeguarding.formContactPref"
-                  as="label"
-                  className={labelClass}
-                />
+              <FieldError name="concerns" />
+            </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {reportContact.map((c, i) => (
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formUrgency">
+                  How urgent is this concern?
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {reportUrgency.map((item, i) => {
+                  const value = item.value || item.id || item.label;
+
+                  return (
                     <button
-                      key={c.id}
+                      key={i}
                       type="button"
                       onClick={() =>
-                        setForm((f) => ({
-                          ...f,
-                          contactPreference: c.id,
+                        setForm((prev) => ({
+                          ...prev,
+                          urgency: value,
                         }))
                       }
-                      className={optionRowClass(
-                        form.contactPreference === c.id
-                      )}
+                      className={`${optionRowClass(
+                        form.urgency === value
+                      )} flex min-h-[76px] items-center`}
                     >
-                      <EditableText
-                        path={`takeAction.reportContact.${i}.label`}
-                      />
-                    </button>
-                  ))}
-                </div>
+                      <span className="block">
+                        <span className="block">
+                          {item.label || item}
+                        </span>
 
-                {errors.contactPreference && (
-                  <p className={errorText}>{errors.contactPreference}</p>
-                )}
-              </div>
-            </div>
-
-            <div className={cardClass}>
-              <div className="mb-5 flex items-center gap-3">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
-                  02
-                </span>
-
-                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
-                  About the concern
-                </h3>
-              </div>
-
-              <div>
-                <EditableText
-                  path="takeAction.safeguarding.formChildName"
-                  as="label"
-                  className={labelClass}
-                />
-
-                <EditableText
-                  path="takeAction.safeguarding.formChildNameOptional"
-                  as="span"
-                  className="mb-2 block text-[0.72rem] text-[#4A4A42]/60"
-                />
-
-                <input
-                  type="text"
-                  value={form.childName}
-                  onChange={handleChange("childName")}
-                  placeholder={getPath("takeAction.safeguarding.formChildNamePlaceholder")}
-                  className={fieldClass(false)}
-                />
-              </div>
-
-              <div className="mt-5">
-                <EditableText
-                  path="takeAction.safeguarding.formLocation"
-                  as="label"
-                  className={labelClass}
-                />
-
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={handleChange("location")}
-                  placeholder={getPath("takeAction.safeguarding.formLocationPlaceholder")}
-                  className={fieldClass(errors.location)}
-                />
-
-                {errors.location && (
-                  <p className={errorText}>{errors.location}</p>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <EditableText
-                  path="takeAction.safeguarding.formConcernType"
-                  as="label"
-                  className={labelClass}
-                />
-
-                <div className="grid grid-cols-1 gap-2">
-                  {reportConcerns.map((c, i) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => toggleConcern(c.id)}
-                      className={optionRowClass(
-                        form.concerns.includes(c.id)
-                      )}
-                    >
-                      <EditableText
-                        path={`takeAction.reportConcerns.${i}.label`}
-                      />
-
-                      <span
-                        className={`grid h-5 w-5 flex-shrink-0 place-items-center rounded-md border text-[0.65rem] ${
-                          form.concerns.includes(c.id)
-                            ? "border-green-700 bg-green-700 text-white"
-                            : "border-green-700/20 bg-white"
-                        }`}
-                      >
-                        {form.concerns.includes(c.id) ? "✓" : ""}
+                        {item.hint && (
+                          <span className="mt-1 block text-xs font-normal opacity-70">
+                            {item.hint}
+                          </span>
+                        )}
                       </span>
                     </button>
-                  ))}
-                </div>
-
-                {errors.concerns && (
-                  <p className={errorText}>{errors.concerns}</p>
-                )}
+                  );
+                })}
               </div>
 
-              <div className="mt-6">
-                <EditableText
-                  path="takeAction.safeguarding.formUrgency"
-                  as="label"
-                  className={labelClass}
-                />
-
-                <div className="space-y-2">
-                  {reportUrgency.map((u, i) => {
-                    const active = form.urgency === u.id;
-                    const immediate = u.id === "immediate";
-
-                    return (
-                      <button
-                        key={u.id}
-                        type="button"
-                        onClick={() =>
-                          setForm((f) => ({
-                            ...f,
-                            urgency: u.id,
-                          }))
-                        }
-                        className={`w-full rounded-xl border p-3.5 text-left transition-all ${
-                          active
-                            ? immediate
-                              ? "border-[#E2703A] bg-[#E2703A]/5 ring-1 ring-[#E2703A]/20"
-                              : "border-green-700 bg-green-700/5 ring-1 ring-green-700/20"
-                            : "border-green-700/15 bg-white hover:border-green-700/40"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <EditableText
-                            path={`takeAction.reportUrgency.${i}.label`}
-                            as="span"
-                            className={`text-[0.82rem] font-bold ${
-                              active
-                                ? immediate
-                                  ? "text-[#E2703A]"
-                                  : "text-green-700"
-                                : "text-[#111111]"
-                            }`}
-                          />
-
-                          {active && (
-                            <span className="text-green-700">✓</span>
-                          )}
-                        </div>
-
-                        <EditableText
-                          path={`takeAction.reportUrgency.${i}.hint`}
-                          as="span"
-                          className="mt-1 block text-[0.72rem] leading-relaxed text-[#4A4A42]/75"
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {errors.urgency && (
-                  <p className={errorText}>{errors.urgency}</p>
-                )}
-              </div>
+              <FieldError name="urgency" />
             </div>
 
-            <div className={cardClass}>
-              <div className="mb-5 flex items-center gap-3">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-700/10 text-[0.72rem] font-bold text-green-700">
-                  03
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formDescription">
+                  Tell us what happened
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <textarea
+                rows={7}
+                value={form.description}
+                onChange={handleChange("description")}
+                placeholder="Please describe the incident or concern. Include when it happened, who was involved and any other relevant details."
+                className={`${inputStyle} resize-y`}
+              />
+
+              <div className="mt-2 flex justify-between gap-3">
+                <p className="text-xs text-[#999990]">
+                  <EditableText path="takeAction.safeguarding.formDescriptionHint">
+                    Please provide as much detail as possible.
+                  </EditableText>
+                </p>
+
+                <span className="shrink-0 text-xs text-[#999990]">
+                  {form.description.length} characters
                 </span>
-
-                <h3 className="hero-serif text-[1.15rem] font-bold text-[#111111]">
-                  Report details
-                </h3>
               </div>
 
-              <div>
-                <EditableText
-                  path="takeAction.safeguarding.formDescription"
-                  as="label"
-                  className={labelClass}
+              <FieldError name="description" />
+            </div>
+
+            <div>
+              <label className={labelStyle}>
+                <EditableText path="takeAction.safeguarding.formContactPref">
+                  How would you prefer us to contact you?
+                </EditableText>{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {reportContact.map((item, i) => {
+                  const value = item.value || item.id || item.label;
+
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          contactPreference: value,
+                        }))
+                      }
+                      className={`${optionRowClass(
+                        form.contactPreference === value
+                      )} flex min-h-[58px] items-center`}
+                    >
+                      {item.label || item}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <FieldError name="contactPreference" />
+            </div>
+
+            {/* <div className="border-t border-green-700/10 pt-7">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={form.acknowledged}
+                  onChange={handleChange("acknowledged")}
+                  className="mt-1 h-4 w-4 accent-green-700"
                 />
 
-                <textarea
-                  value={form.description}
-                  onChange={handleChange("description")}
-                  rows={9}
-                  placeholder={getPath("takeAction.safeguarding.formDescriptionPlaceholder")}
-                  className={`w-full resize-y rounded-xl border bg-white px-4 py-4 text-[0.88rem] leading-[1.8] text-[#111111] outline-none transition-all placeholder:text-[#4A4A42]/40 focus:ring-2 ${
-                    errors.description
-                      ? "border-[#E2703A]/60 focus:border-[#E2703A] focus:ring-[#E2703A]/15"
-                      : "border-green-700/15 focus:border-green-700 focus:ring-green-700/10"
-                  }`}
-                />
+                <span className="text-sm leading-6 text-[#68685F]">
+                  <EditableText path="takeAction.safeguarding.formAcknowledge">
+                    I confirm that the information I have provided is accurate to the best of my knowledge.
+                  </EditableText>{" "}
+                  <span className="text-red-500">*</span>
+                </span>
+              </label>
 
-                {errors.description ? (
-                  <p className={errorText}>{errors.description}</p>
-                ) : (
-                  <EditableText
-                    path="takeAction.safeguarding.formDescriptionHint"
-                    as="p"
-                    className="mt-2 text-[0.72rem] leading-relaxed text-[#4A4A42]/65"
-                  />
-                )}
+              <FieldError name="acknowledged" />
+            </div> */}
+
+            {errors.form && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+                {errors.form}
               </div>
+            )}
 
-              <div className="mt-6">
-                <label
-                  htmlFor="acknowledged"
-                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-green-700/12 bg-green-700/[0.025] p-4"
-                >
-                  <input
-                    id="acknowledged"
-                    type="checkbox"
-                    checked={form.acknowledged}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        acknowledged: e.target.checked,
-                      }))
-                    }
-                    className="mt-1 h-4 w-4 flex-shrink-0 accent-green-700"
-                  />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex w-full items-center justify-center gap-3 rounded-xl bg-green-700 px-6 py-4 text-sm font-bold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Submitting report...
+                </>
+              ) : (
+                <EditableText path="takeAction.safeguarding.formSubmit">
+                  Submit safeguarding report
+                </EditableText>
+              )}
+            </button>
 
-                  <EditableText
-                    path="takeAction.safeguarding.formAcknowledge"
-                    as="span"
-                    multiline
-                    className="text-[0.78rem] leading-[1.75] text-[#4A4A42]"
-                  />
-                </label>
+            <p className="text-center text-xs leading-6 text-[#999990]">
+              <EditableText path="takeAction.safeguarding.formFootnote">
+                Your information will be handled confidentially.
+              </EditableText>
+            </p>
+          </form>
+        </div>
 
-                {errors.acknowledged && (
-                  <p className={errorText}>{errors.acknowledged}</p>
-                )}
-              </div>
 
-              {errors.form && (
-                <div className="mt-5 rounded-xl border border-[#E2703A]/20 bg-[#E2703A]/5 p-4">
-                  <p className="text-[0.78rem] leading-relaxed text-[#E2703A]">
-                    {errors.form}
+        {/* <div className="mt-16">
+          <div className="mb-10 text-center">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+              <EditableText path="takeAction.safeguarding.howKicker">
+                Our commitment
+              </EditableText>
+            </p>
+
+            <h2 className="hero-serif text-3xl text-[#111111] sm:text-5xl">
+              <EditableText path="takeAction.safeguarding.howTitle">
+                How we handle your report
+              </EditableText>
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#77776E]">
+              <EditableText path="takeAction.safeguarding.howIntro">
+                Every concern is taken seriously. We follow a careful process to assess reports and protect the wellbeing of children.
+              </EditableText>
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {howSteps.map((step, i) => (
+              <div
+                key={i}
+                className="flex gap-5 rounded-2xl border border-green-700/10 bg-white p-5 sm:p-7"
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-700 text-sm font-bold text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-base font-bold text-[#22221E]">
+                    <EditableText
+                      path={`takeAction.safeguarding.howSteps.${i}.t`}
+                    >
+                      {step.t}
+                    </EditableText>
+                  </h3>
+
+                  <p className="text-sm leading-7 text-[#77776E]">
+                    <EditableText
+                      path={`takeAction.safeguarding.howSteps.${i}.b`}
+                    >
+                      {step.b}
+                    </EditableText>
                   </p>
                 </div>
-              )}
+              </div>
+            ))}
+          </div>
+        </div> */}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-[#E2703A] px-6 py-4 text-[0.76rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_35px_-18px_rgba(226,112,58,0.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#c95c2b] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {submitting ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Submitting report...
-                  </>
-                ) : (
-                  <>
-                    <EditableText path="takeAction.safeguarding.formSubmit" />
+        {helplines.length > 0 && (
+          <div className="mt-16 rounded-3xl border border-green-700/10 bg-white p-6 sm:p-9">
+            <div className="mb-7">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+                <EditableText path="takeAction.safeguarding.helpKicker">
+                  Support and assistance
+                </EditableText>
+              </p>
 
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </>
-                )}
-              </button>
+              <h2 className="hero-serif text-3xl text-[#111111]">
+                <EditableText path="takeAction.safeguarding.helpTitle">
+                  Need someone to talk to?
+                </EditableText>
+              </h2>
 
-              <p className="mt-5 border-l-2 border-green-700/40 pl-4 text-[0.75rem] leading-[1.8] text-[#4A4A42]/75">
-                <EditableText path="takeAction.safeguarding.formFootnote" />{" "}
-                <a
-                  href="tel:116"
-                  className="font-bold text-green-700 underline underline-offset-4"
-                >
-                  116
-                </a>{" "}
-                <EditableText path="takeAction.safeguarding.formFootnoteMiddle" />{" "}
-                <a
-                  href="tel:999"
-                  className="font-bold text-green-700 underline underline-offset-4"
-                >
-                  999
-                </a>{" "}
-                <EditableText path="takeAction.safeguarding.formFootnoteEnd" />
+              <p className="mt-3 text-sm leading-7 text-[#77776E]">
+                <EditableText path="takeAction.safeguarding.helpIntro">
+                  These contacts may be able to provide additional support and assistance.
+                </EditableText>
               </p>
             </div>
+
+            <div className="space-y-4">
+              {helplines.map((line, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col justify-between gap-3 border-b border-green-700/10 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
+                >
+                  <div>
+                    <p className="text-sm font-bold text-[#22221E]">
+                      <EditableText path={`takeAction.helplines.${i}.name`}>
+                        {line.name}
+                      </EditableText>
+                    </p>
+
+                    <p className="mt-1 text-xs text-[#77776E]">
+                      <EditableText path={`takeAction.helplines.${i}.note`}>
+                        {line.note}
+                      </EditableText>
+                    </p>
+                  </div>
+
+                  <a
+                    href={`tel:${line.number}`}
+                    className="inline-flex items-center gap-2 text-sm font-bold text-green-700 hover:text-green-900"
+                  >
+                    <EditableText path={`takeAction.helplines.${i}.number`}>
+                      {line.number}
+                    </EditableText>
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-        </form>
-      </section>
-
-      <section className="space-y-6">
-        <div className="max-w-2xl">
-          <span className="mb-3 inline-flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-green-700">
-            <span className="h-px w-7 bg-green-700" />
-            How we handle your report
-          </span>
-
-          <h2 className="hero-serif text-[clamp(1.7rem,4vw,2.6rem)] font-bold leading-tight text-[#111111]">
-            Your report matters. Here's what happens next.
-          </h2>
-
-          <p className="mt-3 text-[0.9rem] leading-[1.8] text-[#4A4A42]">
-            Every concern is treated seriously, handled with care and reviewed
-            through our safeguarding procedures.
-          </p>
-        </div>
-
-        {renderHowSteps()}
-
-        <div className="rounded-2xl border border-[#E2703A]/20 border-l-[3px] border-l-[#E2703A] bg-[#E2703A]/5 p-5 sm:p-6">
-          <EditableText
-            path="takeAction.safeguarding.investigateTitle"
-            as="h3"
-            className="text-[0.9rem] font-bold text-[#111111]"
-          />
-
-          <EditableText
-            path="takeAction.safeguarding.investigateBody"
-            as="p"
-            multiline
-            className="mt-2 text-[0.85rem] leading-[1.8] text-[#4A4A42]"
-          />
-        </div>
-      </section>
-
-    </div>
+        )}
+      </div>
+    </section>
   );
 }
 
