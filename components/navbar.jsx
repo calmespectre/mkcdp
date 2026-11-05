@@ -314,12 +314,11 @@ function SideNavigation({
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex min-h-[82px] items-center justify-between border-b border-green-700/10 px-5 sm:px-8">
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 rounded-full bg-green-700" />
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-700">
-              Explore MKCDP
-            </p>
+        <div className="flex min-h-[82px] items-center justify-between px-5 sm:px-8">
+          <div className="mb-5 flex items-center justify-end">
+            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
+              Loitokitok · Kenya
+            </span>
           </div>
 
           <button
@@ -333,11 +332,6 @@ function SideNavigation({
         </div>
 
         <div className="flex flex-1 flex-col px-5 pb-7 pt-5 sm:px-8">
-          <div className="mb-5 flex items-center justify-end">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#92978D]">
-              Loitokitok · Kenya
-            </span>
-          </div>
 
           <nav aria-label="Expanded navigation" className="flex-1">
             {NAV_LINKS.map((item, index) => {
@@ -434,10 +428,7 @@ function SideNavigation({
             })}
           </nav>
 
-          <div className="mt-8 border-t border-green-700/10 pt-6">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.16em] text-[#697367]">
-              Take the next step
-            </p>
+          <div className="mt-8 pt-6">
 
             <div className="grid grid-cols-2 gap-3">
               <Link
@@ -460,10 +451,7 @@ function SideNavigation({
             </div>
           </div>
 
-          <div className="mt-6 border-t border-green-700/10 pt-5">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.16em] text-[#697367]">
-              Your account
-            </p>
+          <div className="mt-2 pt-2">
 
             <Link
               to={isAuthed ? "/account" : "/auth"}

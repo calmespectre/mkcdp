@@ -970,13 +970,13 @@ function Safeguarding() {
 function Leadership() {
   const team = [
     { name: "Elosy Omwenga", role: "Chief Executive Officer", img: "/Elosy.jpg", featured: true, quote: "Raising hope and nurturing futures — one child, one family, one community at a time." },
-    { name: "Nancy Nailantei", role: "Finance & Administration Manager", img: "/Nancy.jpeg" },
+    // { name: "Nancy Nailantei", role: "Finance & Administration Manager", img: "/Nancy.jpeg" },
     { name: "Erickson Solitei Paraitei", role: "Monitoring & Evaluation Manager / Ag. Sponsorship Manager", img: "/Erickson.jpeg" },
     { name: "Fabiola Makena", role: "Procurement Officer", img: "/Fabiola.jpg" },
     { name: "Violah Chepkemboi", role: "Program & Sponsorship Officer", img: "/Violet.jpg" },
     { name: "John Maina", role: "Finance and Administration Assistant", img: "/John.jpeg" },
-    { name: "Valentine Yianoi", role: "Programs & Sponsorship Officer", img: "/nancy.png" },
-    { name: "Fred Karei", role: "Logistics Officer", img: "/Fred.jpeg" },
+    // { name: "Valentine Yianoi", role: "Programs & Sponsorship Officer", img: "/nancy.png" },
+    // { name: "Fred Karei", role: "Logistics Officer", img: "/Fred.jpeg" },
     { name: "Esther Mbithe", role: "Office Support Staff", img: "/Esther.jpg" },
   ];
 
@@ -985,36 +985,10 @@ function Leadership() {
 
   return (
     <div className="space-y-20 lg:space-y-28">
-      <div className="relative">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-          <div>
-            <EditableText as="span" id="about.lead.hero.eyebrow" defaultValue="Our Leadership" className="mb-5 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-green-700">Our Leadership</EditableText>
-            <EditableText as="h1" id="about.lead.hero.heading" defaultValue={"Creative minds\nbehind our success."} multiline className="hero-serif block whitespace-pre-line text-[clamp(2rem,5.4vw,3.9rem)] font-bold leading-[1.05] tracking-[-0.022em] text-[#111111]" />
-            <EditableText as="p" id="about.lead.hero.body" defaultValue="A team rooted in community and focused on children — bringing finance, programs, safeguarding, logistics and care together so every child in Kajiado South is protected, supported and able to thrive." multiline className="mt-7 block max-w-[520px] text-[1.0625rem] leading-[1.8] text-[#3D3D37]" />
-          </div>
-
-          <div className="relative flex flex-col justify-center gap-6 lg:pl-10">
-            <div className="flex items-start gap-5">
-              <span className="mt-2 h-px w-10 flex-shrink-0 bg-green-700" />
-              <EditableText as="p" id="about.lead.tag1" defaultValue={"Raising Hope.\nNurturing Futures."} multiline className="hero-serif block whitespace-pre-line text-[clamp(1.3rem,2.6vw,1.9rem)] font-medium italic leading-[1.35] text-green-700" />
-            </div>
-            <div className="flex items-start gap-5">
-              <span className="mt-2 h-px w-10 flex-shrink-0 bg-[#E2703A]" />
-              <EditableText as="p" id="about.lead.tag2" defaultValue={"Building Brighter Futures\nfor Every Child."} multiline className="hero-serif block whitespace-pre-line text-[clamp(1.3rem,2.6vw,1.9rem)] font-medium italic leading-[1.35] text-[#111111]" />
-            </div>
-            <div className="flex items-start gap-5">
-              <span className="mt-2 h-px w-10 flex-shrink-0 bg-[#F2B33D]" />
-              <EditableText as="p" id="about.lead.tag3" defaultValue={"Where Children Are Protected,\nSupported, and Thrive."} multiline className="hero-serif block whitespace-pre-line text-[clamp(1.3rem,2.6vw,1.9rem)] font-medium italic leading-[1.35] text-[#4A4A42]" />
-            </div>
-          </div>
-        </div>
-
-        <svg viewBox="0 0 120 120" aria-hidden="true" className="pointer-events-none absolute -top-6 right-[42%] hidden w-16 -rotate-12 lg:block">
-          <path d="M18 76c6-30 34-54 66-50 20 3 30 20 22 34-10 17-36 24-58 18" fill="none" stroke="#7FB069" strokeWidth="9" strokeLinecap="round" />
-        </svg>
-      </div>
-
       <div className="relative overflow-hidden rounded-[28px] border border-green-700/12 bg-white/60 p-8 sm:p-12 lg:p-14">
+      <svg viewBox="0 0 120 120" aria-hidden="true" className="pointer-events-none absolute -top-6 right-[42%] hidden w-16 -rotate-12 lg:block">
+        <path d="M18 76c6-30 34-54 66-50 20 3 30 20 22 34-10 17-36 24-58 18" fill="none" stroke="#7FB069" strokeWidth="9" strokeLinecap="round" />
+      </svg>
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-green-700 via-[#7FB069] to-[#F2B33D]" />
 
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-16">
