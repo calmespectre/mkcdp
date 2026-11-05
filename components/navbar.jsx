@@ -231,9 +231,7 @@ function SearchModal({ open, onClose }) {
 
         <div className="max-h-[65vh] overflow-y-auto p-2">
           {!query.trim() && (
-            <p className="px-4 py-8 text-center text-sm text-[#697367]">
-              Search our website.
-            </p>
+            <p className="px-4 py-8 text-center text-sm text-[#697367]"/>
           )}
 
           {query.trim() && results.length === 0 && (
