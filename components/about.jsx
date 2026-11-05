@@ -1212,8 +1212,6 @@ function AboutHub() {
           <SectionHeading
             idPrefix="about.hub.explore"
             eyebrow="Explore MKCDP"
-            title="Six pages. One mission."
-            intro="Learn who we are, how we plan, how we stay accountable, how we protect children, who leads us and who stands with us."
           />
 
           <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
