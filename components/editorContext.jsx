@@ -1335,7 +1335,7 @@ export function EditableImage({
               </button>
             </span>
           ) : (
-            <span className="pointer-events-none absolute inset-0 z-10 flex items-start justify-center p-2">
+            <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-2">
               <button
                 type="button"
                 onClick={openEditor}
