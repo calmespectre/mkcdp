@@ -1015,10 +1015,10 @@ function Leadership() {
       </div>
 
       <div>
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        {/* <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading idPrefix="about.lead.team" eyebrow="The team" title="Rooted in community. Focused on children." />
           <EditableText as="p" id="about.lead.team.note" defaultValue="Every member of the MKCDP team is based in Kajiado South and works side-by-side with the communities we serve." multiline className="block max-w-[380px] text-[0.9rem] leading-[1.75] text-[#4A4A42]/85 lg:text-right" />
-        </div>
+        </div> */}
 
         <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-14 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-8">
           {teamGrid.map((m, i) => {
