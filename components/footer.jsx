@@ -313,7 +313,7 @@ export default function Footer() {
           <EditableText
             as="p"
             id="footer.copyright"
-            defaultValue={`© ${new Date().getFullYear()} MKCDP. All rights reserved.`}
+            defaultValue={`© ${new Date().getFullYear()} <a href="https://www.mkcdp.org" target="_blank" rel="noopener noreferrer">MKCDP</a>. All rights reserved.`}
             className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#4A4A42]/75"
           />
           <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-[0.78rem] font-medium text-[#4A4A42]">
