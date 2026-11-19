@@ -310,12 +310,18 @@ export default function Footer() {
 
       <div className="relative border-t border-green-700/12">
         <div className="mx-auto flex max-w-[1560px] flex-col items-center justify-between gap-4 px-6 py-7 text-center sm:px-10 lg:flex-row lg:px-14 lg:text-left">
-          <EditableText
-            as="p"
-            id="footer.copyright"
-            defaultValue={`© ${new Date().getFullYear()} <a href="https://www.mkcdp.org" target="_blank" rel="noopener noreferrer">MKCDP</a>. All rights reserved.`}
-            className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#4A4A42]/75"
-          />
+          <p className="block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#4A4A42]/75">
+            © {new Date().getFullYear()}{" "}
+            <a
+              href="https://www.mkcdp.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#164E2B] transition-colors"
+            >
+              MKCDP
+            </a>
+            . All rights reserved.
+          </p>
           <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-[0.78rem] font-medium text-[#4A4A42]">
             <EditableText
               id="footer.legal.privacy"
