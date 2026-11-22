@@ -328,7 +328,7 @@ function WaveEdge({ position = "top" }) {
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-x-0 leading-[0]"
-      style={isTop ? { bottom: "calc(100% - 1px)" } : { bottom: "-1px" }}
+      style={isTop ? { bottom: "calc(100% - 1px)" } : { bottom: "0px" }}
     >
       {isTop ? (
         <svg
