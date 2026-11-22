@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -96,7 +95,7 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative isolate flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
+      className="relative z-10 flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
     >
       <motion.div
         className="absolute inset-0 z-0"
@@ -122,20 +121,11 @@ function Hero() {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[1] hidden sm:block"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 30%, rgba(6, 24, 13, 0.55) 100%)",
-        }}
-      />
-
-      <div
-        aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-32 bg-gradient-to-t from-[#173D29]/40 to-transparent sm:hidden"
       />
 
       <motion.div
-        className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-16 pt-32 sm:px-10 sm:pb-0 sm:pt-24 md:px-12 lg:px-20"
+        className="relative z-[50] mx-auto w-full max-w-7xl px-5 pb-16 pt-32 sm:px-10 sm:pb-0 sm:pt-24 md:px-12 lg:px-20"
         style={{ opacity: heroOpacity }}
       >
         <div className="max-w-2xl">
@@ -173,6 +163,7 @@ function Hero() {
                 id="home.hero.ctaPrimary"
                 defaultValue="Sponsor a child"
               />
+
               <svg
                 viewBox="0 0 24 24"
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
@@ -330,6 +321,54 @@ function StatItem({ stat, active, index }) {
   );
 }
 
+function WaveEdge({ position = "top" }) {
+  const isTop = position === "top";
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 leading-[0]"
+      style={isTop ? { bottom: "calc(100% - 1px)" } : { bottom: "-1px" }}
+    >
+      {isTop ? (
+        <svg
+          viewBox="0 0 1440 140"
+          preserveAspectRatio="none"
+          className="block h-14 w-full text-green-700 sm:h-24 lg:h-32"
+        >
+          <path
+            d="M0 140 L0 50 C200 -10 380 -10 560 40 S920 110 1100 50 S1340 -10 1440 30 L1440 140 Z"
+            fill="#00ff6a"
+            fillOpacity="0.45"
+          />
+
+          <path
+            d="M0 140 L0 90 C180 30 360 30 540 80 S900 140 1080 80 S1320 20 1440 70 L1440 140 Z"
+            fill="#00ff6a"
+          />
+        </svg>
+      ) : (
+        <svg
+          viewBox="0 0 1440 140"
+          preserveAspectRatio="none"
+          className="block h-14 w-full sm:h-24 lg:h-32"
+        >
+          <path
+            d="M0 140 L0 60 C240 0 460 0 700 50 S1180 120 1440 40 L1440 140 Z"
+            fill="#FBF7F0"
+            fillOpacity="0.45"
+          />
+
+          <path
+            d="M0 140 L0 100 C220 50 440 50 680 90 S1160 150 1440 80 L1440 140 Z"
+            fill="#FBF7F0"
+          />
+        </svg>
+      )}
+    </div>
+  );
+}
+
 function StatsSection() {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const { isEditing } = useEditor();
@@ -337,9 +376,12 @@ function StatsSection() {
   return (
     <section
       ref={ref}
-      className="relative isolate overflow-hidden bg-green-700"
+      className="relative isolate overflow-x-clip bg-[#008236]"
       style={{ marginTop: "-1px" }}
     >
+      <WaveEdge position="top" />
+      <WaveEdge position="bottom" />
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.35]"
@@ -352,27 +394,6 @@ function StatsSection() {
             "linear-gradient(to bottom, transparent, #000 35%, #000 65%, transparent)",
         }}
       />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 flex justify-center"
-      >
-        {/* <svg
-          viewBox="0 0 1440 460"
-          preserveAspectRatio="xMidYMax meet"
-          className="h-auto w-full max-h-[460px] max-w-[1440px] opacity-[0.13]"
-          fill="none"
-        >
-          <path
-            d="M0 460 L0 392 C60 388 130 380 210 372 C280 366 340 358 400 344 C450 332 490 316 520 296 C545 280 560 262 572 244 C582 230 590 218 598 208 C604 200 610 194 616 188 C620 184 624 180 628 178 C632 176 636 176 640 178 C644 180 648 184 652 188 C658 194 664 200 670 208 C678 218 686 230 696 244 C708 262 724 280 748 296 C778 316 818 332 868 344 C928 358 988 366 1058 372 C1128 380 1200 388 1270 392 C1330 396 1390 396 1440 392 L1440 460 Z"
-            fill="#FBF7F0"
-          />
-          <path
-            d="M600 208 C604 200 610 194 616 188 C620 184 624 180 628 178 C632 176 636 176 640 178 C644 180 648 184 652 188 C658 194 664 200 670 208 C662 204 654 200 646 198 C642 196 638 194 634 194 C630 194 626 196 622 198 C616 202 608 206 600 208 Z"
-            fill="#FFFFFF"
-          />
-        </svg> */}
-      </div>
 
       <svg
         viewBox="0 0 100 100"
@@ -402,11 +423,12 @@ function StatsSection() {
         />
       </svg>
 
-      <div className="relative mx-auto max-w-[1360px] px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24 lg:px-14 lg:pb-28 lg:pt-28">
+      <div className="relative mx-auto max-w-[1360px] px-6 pb-28 pt-20 sm:px-10 sm:pb-36 sm:pt-24 lg:px-14 lg:pb-44 lg:pt-28">
         <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-[650px]">
             <span className="mb-4 inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2B33D] sm:text-xs">
               <span className="h-px w-8 bg-[#F2B33D]" />
+
               <EditableText
                 id="home.stats.eyebrow"
                 defaultValue="Our Impact"
@@ -502,11 +524,6 @@ function StatsSection() {
           </div>
         </div>
       </div>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#0F452B]/30 to-transparent sm:h-20"
-      />
     </section>
   );
 }
