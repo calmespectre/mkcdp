@@ -366,7 +366,7 @@ function OurWorkHub() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
+      {/* <section className="relative mx-auto max-w-[1560px] px-6 sm:px-10 lg:px-14">
         <SectionHeading
           idPrefix="ourWork.hub.explore"
           eyebrow="Explore deeper"
@@ -412,7 +412,7 @@ function OurWorkHub() {
             </Link>
           ))}
         </div>
-      </section>
+      </section> */}
 
       <section className="relative overflow-hidden bg-green-700 py-20 lg:py-28">
         <div
@@ -596,7 +596,7 @@ function WhereWeWork() {
             <EditableText
               as="p"
               id="ourWork.where.region.title"
-              defaultValue="Moshi Rural, Hai District, Siha District & Rombo"
+              defaultValue="Inkisanjani, Kuku Ward, Mbirikani, Rombo - Kajiado South, Kenya"
               multiline
               className="hero-serif mt-3 block text-[clamp(1.3rem,2.4vw,1.7rem)] font-bold leading-tight text-[#111111]"
             />
@@ -653,7 +653,7 @@ function WhereWeWork() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-green-700/12 bg-white/55 p-8 sm:p-12 lg:p-14">
+      {/* <section className="rounded-3xl border border-green-700/12 bg-white/55 p-8 sm:p-12 lg:p-14">
         <div className="flex flex-wrap items-end justify-between gap-6 border-b border-green-700/15 pb-6">
           <div>
             <span className="mb-3 inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-green-700">
@@ -701,7 +701,7 @@ function WhereWeWork() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       <section className="relative overflow-hidden rounded-3xl bg-green-700 px-8 py-16 sm:px-14 lg:px-20 lg:py-24">
         <svg viewBox="0 0 120 120" aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 w-40 rotate-12 opacity-30">

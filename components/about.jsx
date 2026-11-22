@@ -974,7 +974,7 @@ function Leadership() {
     { name: "Erickson Solitei Paraitei", role: "Monitoring & Evaluation Manager / Ag. Sponsorship Manager", img: "/Erickson.jpeg" },
     { name: "Fabiola Makena", role: "Procurement Officer", img: "/Fabiola.jpg" },
     { name: "Violah Chepkemboi", role: "Program & Sponsorship Officer", img: "/Violet.jpg" },
-    { name: "John Maina", role: "Finance and Administration Assistant", img: "/John.jpeg" },
+    { name: "John Maina", role: "Finance and Administration Lead", img: "/John.jpeg" },
     // { name: "Valentine Yianoi", role: "Programs & Sponsorship Officer", img: "/nancy.png" },
     // { name: "Fred Karei", role: "Logistics Officer", img: "/Fred.jpeg" },
     { name: "Esther Mbithe", role: "Office Support Staff", img: "/Esther.jpg" },
