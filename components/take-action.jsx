@@ -311,6 +311,19 @@ function Donate() {
     }
   };
 
+  const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(
+      () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
+    );
+    
+    const handleMaintenanceContinue = () => {
+      navigate("/", { replace: true });
+    };
+  
+    const closeMaintenanceNotice = () => {
+      sessionStorage.setItem("maintenanceNoticeDismissed", "true");
+      setShowMaintenanceNotice(false);
+    };
+
   const reset = () => {
     setPaymentRef("");
     setErrors({});
@@ -375,6 +388,54 @@ function Donate() {
   return (
     <>
       <div className="hidden lg:block">
+        {showMaintenanceNotice && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <svg
+                className="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v3m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"
+                />
+              </svg>
+            </div>
+
+            <h2 className="mb-3 text-2xl font-bold text-gray-900">
+              We're Making Things Better.
+            </h2>
+
+            <p className="mb-4 text-sm leading-6 text-gray-600">
+              We're currently carrying out maintenance to improve your experience.
+            </p>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600">
+              Some services may be temporarily unavailable. We sincerely apologise
+              for any inconvenience and kindly ask for your patience as we complete
+              these improvements.
+            </p>
+
+            <p className="mb-7 text-sm font-medium text-gray-700">
+              Thank you for your understanding and continued support.
+            </p>
+
+            {/* <button
+              type="button"
+              onClick={handleMaintenanceContinue}
+              className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
+            >
+              I Understand
+            </button> */}
+          </div>
+        </div>
+      )}
+
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
           <div className="relative lg:sticky lg:top-40 lg:self-start">
             <span className="mb-5 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-green-700">
@@ -729,8 +790,70 @@ function SendAGift() {
       return next;
     });
 
+  const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(
+      () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
+    );
+    
+    const handleMaintenanceContinue = () => {
+      navigate("/", { replace: true });
+    };
+  
+    const closeMaintenanceNotice = () => {
+      sessionStorage.setItem("maintenanceNoticeDismissed", "true");
+      setShowMaintenanceNotice(false);
+    };
+
   return (
     <div className="mx-auto max-w-[1240px]">
+
+      {showMaintenanceNotice && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <svg
+                className="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v3m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"
+                />
+              </svg>
+            </div>
+
+            <h2 className="mb-3 text-2xl font-bold text-gray-900">
+              We're Making Things Better.
+            </h2>
+
+            <p className="mb-4 text-sm leading-6 text-gray-600">
+              We're currently carrying out maintenance to improve your experience.
+            </p>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600">
+              Some services may be temporarily unavailable. We sincerely apologise
+              for any inconvenience and kindly ask for your patience as we complete
+              these improvements.
+            </p>
+
+            <p className="mb-7 text-sm font-medium text-gray-700">
+              Thank you for your understanding and continued support.
+            </p>
+
+            {/* <button
+              type="button"
+              onClick={handleMaintenanceContinue}
+              className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
+            >
+              I Understand
+            </button> */}
+          </div>
+        </div>
+      )}
+
       <div className="mb-8 sm:mb-10">
         <span className="inline-flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.24em] text-green-700">
           <span className="h-px w-6 bg-green-700" />
@@ -1618,11 +1741,72 @@ function SponsorAChildAdmin() {
     }
   };
 
+  const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(
+      () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
+    );
+    
+    const handleMaintenanceContinue = () => {
+      navigate("/", { replace: true });
+    };
+  
+    const closeMaintenanceNotice = () => {
+      sessionStorage.setItem("maintenanceNoticeDismissed", "true");
+      setShowMaintenanceNotice(false);
+    };
+
   const filters = ["All", "Available", "Sponsored"];
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#FBF7F0]">
       <SponsorDecor />
+
+      {showMaintenanceNotice && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <svg
+                className="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v3m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"
+                />
+              </svg>
+            </div>
+
+            <h2 className="mb-3 text-2xl font-bold text-gray-900">
+              We're Making Things Better.
+            </h2>
+
+            <p className="mb-4 text-sm leading-6 text-gray-600">
+              We're currently carrying out maintenance to improve your experience.
+            </p>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600">
+              Some services may be temporarily unavailable. We sincerely apologise
+              for any inconvenience and kindly ask for your patience as we complete
+              these improvements.
+            </p>
+
+            <p className="mb-7 text-sm font-medium text-gray-700">
+              Thank you for your understanding and continued support.
+            </p>
+
+            {/* <button
+              type="button"
+              onClick={handleMaintenanceContinue}
+              className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
+            >
+              I Understand
+            </button> */}
+          </div>
+        </div>
+      )}
 
       <div className="relative mx-auto max-w-[1560px] px-5 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-20">
         <div className="grid grid-cols-1 items-end gap-8 border-b border-green-700/15 pb-8 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:pb-12">

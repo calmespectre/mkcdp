@@ -883,6 +883,19 @@ export default function Auth() {
     setErrors({});
   };
 
+  const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(
+    () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
+  );
+  
+  const handleMaintenanceContinue = () => {
+    navigate("/", { replace: true });
+  };
+
+  const closeMaintenanceNotice = () => {
+    sessionStorage.setItem("maintenanceNoticeDismissed", "true");
+    setShowMaintenanceNotice(false);
+  };
+
   const handleVerified = (payload) => {
     const data = payload || {};
 
@@ -915,6 +928,54 @@ export default function Auth() {
         .hero-sans { font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
         ::selection { background: #14532D; color: #FBF7F0; }
       `}</style>
+
+      {showMaintenanceNotice && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <svg
+                className="h-8 w-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v3m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"
+                />
+              </svg>
+            </div>
+
+            <h2 className="mb-3 text-2xl font-bold text-gray-900">
+              We're Making Things Better.
+            </h2>
+
+            <p className="mb-4 text-sm leading-6 text-gray-600">
+              We're currently carrying out maintenance to improve your experience.
+            </p>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600">
+              Some services may be temporarily unavailable. We sincerely apologise
+              for any inconvenience and kindly ask for your patience as we complete
+              these improvements.
+            </p>
+
+            <p className="mb-7 text-sm font-medium text-gray-700">
+              Thank you for your understanding and continued support.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleMaintenanceContinue}
+              className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
+            >
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
 
       <div
         aria-hidden="true"
