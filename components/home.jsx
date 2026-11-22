@@ -95,7 +95,7 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative z-10 flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
+      className="relative flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
     >
       <motion.div
         className="absolute inset-0 z-0"
@@ -376,7 +376,7 @@ function StatsSection() {
   return (
     <section
       ref={ref}
-      className="relative isolate overflow-x-clip bg-[#008236]"
+      className="relative isolate overflow-x-clip bg-green-700"
       style={{ marginTop: "-1px" }}
     >
       <WaveEdge position="top" />
