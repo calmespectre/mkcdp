@@ -963,6 +963,12 @@ export default function Auth() {
             </p>
 
             <p className="mb-7 text-sm font-medium text-gray-700">
+              For urgent matters, please contact us at <a href="mailto:info@mkcdp.org" className="text-green-700 underline">
+                info@mkcdp.org
+              </a>
+            </p>
+
+            <p className="mb-7 text-sm font-medium text-gray-700">
               Thank you for your understanding and continued support.
             </p>
 
