@@ -431,13 +431,13 @@ function Donate() {
               Thank you for your understanding and continued support.
             </p>
 
-            {/* <button
+            <button
               type="button"
               onClick={handleMaintenanceContinue}
               className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
             >
               I Understand
-            </button> */}
+            </button>
           </div>
         </div>
       )}
@@ -855,13 +855,13 @@ function SendAGift() {
               Thank you for your understanding and continued support.
             </p>
 
-            {/* <button
+            <button
               type="button"
               onClick={handleMaintenanceContinue}
               className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
             >
               I Understand
-            </button> */}
+            </button>
           </div>
         </div>
       )}
@@ -1815,13 +1815,13 @@ function SponsorAChildAdmin() {
               Thank you for your understanding and continued support.
             </p>
 
-            {/* <button
+            <button
               type="button"
               onClick={handleMaintenanceContinue}
               className="w-full rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-800"
             >
               I Understand
-            </button> */}
+            </button>
           </div>
         </div>
       )}
