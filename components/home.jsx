@@ -8,11 +8,10 @@ import {
 } from "./editorContext";
 
 const PHOTOS = [
-  "/img13.jpg",
-  "/img14.jpg",
-  "/img15.jpg",
-  "/img16.jpg",
+  "/img18.jpg",
   "/img17.jpg",
+  "/img14.webp",
+  "/img19.jpg",
 ];
 
 const YOUTUBE_ID = "ztwN71sY98o";
