@@ -122,7 +122,7 @@ function Hero() {
             exit={{ opacity: 0 }}
             transition={{
               opacity: {
-                duration: 1.8,
+                duration: 2.8,
                 ease: [0.22, 1, 0.36, 1],
               },
               scale: {
