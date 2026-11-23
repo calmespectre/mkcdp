@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   useEditor,
   EditableText,
-  EditableImage,
   EditableVideo,
 } from "./editorContext";
 
-const PHOTOS = {
-  main: "/img18.jpg",
-};
+const PHOTOS = [
+  "/img13.jpg",
+  "/img14.jpg",
+  "/img15.jpg",
+  "/img16.jpg",
+  "/img17.jpg",
+];
 
 const YOUTUBE_ID = "ztwN71sY98o";
 
@@ -83,6 +86,7 @@ function useCountUp(target, active, duration = 2200) {
 function Hero() {
   const heroRef = useRef(null);
   const { isEditing } = useEditor();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -92,22 +96,38 @@ function Hero() {
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.2]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((previous) => (previous + 1) % PHOTOS.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section
       ref={heroRef}
       className="relative flex min-h-[760px] h-[100svh] max-h-[1000px] w-full items-end overflow-hidden sm:min-h-[720px] sm:items-center"
     >
       <motion.div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 overflow-hidden"
         style={{ y: heroY }}
       >
-        <EditableImage
-          id="home.hero.image"
-          defaultValue={PHOTOS.main}
-          alt="Children learning together"
-          className="h-full w-full object-cover object-[55%_center] sm:object-center"
-          wrapperClassName="h-full w-full"
-        />
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={PHOTOS[currentSlide]}
+            src={PHOTOS[currentSlide]}
+            alt="Children and communities supported by the programme"
+            className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:object-center"
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 1.5, ease: "easeInOut" },
+              scale: { duration: 7, ease: "linear" },
+            }}
+          />
+        </AnimatePresence>
       </motion.div>
 
       <div
@@ -115,7 +135,7 @@ function Hero() {
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 30%, rgba(6, 24, 13, 0.55) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 30%, rgba(6,24,13,0.55) 100%)",
         }}
       />
 
@@ -199,12 +219,26 @@ function Hero() {
         </div>
       </motion.div>
 
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-7 right-10 z-[3] hidden items-center gap-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/70 sm:flex"
-      >
+      <div className="absolute bottom-7 right-10 z-[3] hidden items-center gap-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/70 sm:flex">
         <span className="h-px w-10 bg-[#F2C94C]" />
         <span>Building brighter futures</span>
+      </div>
+
+      <div className="absolute bottom-7 left-1/2 z-[5] hidden -translate-x-1/2 items-center gap-2 sm:flex">
+        {PHOTOS.map((photo, index) => (
+          <button
+            key={photo}
+            type="button"
+            onClick={() => setCurrentSlide(index)}
+            aria-label={`Show slide ${index + 1}`}
+            aria-current={currentSlide === index ? "true" : undefined}
+            className={`h-1.5 rounded-full transition-all duration-500 ${
+              currentSlide === index
+                ? "w-8 bg-[#F2C94C]"
+                : "w-2 bg-white/50 hover:bg-white"
+            }`}
+          />
+        ))}
       </div>
     </section>
   );
@@ -263,9 +297,8 @@ const STATS = [
 function StatItem({ stat, active, index }) {
   const { isEditing, getValue, setValue } = useEditor();
 
-  const target = Number(
-    getValue(`home.stats.${index}.value`, stat.value)
-  ) || 0;
+  const target =
+    Number(getValue(`home.stats.${index}.value`, stat.value)) || 0;
 
   const count = useCountUp(
     target,
