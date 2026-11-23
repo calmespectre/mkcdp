@@ -1754,17 +1754,17 @@ function SponsorAChildAdmin() {
   };
 
   const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(
-      () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
-    );
-    
-    const handleMaintenanceContinue = () => {
-      navigate("/", { replace: true });
-    };
+    () => sessionStorage.getItem("maintenanceNoticeDismissed") !== "true"
+  );
   
-    const closeMaintenanceNotice = () => {
-      sessionStorage.setItem("maintenanceNoticeDismissed", "true");
-      setShowMaintenanceNotice(false);
-    };
+  const handleMaintenanceContinue = () => {
+    navigate("/", { replace: true });
+  };
+
+  const closeMaintenanceNotice = () => {
+    sessionStorage.setItem("maintenanceNoticeDismissed", "true");
+    setShowMaintenanceNotice(false);
+  };
 
   const filters = ["All", "Available", "Sponsored"];
 
