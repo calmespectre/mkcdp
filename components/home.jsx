@@ -10,7 +10,6 @@ import {
 const PHOTOS = [
   "/img18.jpg",
   "/img17.jpg",
-  "/img14.webp",
   "/img19.jpg",
 ];
 
