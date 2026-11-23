@@ -416,7 +416,7 @@ function StatsSection() {
       className="relative isolate overflow-x-clip bg-green-700"
       style={{ marginTop: "-1px" }}
     >
-      <WaveEdge position="top" />
+      {/* <WaveEdge position="top" /> */}
       <WaveEdge position="bottom" />
 
       <div
