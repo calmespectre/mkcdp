@@ -117,12 +117,18 @@ function Hero() {
             src={PHOTOS[currentSlide]}
             alt="Children and communities supported by the programme"
             className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:object-center"
-            initial={{ opacity: 0, scale: 1.06 }}
+            initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{
-              opacity: { duration: 1.5, ease: "easeInOut" },
-              scale: { duration: 7, ease: "linear" },
+              opacity: {
+                duration: 1.8,
+                ease: [0.22, 1, 0.36, 1],
+              },
+              scale: {
+                duration: 8,
+                ease: "linear",
+              },
             }}
           />
         </AnimatePresence>
